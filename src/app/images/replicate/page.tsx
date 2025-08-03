@@ -3,6 +3,8 @@
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useState } from 'react';
+import { createReplicateJob, getJobStatus } from '../../../lib/api';
+
 
 interface Job {
   id: string;
@@ -27,59 +29,51 @@ export default function ReplicatePage() {
   const src = currentImage?.status === 'done' && currentImage?.url ? currentImage.url : '';
 
   const handleGenerate = async () => {
-    if (!prompt.trim()) return;
-    
-    setLoading(true);
-    setSubmittedAspectRatio(selectedAspectRatio);
+  if (!prompt.trim()) return;
 
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt,   aspectRatio: selectedAspectRatio }),
-    });
+  setLoading(true);
+  setSubmittedAspectRatio(selectedAspectRatio);
 
-    const json = await res.json();
-    const jobId = json?.content?.jobId;
+  const jobId = await createReplicateJob(prompt, selectedAspectRatio);
 
-    const newJob: Job = {
-      id: jobId,
-      status: 'loading',
-      url: null,
-      aspectRatio: selectedAspectRatio
-    };
-
-    setImages((prev) => [newJob, ...prev]);
-
-    const poll = setInterval(async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`);
-      const json = await res.json();
-      const content = json?.content;
-      const status = content?.status?.toUpperCase();
-      debugger
-
-      if (status === 'COMPLETED' && content?.imageUrl) {
-        clearInterval(poll);
-
-        const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
-
-        setImages((prev) =>
-          prev.map((img) =>
-            img.id === jobId ? { ...img, status: 'done', url: imageUrl } : img
-          )
-        );
-        setSelectedImage(imageUrl);
-      }
-
-      if (status === 'FAILED') {
-        clearInterval(poll);
-        setImages((prev) =>
-          prev.map((img) => (img.id === jobId ? { ...img, status: 'done', url: null } : img))
-        );
-      }
-    }, 2000);
-
-    setLoading(false);
+  const newJob: Job = {
+    id: jobId,
+    status: 'loading',
+    url: null,
+    aspectRatio: selectedAspectRatio,
   };
+  setImages((prev) => [newJob, ...prev]);
+
+  const poll = setInterval(async () => {
+    const content = await getJobStatus(jobId);
+    if (!content) return;
+    const status = content.status?.toUpperCase();
+
+    if (status === 'COMPLETED' && content.imageUrl) {
+      clearInterval(poll);
+      const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
+
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === jobId ? { ...img, status: 'done', url: imageUrl } : img
+        )
+      );
+      setSelectedImage(imageUrl);
+    }
+
+    if (status === 'FAILED') {
+      clearInterval(poll);
+      setImages((prev) =>
+        prev.map((img) =>
+          img.id === jobId ? { ...img, status: 'done', url: null } : img
+        )
+      );
+    }
+  }, 2000);
+
+  setLoading(false);
+};
+
 
   return (
     <main className="flex h-[calc(100vh-5rem)] bg-gray-950 text-white">

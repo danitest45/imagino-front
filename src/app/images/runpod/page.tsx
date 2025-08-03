@@ -3,7 +3,7 @@
 import ImageCard from '../../../components/ImageCard';
 import { useState } from 'react';
 import ImageCardModal from '../../../components/ImageCardModal';
-
+import { useImageJobs } from '../../../hooks/useImageJobs';
 
 
 interface JobCreationResponse {
@@ -30,99 +30,17 @@ export default function Home() {
     const [jobId, setJobId] = useState('');
     const [loading, setLoading] = useState(false);
     const [resolution, setResolution] = useState({ width: 1024, height: 1024 });
+    const { jobs, submitPrompt } = useImageJobs();
 
     
 
 const handleSubmit = async () => {
   if (!prompt.trim()) return;
-
   setLoading(true);
-  setModalImage('');
-  setModalPrompt('');
-
-  // Gera 1 job no endpoint XL (que cria 4 imagens)
-const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comfy`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    prompt,
-    negativePrompt: 'low quality, blurry',
-    width: resolution.width,
-    height: resolution.height,
-    numInferenceSteps: 30,
-    refinerInferenceSteps: 50,
-    guidanceScale: 7.5,
-    scheduler: 'K_EULER'
-  }),
-});
-
-const data: JobCreationResponse = await response.json();
-const jobId = data.content.jobId;
-
-  // Inicializa os placeholders
-  const newJobs = Array.from({ length: 4 }).map((_, index) => ({
-    id: `${jobId}-img${index + 1}`,
-    status: 'loading' as const,
-    url: null,
-    resolution,
-  }));
-
-
-  setImages((prev) => [...newJobs, ...prev]);
-
-  // Faz o polling de cada imagem
-  newJobs.forEach((job, index) => {
-    const poll = setInterval(async () => {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`);
-    if (!res.ok) return;
-
-    const json = await res.json();
-    const content = json.content;
-
-    if (!content || !content.status) return;
-
-    const status = content.status.toUpperCase();
-    if (status === 'IN_QUEUE' || status === 'PROCESSING') return;
-
-    if (status === 'COMPLETED' && content.imageUrls?.length) {
-      clearInterval(poll);
-
-      const completedJobs = content.imageUrls.map((url: string, index: number) => ({
-        id: `${jobId}-img${index + 1}`,
-        status: 'done' as const,
-        url: `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-        resolution,
-      }));
-
-      setImages((prev) =>
-        prev.map((img) => {
-          const found = completedJobs.find((c: { id: string; }) => c.id === img.id);
-          return found ? found : img;
-        })
-      );
-    }
-
-    if (status === 'FAILED') {
-      clearInterval(poll);
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id.startsWith(jobId) ? { ...img, status: 'done', url: null } : img
-        )
-      );
-    }
-  } catch (e) {
-    console.error('Erro no polling geral:', e);
-  }
-}, 2000);
-
-  });
-
+  await submitPrompt(prompt, resolution);
   setModalPrompt(prompt);
   setLoading(false);
 };
-
-
 
     return (
   <main className="min-h-screen bg-gray-950 text-white w-full">
@@ -198,49 +116,31 @@ const jobId = data.content.jobId;
 
 
       {/* Resultado gerado (caso esteja pronto) */}
-      {images.length > 0 && (
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-        {images.map((img, index) => (
-          <div
-            key={img.id + index}
-            className={`relative w-full overflow-hidden rounded-xl border border-gray-700
-              ${img.resolution.width === img.resolution.height
-                ? 'aspect-square'
-                : img.resolution.width > img.resolution.height
-                ? 'aspect-[3/2]'
-                : 'aspect-[2/3]'}
-            `}
-          >
-            {img.status === 'loading' ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-              </div>
-            ) : (
-              img.url && (
+      {jobs.map((job) => (
+        <div key={job.id} className="grid grid-cols-2 gap-4 w-full">
+          {job.status === 'loading'
+            ? Array.from({ length: 4 }).map((_, i) => (
                 <ImageCard
-                  src={img.url}
+                  key={`${job.id}-${i}`}
+                  loading={true}
+                  onClick={() => {}}
+                />
+              ))
+            : job.urls?.map((url, i) => (
+                <ImageCard
+                  key={`${job.id}-${i}`}
+                  src={url}
+                  loading={false}
                   onClick={() => {
-                    setModalImage(img.url as string);
+                    setModalImage(url);
                     setModalPrompt(prompt);
                     setModalOpen(true);
                   }}
                 />
-              )
-            )}
-          </div>
-
-        ))}
-
-      </div>
-      )}
+              ))}
+        </div>
+      ))}
     </div>
-
-    <ImageCardModal
-      isOpen={modalOpen}
-      onClose={() => setModalOpen(false)}
-      src={modalImage}
-      prompt={modalPrompt}
-    />
   </main>
 );
 
