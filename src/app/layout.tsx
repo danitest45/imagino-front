@@ -1,7 +1,8 @@
-import './globals.css'; 
+import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Navbar from '../components/Navbar';
+import Providers from '../components/Providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="pt-br" className={inter.className}>
       <body className="bg-gray-950 text-white">
-        <Navbar />
-        <div className="pt-20">{children}</div>
+        <Providers>
+          <Navbar />
+          <div className="pt-20">{children}</div>
+        </Providers>
       </body>
     </html>
   );

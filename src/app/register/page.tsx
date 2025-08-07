@@ -4,23 +4,28 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { registerUser } from '../../lib/api';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const auth = useContext(AuthContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { token } = await registerUser(email, password);
-      localStorage.setItem('token', token);
-      router.push('/images/replicate');
-    } catch (err: unknown) {
-      setError('Erro ao registrar');
-    }
-  };
+  e.preventDefault();
+  if (!auth) return;
+  try {
+    const { token } = await registerUser(email, password);
+    auth.login(token);
+    router.push('/images/replicate');
+  } catch (err: unknown) {
+    setError('Erro ao entrar');
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">

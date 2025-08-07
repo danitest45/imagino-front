@@ -4,23 +4,28 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '../../lib/api';
+import { useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
+  const auth = useContext(AuthContext);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const { token } = await loginUser(email, password);
-      localStorage.setItem('token', token);
-      router.push('/images/replicate'); // direcione para a área principal após login
-    } catch (err: unknown) {
-      setError('Erro ao entrar');
-    }
-  };
+  e.preventDefault();
+  if (!auth) return;
+  try {
+    const { token } = await loginUser(email, password);
+    auth.login(token);
+    router.push('/images/replicate');
+  } catch (err: unknown) {
+    setError('Erro ao entrar');
+  }
+};
 
   // Redireciona usuário para a tela de consentimento do Google
   const handleGoogleLogin = () => {
