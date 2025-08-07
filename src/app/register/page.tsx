@@ -1,0 +1,68 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { registerUser } from '../../lib/api';
+
+export default function RegisterPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const { token } = await registerUser(email, password);
+      localStorage.setItem('token', token);
+      router.push('/images/replicate');
+    } catch (err: unknown) {
+      setError('Erro ao registrar');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-lg w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center text-white mb-6">
+          Registrar-se
+        </h1>
+
+        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="Senha"
+            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+            required
+          />
+          <button
+            type="submit"
+            className="w-full py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-semibold"
+          >
+            Registrar
+          </button>
+        </form>
+
+        <p className="mt-4 text-center text-gray-400">
+          Já tem conta?{' '}
+          <Link href="/login" className="text-purple-500 hover:underline">
+            Entrar
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}

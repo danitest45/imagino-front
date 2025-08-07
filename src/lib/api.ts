@@ -23,3 +23,24 @@ export async function getJobStatus(jobId: string) {
   if (!res.ok) return null;
   return (await res.json()).content;
 }
+
+export async function registerUser(email: string, password: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (!res.ok) throw new Error((await res.json()).message ?? 'Erro ao registrar');
+  return (await res.json()) as { token: string };
+}
+
+export async function loginUser(email: string, password: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
+  });
+  if (!res.ok) throw new Error('Credenciais inválidas');
+  return (await res.json()) as { token: string };
+}
+

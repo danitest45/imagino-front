@@ -1,5 +1,6 @@
 import Sidebar from './Sidebar';
 
+
 export default function ImagesLayout({
   children,
 }: {
