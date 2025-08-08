@@ -5,182 +5,153 @@ import ImageCardModal from '../../../components/ImageCardModal';
 import { useState } from 'react';
 import { createReplicateJob, getJobStatus } from '../../../lib/api';
 
-
 interface Job {
   id: string;
   status: 'loading' | 'done';
   url: string | null;
-  resolution?: { width: number; height: number };
   aspectRatio: string;
-
 }
 
 export default function ReplicatePage() {
   const [prompt, setPrompt] = useState('');
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState("1:1");
-  const [submittedAspectRatio, setSubmittedAspectRatio] = useState("1:1");  const [images, setImages] = useState<Job[]>([]);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
+  const [images, setImages] = useState<Job[]>([]);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPrompt, setModalPrompt] = useState('');
   const [modalImage, setModalImage] = useState('');
-  const currentImage = images[0];
-  const isLoading = currentImage?.status === 'loading';
-  const src = currentImage?.status === 'done' && currentImage?.url ? currentImage.url : '';
 
-  const handleGenerate = async () => {
-  if (!prompt.trim()) return;
+  async function handleGenerate() {
+    if (!prompt.trim()) return;
 
-  setLoading(true);
-  setSubmittedAspectRatio(selectedAspectRatio);
+    setLoading(true);
+    // limpa a imagem central enquanto a geração ocorre
+    setSelectedImageUrl(null);
 
-  const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    const newJob: Job = {
+      id: jobId,
+      status: 'loading',
+      url: null,
+      aspectRatio: selectedAspectRatio
+    };
+    // insere o novo job no início da lista (fila)
+    setImages(prev => [newJob, ...prev]);
 
-  const newJob: Job = {
-    id: jobId,
-    status: 'loading',
-    url: null,
-    aspectRatio: selectedAspectRatio,
-  };
-  setImages((prev) => [newJob, ...prev]);
+    const poll = setInterval(async () => {
+      const content = await getJobStatus(jobId);
+      if (!content) return;
+      const status = content.status?.toUpperCase();
 
-  const poll = setInterval(async () => {
-    const content = await getJobStatus(jobId);
-    if (!content) return;
-    const status = content.status?.toUpperCase();
+      if (status === 'COMPLETED' && content.imageUrl) {
+        clearInterval(poll);
+        const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
+        // atualiza o job com a URL de imagem
+        setImages(prev =>
+          prev.map(img => (img.id === jobId ? { ...img, status: 'done', url: imageUrl } : img))
+        );
+        // exibe a nova imagem no centro
+        setSelectedImageUrl(imageUrl);
+      }
 
-    if (status === 'COMPLETED' && content.imageUrl) {
-      clearInterval(poll);
-      const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
+      if (status === 'FAILED') {
+        clearInterval(poll);
+        setImages(prev =>
+          prev.map(img => (img.id === jobId ? { ...img, status: 'done', url: null } : img))
+        );
+      }
+    }, 2000);
 
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === jobId ? { ...img, status: 'done', url: imageUrl } : img
-        )
-      );
-      setSelectedImage(imageUrl);
-    }
+    setLoading(false);
+  }
 
-    if (status === 'FAILED') {
-      clearInterval(poll);
-      setImages((prev) =>
-        prev.map((img) =>
-          img.id === jobId ? { ...img, status: 'done', url: null } : img
-        )
-      );
-    }
-  }, 2000);
-
-  setLoading(false);
-};
-
+  // escolhe a imagem a ser exibida no centro
+  const centerImageUrl = selectedImageUrl;
 
   return (
-    <main className="flex h-[calc(100vh-5rem)] bg-gray-950 text-white">
-      {/* Lado esquerdo – Prompt */}
-      <aside className="w-1/3 p-6 border-r border-gray-800 flex flex-col space-y-6">
+    <div className="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8">
+      {/* Painel esquerdo: prompt e controles */}
+      <div className="w-full lg:w-1/3 space-y-4">
         <div>
-          <h2 className="text-lg font-semibold mb-2">Prompt</h2>
+          <label className="block text-white mb-2">Prompt</label>
           <textarea
             value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
+            onChange={e => setPrompt(e.target.value)}
             placeholder="Descreva a imagem..."
             className="w-full h-28 p-3 rounded-md bg-gray-800 text-white resize-none"
           />
         </div>
-
-        <div>
-          <label className="block mb-1">Proporção</label>
-            <div className="flex gap-2">
+        <div className="flex space-x-2">
+          {['1:1', '9:16', '16:9'].map(ratio => (
             <button
-              onClick={() => setSelectedAspectRatio("1:1")}
+              key={ratio}
+              onClick={() => setSelectedAspectRatio(ratio)}
               className={`px-4 py-2 rounded-md ${
-                selectedAspectRatio === "1:1" ? 'bg-purple-600' : 'bg-gray-800'
+                selectedAspectRatio === ratio ? 'bg-purple-600' : 'bg-gray-800'
               }`}
             >
-              1:1
+              {ratio}
             </button>
-            <button
-              onClick={() => setSelectedAspectRatio("9:16")}
-              className={`px-4 py-2 rounded-md ${
-                selectedAspectRatio === "9:16" ? 'bg-purple-600' : 'bg-gray-800'
-              }`}
-            >
-              9:16
-            </button>
-            <button
-              onClick={() => setSelectedAspectRatio("16:9")}
-              className={`px-4 py-2 rounded-md ${
-                selectedAspectRatio === "16:9" ? 'bg-purple-600' : 'bg-gray-800'
-              }`}
-            >
-              16:9
-            </button>
-          </div>
+          ))}
         </div>
-
         <button
           onClick={handleGenerate}
-          className="bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg"
+          disabled={loading}
+          className="w-full py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-semibold"
         >
           {loading ? 'Gerando...' : 'Gerar Imagem'}
         </button>
-      </aside>
+      </div>
 
-      {/* Imagem ao centro */}
-      <section className="flex-1 p-6 flex justify-center items-start">
-        <div
-          className={`
-            relative 
-            ${submittedAspectRatio === '1:1' ? 'w-[512px] h-[512px]' : ''}
-            ${submittedAspectRatio === '9:16' ? 'w-[384px] h-[640px]' : ''}
-            ${submittedAspectRatio === '16:9' ? 'w-[640px] h-[360px]' : ''}
-          `}
-        >
+      {/* Painel central: imagem selecionada ou estado de geração */}
+      <div className="w-full lg:w-2/3 flex items-center justify-center">
+        {centerImageUrl ? (
           <ImageCard
-            src={src}
-            loading={isLoading}
+            src={centerImageUrl}
+            loading={false}
             onClick={() => {
-              if (currentImage?.url) {
-                setModalImage(currentImage.url);
-                setModalPrompt(prompt);
-                setModalOpen(true);
-              }
+              setModalImage(centerImageUrl);
+              setModalPrompt(prompt);
+              setModalOpen(true);
             }}
           />
-        </div>
-      </section>
+        ) : loading ? (
+          <ImageCard loading={true} onClick={() => {}} />
+        ) : (
+          <div className="text-gray-500 italic">
+            Clique em &quot;Gerar Imagem&quot; para começar.
+          </div>
+        )}
+      </div>
 
-
-
-      {/* Histórico à direita */}
-      <aside className="w-[180px] p-4 border-l border-gray-800 overflow-y-auto bg-gray-900">
-        <h3 className="text-white text-lg font-medium mb-3">Histórico</h3>
-        <div className="flex flex-col gap-3">
+      {/* Painel direito: histórico em fila */}
+      <div className="w-full lg:w-1/6">
+        <h3 className="text-white mb-2">Histórico</h3>
+        <div className="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-4 overflow-x-auto">
           {images
-            .filter((img) => img.status === 'done' && img.url)
-            .map((img, i) => (
+            .filter(img => img.status === 'done' && img.url)
+            .map(job => (
               <img
-                key={i}
-                src={img.url!}
-                alt={`Histórico ${i}`}
-                onClick={() => setSelectedImage(img.url!)}
+                key={job.id}
+                src={job.url!}
+                onClick={() => setSelectedImageUrl(job.url!)}
                 className={`cursor-pointer rounded-md border-2 w-[80px] h-[80px] object-cover ${
-                  selectedImage === img.url ? 'border-purple-500' : 'border-transparent'
+                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                 } hover:border-purple-400 transition`}
+                alt=""
               />
-
             ))}
         </div>
-      </aside>
+      </div>
 
-      {/* Modal */}
+      {/* Modal para ampliar imagem */}
       <ImageCardModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         src={modalImage}
         prompt={modalPrompt}
       />
-    </main>
+    </div>
   );
 }
