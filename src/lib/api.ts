@@ -1,3 +1,7 @@
+import { ImageJob } from "../hooks/useImageJobs";
+import type { ImageJobApi, UiJob } from '../types/image-job';
+
+
 export async function createRunpodJob(prompt: string, options: {width: number; height: number;}) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/comfy`, {
     method: 'POST',
@@ -44,3 +48,20 @@ export async function loginUser(email: string, password: string) {
   return (await res.json()) as { token: string };
 }
 
+export async function getUserHistory(token: string): Promise<ImageJobApi[]> {
+  debugger
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/history`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erro ao carregar histórico');
+  return (await res.json()) as ImageJobApi[];
+}
+
+export function mapApiToUiJob(j: ImageJobApi): UiJob {
+  return {
+    id: j.jobId || j.id,
+    status: j.status === 'done' ? 'done' : 'loading',
+    url: j.imageUrl,
+    aspectRatio: j.aspectRatio ?? '1:1',
+  };
+}

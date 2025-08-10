@@ -2,66 +2,108 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createReplicateJob, getJobStatus } from '../../../lib/api';
+import type { UiJob } from '../../../types/image-job';
+import { useAuth } from '../../../context/AuthContext';
+import { useImageHistory } from '../../../hooks/useImageHistory';
+import { mapApiToUiJob } from '../../../lib/api';
+import type { ImageJobApi } from '../../../types/image-job';
 
-interface Job {
-  id: string;
-  status: 'loading' | 'done';
-  url: string | null;
-  aspectRatio: string;
-}
+
+
 
 export default function ReplicatePage() {
   const [prompt, setPrompt] = useState('');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
-  const [images, setImages] = useState<Job[]>([]);
+  const [images, setImages] = useState<UiJob[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalPrompt, setModalPrompt] = useState('');
   const [modalImage, setModalImage] = useState('');
+  const { token } = useAuth();
+  const { history, setHistory, loading: historyLoading } = useImageHistory();
+
+
+  
+
+  useEffect(() => {
+    if (!history) return;
+
+    // converte jobs da API para o formato que sua UI já usa
+    const ui = history
+      .filter((h: ImageJobApi) => !!h.imageUrl)
+      .map(mapApiToUiJob);
+
+    setImages(ui);
+
+    // mantém a mais recente selecionada no centro
+    if (ui.length > 0) {
+      setSelectedImageUrl(ui[0].url ?? null);
+    } else {
+      setSelectedImageUrl(null);
+    }
+  }, [history]);
+
+
 
   async function handleGenerate() {
     if (!prompt.trim()) return;
 
     setLoading(true);
-    // limpa a imagem central enquanto a geração ocorre
     setSelectedImageUrl(null);
 
     const jobId = await createReplicateJob(prompt, selectedAspectRatio);
-    const newJob: Job = {
+    
+    const newJob: UiJob = {
       id: jobId,
       status: 'loading',
       url: null,
       aspectRatio: selectedAspectRatio
     };
-    // insere o novo job no início da lista (fila)
-    setImages(prev => [newJob, ...prev]);
+    
+    setImages((prev: UiJob[]) => [newJob, ...prev]);
 
     const poll = setInterval(async () => {
-      const content = await getJobStatus(jobId);
-      if (!content) return;
-      const status = content.status?.toUpperCase();
+    const content = await getJobStatus(jobId /*, token se necessário*/);
+    if (!content) return;
+    const status = content.status?.toUpperCase();
 
-      if (status === 'COMPLETED' && content.imageUrl) {
-        clearInterval(poll);
-        const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
-        // atualiza o job com a URL de imagem
-        setImages(prev =>
-          prev.map(img => (img.id === jobId ? { ...img, status: 'done', url: imageUrl } : img))
-        );
-        // exibe a nova imagem no centro
-        setSelectedImageUrl(imageUrl);
-      }
+    if (status === 'COMPLETED' && content.imageUrl) {
+      clearInterval(poll);
+      const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
 
-      if (status === 'FAILED') {
-        clearInterval(poll);
-        setImages(prev =>
-          prev.map(img => (img.id === jobId ? { ...img, status: 'done', url: null } : img))
-        );
-      }
-    }, 2000);
+      setImages((prev: UiJob[]) =>
+        prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
+      );
+      setSelectedImageUrl(fullUrl);
+
+      // (opcional) mantenha o cache do hook sincronizado:
+      setHistory((prev: ImageJobApi[]) => [
+        {
+          id: jobId,
+          jobId,
+          prompt,
+          userId: 'me',
+          status: 'done',
+          imageUrl: fullUrl,
+          aspectRatio: selectedAspectRatio,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+
+      setLoading(false);
+    }
+
+    if (status === 'FAILED') {
+      clearInterval(poll);
+      setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
+      setLoading(false);
+    }
+  }, 2000);
 
     setLoading(false);
   }

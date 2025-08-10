@@ -1,5 +1,5 @@
 // hooks/useImageJobs.ts
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { createRunpodJob, getJobStatus } from '../lib/api';
 
 export interface ImageJob {

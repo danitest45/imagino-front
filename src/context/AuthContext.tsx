@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode, useContext  } from 'react';
 
 interface AuthContextType {
   token: string | null;
@@ -10,6 +10,8 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
+
+
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
@@ -41,4 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error('useAuth deve ser usado dentro de <AuthProvider>');
+  }
+  return ctx;
 }
