@@ -51,7 +51,12 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Mail
+              data-testid="email-icon"
+              aria-hidden="true"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type="email"
               value={email}
@@ -62,7 +67,12 @@ export default function LoginPage() {
             />
           </div>
           <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+            <Lock
+              data-testid="password-icon"
+              aria-hidden="true"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={20}
+            />
             <input
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -73,6 +83,8 @@ export default function LoginPage() {
             />
             <button
               type="button"
+              aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
+              aria-pressed={showPassword}
               onClick={() => setShowPassword(s => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
             >
