@@ -20,7 +20,7 @@ export default function Support() {
       onSubmit={handleSubmit}
       className={`${
         visible ? 'opacity-100' : 'opacity-0'
-      } transition-opacity duration-300 bg-gray-800 rounded-lg p-6 shadow-md space-y-4`}
+      } transition-opacity duration-300 space-y-4`}
     >
       <div>
         <label className="block text-sm mb-1" htmlFor="message">
@@ -34,12 +34,12 @@ export default function Support() {
             setSent(false);
           }}
           placeholder="Descreva seu problema ou feedback"
-          className="w-full bg-gray-700 rounded px-3 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
+          className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 h-32 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
         />
       </div>
       <button
         type="submit"
-        className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded transition-colors"
+        className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
       >
         Enviar
       </button>

@@ -10,7 +10,7 @@ export default function Billing() {
     <div
       className={`${
         visible ? 'opacity-100' : 'opacity-0'
-      } transition-opacity duration-300 bg-gray-800 rounded-lg p-6 shadow-md space-y-6`}
+      } transition-opacity duration-300 space-y-6`}
     >
       <section>
         <h2 className="text-xl font-semibold mb-2">Plano Atual</h2>
@@ -22,7 +22,7 @@ export default function Billing() {
 
       <section>
         <h3 className="text-lg font-semibold mb-2">Histórico de Pagamentos</h3>
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm bg-gray-900/40 rounded-lg overflow-hidden">
           <thead>
             <tr className="text-gray-400">
               <th className="py-2">Data</th>
