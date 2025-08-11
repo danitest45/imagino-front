@@ -1,4 +1,3 @@
-import { ImageJob } from "../hooks/useImageJobs";
 import type { ImageJobApi, UiJob } from '../types/image-job';
 
 
@@ -12,18 +11,23 @@ export async function createRunpodJob(prompt: string, options: {width: number; h
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string) {
+export async function createReplicateJob(prompt: string, aspectRatio: string, token: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, aspectRatio })
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ prompt, aspectRatio }),
   });
   const json = await res.json();
   return json.content.jobId as string;
 }
 
-export async function getJobStatus(jobId: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`);
+export async function getJobStatus(jobId: string, token: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   if (!res.ok) return null;
   return (await res.json()).content;
 }
@@ -49,7 +53,6 @@ export async function loginUser(email: string, password: string) {
 }
 
 export async function getUserHistory(token: string): Promise<ImageJobApi[]> {
-  debugger
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/history`, {
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -58,10 +61,18 @@ export async function getUserHistory(token: string): Promise<ImageJobApi[]> {
 }
 
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
+  const rawUrl = j.imageUrl ?? j.imageUrls?.[0] ?? null;     // <<<<<< pega singular OU primeira do array
   return {
     id: j.jobId || j.id,
-    status: j.status === 'done' ? 'done' : 'loading',
-    url: j.imageUrl,
+    status: j.status?.toUpperCase() === 'COMPLETED' ? 'done' : 'loading',
+    url: normalizeUrl(rawUrl),                               // <<<<<< normaliza
     aspectRatio: j.aspectRatio ?? '1:1',
   };
+}
+
+export function normalizeUrl(pathOrUrl?: string | null): string | null {
+  if (!pathOrUrl) return null;
+  if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) return pathOrUrl;
+  const base = process.env.NEXT_PUBLIC_API_URL ?? '';
+  return `${base}${pathOrUrl}`;
 }

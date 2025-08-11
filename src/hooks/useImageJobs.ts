@@ -1,6 +1,8 @@
 // hooks/useImageJobs.ts
 import { useState, useEffect } from 'react';
 import { createRunpodJob, getJobStatus } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+
 
 export interface ImageJob {
   id: string;
@@ -10,6 +12,7 @@ export interface ImageJob {
 }
 
 export function useImageJobs() {
+  const { token } = useAuth();
   const [jobs, setJobs] = useState<ImageJob[]>(() => {
     if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem('image-jobs');
@@ -23,12 +26,12 @@ export function useImageJobs() {
 
   // Iniciar polling de jobs pendentes
   useEffect(() => {
+    if (!token) return;
     const intervals: NodeJS.Timeout[] = [];
-
     jobs.forEach(job => {
       if (job.status === 'loading') {
         const interval = setInterval(async () => {
-          const status = await getJobStatus(job.id);
+          const status = await getJobStatus(job.id, token);
           if (!status) return;
           const jobStatus = status.status?.toUpperCase();
           if (jobStatus === 'COMPLETED' && status.imageUrls) {

@@ -6,6 +6,7 @@ export interface ImageJobApi {
   userId: string;
   status: 'loading' | 'processing' | 'done' | 'failed';
   imageUrl: string | null;
+  imageUrls?: string[];          // <- é o que o back está mandando
   aspectRatio?: string | null;
   createdAt: string; // ISO
   updatedAt: string; // ISO

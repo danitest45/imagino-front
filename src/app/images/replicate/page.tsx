@@ -9,6 +9,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import type { ImageJobApi } from '../../../types/image-job';
+import { normalizeUrl } from '../../../lib/api'; 
+
 
 
 
@@ -30,11 +32,10 @@ export default function ReplicatePage() {
 
   useEffect(() => {
     if (!history) return;
-
     // converte jobs da API para o formato que sua UI já usa
     const ui = history
-      .filter((h: ImageJobApi) => !!h.imageUrl)
-      .map(mapApiToUiJob);
+      .map(mapApiToUiJob)     // pega imageUrl OU imageUrls[0] e normaliza
+      .filter(j => !!j.url);  
 
     setImages(ui);
 
@@ -50,12 +51,15 @@ export default function ReplicatePage() {
 
   async function handleGenerate() {
     if (!prompt.trim()) return;
+    if (!token) {
+      console.warn('Usuário não autenticado');
+      return;
+    }
 
     setLoading(true);
     setSelectedImageUrl(null);
 
-    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
-    
+  const jobId = await createReplicateJob(prompt, selectedAspectRatio, token);    
     const newJob: UiJob = {
       id: jobId,
       status: 'loading',
@@ -66,20 +70,22 @@ export default function ReplicatePage() {
     setImages((prev: UiJob[]) => [newJob, ...prev]);
 
     const poll = setInterval(async () => {
-    const content = await getJobStatus(jobId /*, token se necessário*/);
+    const content = await getJobStatus(jobId, token);
     if (!content) return;
     const status = content.status?.toUpperCase();
 
-    if (status === 'COMPLETED' && content.imageUrl) {
+    const rawUrl = content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
+
+    if (status === 'COMPLETED') {
       clearInterval(poll);
-      const fullUrl = `${process.env.NEXT_PUBLIC_API_URL}${content.imageUrl}`;
+
+      const fullUrl = normalizeUrl(rawUrl);
 
       setImages((prev: UiJob[]) =>
         prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
       );
       setSelectedImageUrl(fullUrl);
 
-      // (opcional) mantenha o cache do hook sincronizado:
       setHistory((prev: ImageJobApi[]) => [
         {
           id: jobId,
@@ -87,7 +93,8 @@ export default function ReplicatePage() {
           prompt,
           userId: 'me',
           status: 'done',
-          imageUrl: fullUrl,
+          imageUrl: rawUrl,          // mantém como veio (sem normalizar) — o map normaliza
+          imageUrls: content.imageUrls ?? (rawUrl ? [rawUrl] : []),
           aspectRatio: selectedAspectRatio,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
@@ -104,8 +111,6 @@ export default function ReplicatePage() {
       setLoading(false);
     }
   }, 2000);
-
-    setLoading(false);
   }
 
   // escolhe a imagem a ser exibida no centro
@@ -139,7 +144,7 @@ export default function ReplicatePage() {
         </div>
         <button
           onClick={handleGenerate}
-          disabled={loading}
+          disabled={loading || !token}   // <<<<<< desabilita se não logado
           className="w-full py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-semibold"
         >
           {loading ? 'Gerando...' : 'Gerar Imagem'}
