@@ -126,10 +126,10 @@ export default function ReplicatePage() {
         <p className="text-gray-400">Gere imagens com modelos hospedados no Replicate.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 items-stretch">
         {/* Painel esquerdo: prompt e controles */}
-        <div className="w-full lg:w-1/3">
-          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 space-y-4">
+        <div className="w-full lg:w-2/5 flex">
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 space-y-4 flex-1">
             <div>
               <label className="block mb-2 text-sm text-gray-300">Prompt</label>
               <textarea
@@ -192,7 +192,7 @@ export default function ReplicatePage() {
         {images.filter(img => img.status === 'done' && img.url).length > 0 && (
           <div className="w-full lg:w-1/6">
             <h3 className="text-white mb-2">Histórico</h3>
-            <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
+            <div className="flex flex-wrap lg:flex-col gap-2">
               {images
                 .filter(img => img.status === 'done' && img.url)
                 .map(job => (
@@ -200,7 +200,7 @@ export default function ReplicatePage() {
                     key={job.id}
                     src={job.url!}
                     onClick={() => setSelectedImageUrl(job.url!)}
-                    className={`cursor-pointer rounded-md border-2 object-cover w-full h-24 ${
+                    className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 ${
                       selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                     } hover:border-purple-400 transition`}
                     alt=""
