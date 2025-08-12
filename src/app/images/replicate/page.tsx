@@ -129,7 +129,7 @@ export default function ReplicatePage() {
           placeholder="Descreva a imagem..."
           className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
-        <div className="mt-4 flex-1 flex flex-col gap-4">
+        <div className="mt-4 flex flex-col gap-4">
           <div className="flex gap-2">
             {['1:1', '9:16', '16:9'].map(ratio => (
               <button
@@ -167,7 +167,7 @@ export default function ReplicatePage() {
           <button
             onClick={handleGenerate}
             disabled={loading || !token}
-            className="mt-auto px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
+            className="mt-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
           >
             {loading ? 'Gerando...' : 'Gerar'}
           </button>
