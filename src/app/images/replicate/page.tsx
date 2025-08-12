@@ -18,6 +18,7 @@ import { normalizeUrl } from '../../../lib/api';
 export default function ReplicatePage() {
   const [prompt, setPrompt] = useState('');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
+  const [quality, setQuality] = useState(3);
   const [images, setImages] = useState<UiJob[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -120,40 +121,56 @@ export default function ReplicatePage() {
   return (
     <div className="h-screen w-full flex flex-col lg:flex-row">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-1/3 p-4 flex flex-col">
+      <div className="w-full lg:w-1/3 p-4 flex flex-col h-full">
         <label className="mb-2 text-sm text-gray-300">Prompt</label>
-        <div className="flex-1 flex flex-col">
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Descreva a imagem..."
-            className="flex-1 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-            <div className="flex gap-2">
-              {['1:1', '9:16', '16:9'].map(ratio => (
-                <button
-                  key={ratio}
-                  onClick={() => setSelectedAspectRatio(ratio)}
-                  className={`px-4 py-2 rounded-lg text-sm ${
-                    selectedAspectRatio === ratio
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-800 text-gray-300'
-                  } hover:bg-purple-500 transition`}
-                >
-                  {ratio}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={handleGenerate}
-              disabled={loading || !token}
-              className="px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
-            >
-              {loading ? 'Gerando...' : 'Gerar'}
-            </button>
+        <textarea
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Descreva a imagem..."
+          className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <div className="mt-4 flex-1 flex flex-col gap-4">
+          <div className="flex gap-2">
+            {['1:1', '9:16', '16:9'].map(ratio => (
+              <button
+                key={ratio}
+                onClick={() => setSelectedAspectRatio(ratio)}
+                className={`px-4 py-2 rounded-lg text-sm ${
+                  selectedAspectRatio === ratio
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-800 text-gray-300'
+                } hover:bg-purple-500 transition`}
+              >
+                {ratio}
+              </button>
+            ))}
           </div>
+
+          <div>
+            <label className="text-sm text-gray-300 mb-1 block">
+              Velocidade x Qualidade ({quality})
+            </label>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              value={quality}
+              onChange={e => setQuality(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>Rápido</span>
+              <span>Qualidade</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !token}
+            className="mt-auto px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Gerando...' : 'Gerar'}
+          </button>
         </div>
       </div>
 
