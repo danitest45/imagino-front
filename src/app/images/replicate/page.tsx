@@ -18,6 +18,7 @@ import { normalizeUrl } from '../../../lib/api';
 export default function ReplicatePage() {
   const [prompt, setPrompt] = useState('');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
+  const [quality, setQuality] = useState(3);
   const [images, setImages] = useState<UiJob[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -59,100 +60,122 @@ export default function ReplicatePage() {
     setLoading(true);
     setSelectedImageUrl(null);
 
-  const jobId = await createReplicateJob(prompt, selectedAspectRatio, token);    
+    const jobId = await createReplicateJob(prompt, selectedAspectRatio, token);
     const newJob: UiJob = {
       id: jobId,
       status: 'loading',
       url: null,
-      aspectRatio: selectedAspectRatio
+      aspectRatio: selectedAspectRatio,
     };
-    
+
     setImages((prev: UiJob[]) => [newJob, ...prev]);
 
     const poll = setInterval(async () => {
-    const content = await getJobStatus(jobId, token);
-    if (!content) return;
-    const status = content.status?.toUpperCase();
+      const content = await getJobStatus(jobId, token);
+      if (!content) return;
+      const status = content.status?.toUpperCase();
 
-    const rawUrl = content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
+      const rawUrl =
+        content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
 
-    if (status === 'COMPLETED') {
-      clearInterval(poll);
+      if (status === 'COMPLETED') {
+        clearInterval(poll);
 
-      const fullUrl = normalizeUrl(rawUrl);
+        const fullUrl = normalizeUrl(rawUrl);
 
-      setImages((prev: UiJob[]) =>
-        prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
-      );
-      setSelectedImageUrl(fullUrl);
+        setImages((prev: UiJob[]) =>
+          prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
+        );
+        setSelectedImageUrl(fullUrl);
 
-      setHistory((prev: ImageJobApi[]) => [
-        {
-          id: jobId,
-          jobId,
-          prompt,
-          userId: 'me',
-          status: 'done',
-          imageUrl: rawUrl,          // mantém como veio (sem normalizar) — o map normaliza
-          imageUrls: content.imageUrls ?? (rawUrl ? [rawUrl] : []),
-          aspectRatio: selectedAspectRatio,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        },
-        ...prev,
-      ]);
+        setHistory((prev: ImageJobApi[]) => [
+          {
+            id: jobId,
+            jobId,
+            prompt,
+            userId: 'me',
+            status: 'done',
+            imageUrl: rawUrl, // mantém como veio (sem normalizar) — o map normaliza
+            imageUrls: content.imageUrls ?? (rawUrl ? [rawUrl] : []),
+            aspectRatio: selectedAspectRatio,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+          ...prev,
+        ]);
 
-      setLoading(false);
-    }
+        setLoading(false);
+      }
 
-    if (status === 'FAILED') {
-      clearInterval(poll);
-      setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
-      setLoading(false);
-    }
-  }, 2000);
+      if (status === 'FAILED') {
+        clearInterval(poll);
+        setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
+        setLoading(false);
+      }
+    }, 2000);
   }
 
   // escolhe a imagem a ser exibida no centro
   const centerImageUrl = selectedImageUrl;
 
   return (
-    <div className="flex flex-col lg:flex-row space-y-8 lg:space-y-0 lg:space-x-8">
+    <div className="h-screen w-full flex flex-col lg:flex-row">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-1/3 space-y-4">
-        <div>
-          <label className="block text-white mb-2">Prompt</label>
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Descreva a imagem..."
-            className="w-full h-28 p-3 rounded-md bg-gray-800 text-white resize-none"
-          />
+      <div className="w-full lg:w-1/3 p-4 flex flex-col h-full">
+        <label className="mb-2 text-sm text-gray-300">Prompt</label>
+        <textarea
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Descreva a imagem..."
+          className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+        />
+        <div className="mt-4 flex flex-col gap-4">
+          <div className="flex gap-2">
+            {['1:1', '9:16', '16:9'].map(ratio => (
+              <button
+                key={ratio}
+                onClick={() => setSelectedAspectRatio(ratio)}
+                className={`px-4 py-2 rounded-lg text-sm ${
+                  selectedAspectRatio === ratio
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-gray-800 text-gray-300'
+                } hover:bg-purple-500 transition`}
+              >
+                {ratio}
+              </button>
+            ))}
+          </div>
+
+          <div>
+            <label className="text-sm text-gray-300 mb-1 block">
+              Velocidade x Qualidade ({quality})
+            </label>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              value={quality}
+              onChange={e => setQuality(Number(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex justify-between text-xs text-gray-400">
+              <span>Rápido</span>
+              <span>Qualidade</span>
+            </div>
+          </div>
+
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !token}
+            className="mt-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
+          >
+            {loading ? 'Gerando...' : 'Gerar'}
+          </button>
         </div>
-        <div className="flex space-x-2">
-          {['1:1', '9:16', '16:9'].map(ratio => (
-            <button
-              key={ratio}
-              onClick={() => setSelectedAspectRatio(ratio)}
-              className={`px-4 py-2 rounded-md ${
-                selectedAspectRatio === ratio ? 'bg-purple-600' : 'bg-gray-800'
-              }`}
-            >
-              {ratio}
-            </button>
-          ))}
-        </div>
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !token}   // <<<<<< desabilita se não logado
-          className="w-full py-2 rounded-md bg-purple-600 hover:bg-purple-700 text-white font-semibold"
-        >
-          {loading ? 'Gerando...' : 'Gerar Imagem'}
-        </button>
       </div>
 
       {/* Painel central: imagem selecionada ou estado de geração */}
-      <div className="w-full lg:w-2/3 flex items-center justify-center">
+      <div className="flex-1 p-4 flex items-center justify-center">
         {centerImageUrl ? (
           <ImageCard
             src={centerImageUrl}
@@ -166,31 +189,33 @@ export default function ReplicatePage() {
         ) : loading ? (
           <ImageCard loading={true} onClick={() => {}} />
         ) : (
-          <div className="text-gray-500 italic">
-            Clique em &quot;Gerar Imagem&quot; para começar.
+          <div className="text-gray-500 italic text-center">
+            Digite um prompt e clique em &quot;Gerar&quot; para começar.
           </div>
         )}
       </div>
 
-      {/* Painel direito: histórico em fila */}
-      <div className="w-full lg:w-1/6">
-        <h3 className="text-white mb-2">Histórico</h3>
-        <div className="flex lg:flex-col space-x-4 lg:space-x-0 lg:space-y-4 overflow-x-auto">
-          {images
-            .filter(img => img.status === 'done' && img.url)
-            .map(job => (
-              <img
-                key={job.id}
-                src={job.url!}
-                onClick={() => setSelectedImageUrl(job.url!)}
-                className={`cursor-pointer rounded-md border-2 w-[80px] h-[80px] object-cover ${
-                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                } hover:border-purple-400 transition`}
-                alt=""
-              />
-            ))}
+      {/* Painel direito: histórico */}
+      {images.filter(img => img.status === 'done' && img.url).length > 0 && (
+        <div className="w-full lg:w-1/5 p-4">
+          <h3 className="text-white mb-2">Histórico</h3>
+          <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2 overflow-y-auto">
+            {images
+              .filter(img => img.status === 'done' && img.url)
+              .map(job => (
+                <img
+                  key={job.id}
+                  src={job.url!}
+                  onClick={() => setSelectedImageUrl(job.url!)}
+                  className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 ${
+                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                  } hover:border-purple-400 transition`}
+                  alt=""
+                />
+              ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Modal para ampliar imagem */}
       <ImageCardModal

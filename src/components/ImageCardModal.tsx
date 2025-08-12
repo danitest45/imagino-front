@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React from 'react';
 
 type Props = {
   isOpen: boolean;
@@ -10,38 +10,23 @@ type Props = {
 };
 
 export default function ImageCardModal({ isOpen, onClose, src, prompt }: Props) {
-  const modalRef = useRef<HTMLDivElement>(null); // ✅ Agora está no lugar certo
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center px-4">
-      <div
-        ref={modalRef}
-        className="bg-gray-900 rounded-xl p-6 w-full max-w-3xl shadow-2xl relative"
-      >
+    <div className="fixed inset-0 z-50 bg-black flex flex-col" onClick={onClose}>
+      <div className="flex-1 flex items-center justify-center overflow-auto">
         <img
           src={src}
           alt="Imagem completa"
-          className="w-full h-auto rounded-md mb-4"
+          className="max-w-full max-h-full object-contain"
+          onClick={e => e.stopPropagation()}
         />
-        <p className="text-gray-300 text-sm whitespace-pre-line break-words">{prompt}</p>
+      </div>
+      <div
+        className="p-4 text-gray-300 text-sm border-t border-gray-700 overflow-auto"
+        onClick={e => e.stopPropagation()}
+      >
+        {prompt}
       </div>
     </div>
   );
