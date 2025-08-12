@@ -126,86 +126,90 @@ export default function ReplicatePage() {
         <p className="text-gray-400">Gere imagens com modelos hospedados no Replicate.</p>
       </div>
 
-      {/* Bloco de prompt e controles */}
-      <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 space-y-4">
-        <div>
-          <label className="block mb-2 text-sm text-gray-300">Prompt</label>
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Descreva a imagem..."
-            className="w-full h-28 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
-        </div>
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex gap-2">
-            {['1:1', '9:16', '16:9'].map(ratio => (
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Painel esquerdo: prompt e controles */}
+        <div className="w-full lg:w-1/3">
+          <div className="bg-gray-900/70 border border-gray-800 rounded-xl p-6 space-y-4">
+            <div>
+              <label className="block mb-2 text-sm text-gray-300">Prompt</label>
+              <textarea
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                placeholder="Descreva a imagem..."
+                className="w-full h-28 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex gap-2">
+                {['1:1', '9:16', '16:9'].map(ratio => (
+                  <button
+                    key={ratio}
+                    onClick={() => setSelectedAspectRatio(ratio)}
+                    className={`px-4 py-2 rounded-lg text-sm ${
+                      selectedAspectRatio === ratio
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-800 text-gray-300'
+                    } hover:bg-purple-500 transition`}
+                  >
+                    {ratio}
+                  </button>
+                ))}
+              </div>
+
               <button
-                key={ratio}
-                onClick={() => setSelectedAspectRatio(ratio)}
-                className={`px-4 py-2 rounded-lg text-sm ${
-                  selectedAspectRatio === ratio
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-800 text-gray-300'
-                } hover:bg-purple-500 transition`}
+                onClick={handleGenerate}
+                disabled={loading || !token}
+                className="px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
               >
-                {ratio}
+                {loading ? 'Gerando...' : 'Gerar'}
               </button>
-            ))}
+            </div>
           </div>
-
-          <button
-            onClick={handleGenerate}
-            disabled={loading || !token}
-            className="px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
-          >
-            {loading ? 'Gerando...' : 'Gerar'}
-          </button>
         </div>
-      </div>
 
-      {/* Exibição da imagem gerada */}
-      <div className="flex justify-center">
-        {centerImageUrl ? (
-          <ImageCard
-            src={centerImageUrl}
-            loading={false}
-            onClick={() => {
-              setModalImage(centerImageUrl);
-              setModalPrompt(prompt);
-              setModalOpen(true);
-            }}
-          />
-        ) : loading ? (
-          <ImageCard loading={true} onClick={() => {}} />
-        ) : (
-          <div className="text-gray-500 italic text-center">
-            Digite um prompt e clique em &quot;Gerar&quot; para começar.
+        {/* Painel central: imagem selecionada ou estado de geração */}
+        <div className="flex-1 flex items-center justify-center">
+          {centerImageUrl ? (
+            <ImageCard
+              src={centerImageUrl}
+              loading={false}
+              onClick={() => {
+                setModalImage(centerImageUrl);
+                setModalPrompt(prompt);
+                setModalOpen(true);
+              }}
+            />
+          ) : loading ? (
+            <ImageCard loading={true} onClick={() => {}} />
+          ) : (
+            <div className="text-gray-500 italic text-center">
+              Digite um prompt e clique em &quot;Gerar&quot; para começar.
+            </div>
+          )}
+        </div>
+
+        {/* Painel direito: histórico */}
+        {images.filter(img => img.status === 'done' && img.url).length > 0 && (
+          <div className="w-full lg:w-1/6">
+            <h3 className="text-white mb-2">Histórico</h3>
+            <div className="grid grid-cols-3 lg:grid-cols-1 gap-4">
+              {images
+                .filter(img => img.status === 'done' && img.url)
+                .map(job => (
+                  <img
+                    key={job.id}
+                    src={job.url!}
+                    onClick={() => setSelectedImageUrl(job.url!)}
+                    className={`cursor-pointer rounded-md border-2 object-cover w-full h-24 ${
+                      selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                    } hover:border-purple-400 transition`}
+                    alt=""
+                  />
+                ))}
+            </div>
           </div>
         )}
       </div>
-
-      {/* Histórico de imagens */}
-      {images.filter(img => img.status === 'done' && img.url).length > 0 && (
-        <div>
-          <h3 className="text-white mb-2">Histórico</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
-            {images
-              .filter(img => img.status === 'done' && img.url)
-              .map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => setSelectedImageUrl(job.url!)}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-full h-24 ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  } hover:border-purple-400 transition`}
-                  alt=""
-                />
-              ))}
-          </div>
-        </div>
-      )}
 
       {/* Modal para ampliar imagem */}
       <ImageCardModal
