@@ -57,6 +57,7 @@ export default function UserInfo() {
       setUser(updated);
       setForm(updated);
       setEditing(null);
+      window.dispatchEvent(new Event('userUpdated'));
     } catch (err) {
       console.error(err);
     }
@@ -70,13 +71,10 @@ export default function UserInfo() {
 
   return (
     <div
-      className={`${
-        visible ? 'opacity-100' : 'opacity-0'
-      } transition-opacity duration-300 space-y-4`}
+      className={`${visible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 space-y-8`}
     >
       {user && (
-        <div className="space-y-1">
-          <label className="block text-sm">Foto de perfil</label>
+        <div className="flex items-center gap-6">
           <div className="relative w-24 h-24">
             {(form?.profileImageUrl || user.profileImageUrl) ? (
               <img
@@ -102,40 +100,47 @@ export default function UserInfo() {
               onChange={handleImageChange}
             />
           </div>
+          <div className="space-y-1">
+            <p className="text-lg font-medium">{user.username ?? 'Usuário'}</p>
+            <p className="text-sm text-gray-400">{user.email}</p>
+          </div>
         </div>
       )}
 
-      {user &&
-        fields.map((f) => (
-          <div key={f.key} className="space-y-1">
-            <label className="block text-sm" htmlFor={f.key}>
-              {f.label}
-            </label>
-            <div className="flex items-center space-x-2">
-              {editing === f.key ? (
-                <input
-                  id={f.key}
-                  name={f.key}
-                  value={form?.[f.key] ?? ''}
-                  onChange={handleChange}
-                  className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-              ) : (
-                <p className="flex-1 truncate">{user[f.key] ?? ''}</p>
-              )}
-              <button
-                type="button"
-                onClick={() => setEditing(editing === f.key ? null : f.key)}
-                className="text-gray-400 hover:text-white"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
+      {user && (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {fields.map((f) => (
+            <div key={f.key} className="space-y-1">
+              <label className="block text-sm" htmlFor={f.key}>
+                {f.label}
+              </label>
+              <div className="flex items-center gap-2">
+                {editing === f.key ? (
+                  <input
+                    id={f.key}
+                    name={f.key}
+                    value={form?.[f.key] ?? ''}
+                    onChange={handleChange}
+                    className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                ) : (
+                  <p className="flex-1 truncate">{user[f.key] ?? ''}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setEditing(editing === f.key ? null : f.key)}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
+      )}
 
       {editing && (
-        <div className="pt-2">
+        <div className="pt-4 flex justify-end">
           <button
             type="button"
             onClick={handleSave}
