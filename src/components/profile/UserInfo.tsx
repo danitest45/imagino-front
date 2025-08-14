@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserId, getUserById, updateUser } from '../../lib/api';
@@ -13,6 +13,7 @@ export default function UserInfo() {
   const [editing, setEditing] = useState<keyof UserDto | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => setVisible(true), []);
 
@@ -37,6 +38,18 @@ export default function UserInfo() {
     setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result as string;
+      setForm((prev) => (prev ? { ...prev, profileImageUrl: result } : prev));
+      setEditing('profileImageUrl');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = async () => {
     if (!token || !userId || !form) return;
     try {
@@ -51,7 +64,6 @@ export default function UserInfo() {
 
   const fields: { key: keyof UserDto; label: string }[] = [
     { key: 'email', label: 'E-mail' },
-    { key: 'profileImageUrl', label: 'URL da imagem' },
     { key: 'username', label: 'Nome de usuário' },
     { key: 'phoneNumber', label: 'Telefone' },
   ];
@@ -62,6 +74,37 @@ export default function UserInfo() {
         visible ? 'opacity-100' : 'opacity-0'
       } transition-opacity duration-300 space-y-4`}
     >
+      {user && (
+        <div className="space-y-1">
+          <label className="block text-sm">Foto de perfil</label>
+          <div className="relative w-24 h-24">
+            {(form?.profileImageUrl || user.profileImageUrl) ? (
+              <img
+                src={form?.profileImageUrl || user.profileImageUrl || ''}
+                alt="Foto de perfil"
+                className="w-24 h-24 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-24 h-24 rounded-full bg-gray-700" />
+            )}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
+        </div>
+      )}
+
       {user &&
         fields.map((f) => (
           <div key={f.key} className="space-y-1">
