@@ -19,11 +19,11 @@ export default function LoginPage() {
     e.preventDefault();
     if (!auth) return;
     try {
-      const { token } = await loginUser(email, password);
-      auth.login(token);
+      const { token, username } = await loginUser(email, password);
+      auth.login(token, username);
       router.push('/images/replicate');
     } catch (err: unknown) {
-      setError('Erro ao entrar');
+      setError(err instanceof Error ? err.message : 'Erro ao entrar');
     }
   };
 

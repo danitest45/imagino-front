@@ -11,8 +11,9 @@ export default function GoogleAuthPage() {
 
   useEffect(() => {
     const token = params.get('token');
-    if (token && auth) {
-      auth.login(token);
+    const username = params.get('username');
+    if (token && username && auth) {
+      auth.login(token, username);
       router.push('/images/replicate');
     } else {
       router.push('/login');

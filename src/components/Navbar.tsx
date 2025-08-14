@@ -12,7 +12,7 @@ export default function Navbar() {
 
   if (!auth) return null;
 
-  const { isAuthenticated, logout } = auth;
+  const { isAuthenticated, logout, username } = auth;
 
   const handleLogout = () => {
     logout();
@@ -49,7 +49,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen((o) => !o)}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white"
             >
-              U {/* Pode trocar por ícone ou inicial do usuário */}
+              {(username?.[0] ?? 'U').toUpperCase()}
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-lg z-50">

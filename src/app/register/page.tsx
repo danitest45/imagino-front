@@ -11,21 +11,26 @@ import { AuthContext } from '../../context/AuthContext';
 export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
   const auth = useContext(AuthContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!auth) return;
-  try {
-    const { token } = await registerUser(email, password);
-    auth.login(token);
-    router.push('/images/replicate');
-  } catch (err: unknown) {
-    setError('Erro ao entrar');
-  }
-};
+    e.preventDefault();
+    if (!auth) return;
+    try {
+      const { token, username: returnedUsername } = await registerUser(
+        email,
+        password,
+        username || undefined,
+      );
+      auth.login(token, returnedUsername);
+      router.push('/images/replicate');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erro ao entrar');
+    }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4 py-8">
@@ -37,6 +42,13 @@ export default function RegisterPage() {
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            placeholder="Username (opcional)"
+            className="w-full px-4 py-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none"
+          />
           <input
             type="email"
             value={email}

@@ -32,24 +32,58 @@ export async function getJobStatus(jobId: string, token: string) {
   return (await res.json()).content;
 }
 
-export async function registerUser(email: string, password: string) {
+export async function registerUser(email: string, password: string, username?: string) {
+  const payload: Record<string, unknown> = { email, password };
+  if (username) payload.username = username;
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify(payload),
   });
   if (!res.ok) throw new Error((await res.json()).message ?? 'Erro ao registrar');
-  return (await res.json()) as { token: string };
+  return (await res.json()) as { token: string; username: string };
 }
 
 export async function loginUser(email: string, password: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
   });
   if (!res.ok) throw new Error('Credenciais inválidas');
-  return (await res.json()) as { token: string };
+  return (await res.json()) as { token: string; username: string };
+}
+
+export interface UserProfile {
+  id: string;
+  email: string;
+  username: string;
+  phoneNumber?: string | null;
+}
+
+export async function getUserProfile(token: string): Promise<UserProfile> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erro ao carregar usuário');
+  return (await res.json()) as UserProfile;
+}
+
+export async function updateUser(
+  id: string,
+  data: { username?: string; phoneNumber?: string | null },
+  token: string,
+): Promise<UserProfile> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error((await res.json()).message ?? 'Erro ao atualizar usuário');
+  return (await res.json()) as UserProfile;
 }
 
 export async function getUserHistory(token: string): Promise<ImageJobApi[]> {

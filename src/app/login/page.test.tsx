@@ -14,7 +14,7 @@ vi.mock('next/navigation', () => ({
 
 describe('LoginPage interactions', () => {
   const renderPage = () => {
-    const auth = { token: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn() };
+    const auth = { token: null, username: null, isAuthenticated: false, login: vi.fn(), logout: vi.fn(), setUsername: vi.fn() };
     render(
       <AuthContext.Provider value={auth}>
         <LoginPage />

@@ -1,45 +1,59 @@
 'use client';
 
-import { createContext, useState, useEffect, ReactNode, useContext  } from 'react';
+import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 
 interface AuthContextType {
   token: string | null;
+  username: string | null;
   isAuthenticated: boolean;
-  login: (token: string) => void;
+  login: (token: string, username: string) => void;
   logout: () => void;
+  setUsername: (username: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
+  const [username, setUsernameState] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Carrega o token do localStorage na inicialização
+  // Carrega o token e o username do localStorage na inicialização
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (stored) {
-      setToken(stored);
+    const storedToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('username') : null;
+    if (storedToken) {
+      setToken(storedToken);
       setIsAuthenticated(true);
+    }
+    if (storedUsername) {
+      setUsernameState(storedUsername);
     }
   }, []);
 
-  const login = (newToken: string) => {
+  const login = (newToken: string, newUsername: string) => {
     localStorage.setItem('token', newToken);
+    localStorage.setItem('username', newUsername);
     setToken(newToken);
+    setUsernameState(newUsername);
     setIsAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('username');
     setToken(null);
+    setUsernameState(null);
     setIsAuthenticated(false);
   };
 
+  const setUsername = (newUsername: string) => {
+    localStorage.setItem('username', newUsername);
+    setUsernameState(newUsername);
+  };
+
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ token, username, isAuthenticated, login, logout, setUsername }}>
       {children}
     </AuthContext.Provider>
   );
