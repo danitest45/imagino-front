@@ -1,71 +1,107 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Pencil } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { getUserId, getUserById, updateUser } from '../../lib/api';
+import type { UserDto } from '../../types/user';
 
 export default function UserInfo() {
-  const [form, setForm] = useState({ name: '', email: '' });
-  const [saved, setSaved] = useState(false);
+  const { token } = useAuth();
+  const [user, setUser] = useState<UserDto | null>(null);
+  const [form, setForm] = useState<UserDto | null>(null);
+  const [editing, setEditing] = useState<keyof UserDto | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => setVisible(true), []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  useEffect(() => {
+    async function load() {
+      if (!token) return;
+      try {
+        const id = await getUserId(token);
+        setUserId(id);
+        const data = await getUserById(id, token);
+        setUser(data);
+        setForm(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    load();
+  }, [token]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    setSaved(false);
+    setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaved(true);
+  const handleSave = async () => {
+    if (!token || !userId || !form) return;
+    try {
+      const updated = await updateUser(userId, form, token);
+      setUser(updated);
+      setForm(updated);
+      setEditing(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  const fields: { key: keyof UserDto; label: string }[] = [
+    { key: 'email', label: 'E-mail' },
+    { key: 'profileImageUrl', label: 'URL da imagem' },
+    { key: 'username', label: 'Nome de usuário' },
+    { key: 'phoneNumber', label: 'Telefone' },
+  ];
 
   return (
-    <form
-      onSubmit={handleSubmit}
+    <div
       className={`${
         visible ? 'opacity-100' : 'opacity-0'
       } transition-opacity duration-300 space-y-4`}
     >
-      <div>
-        <label className="block text-sm mb-1" htmlFor="name">
-          Nome
-        </label>
-        <input
-          id="name"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Seu nome"
-          className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-        />
-      </div>
-      <div>
-        <label className="block text-sm mb-1" htmlFor="email">
-          E-mail
-        </label>
-        <input
-          id="email"
-          type="email"
-          name="email"
-          value={form.email}
-          onChange={handleChange}
-          placeholder="voce@exemplo.com"
-          className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-        />
-      </div>
-      <button
-        type="submit"
-        className="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg transition-colors"
-      >
-        Salvar
-      </button>
-      {saved && (
-        <p className="text-green-400 text-sm">Informações atualizadas!</p>
+      {user &&
+        fields.map((f) => (
+          <div key={f.key} className="space-y-1">
+            <label className="block text-sm" htmlFor={f.key}>
+              {f.label}
+            </label>
+            <div className="flex items-center space-x-2">
+              {editing === f.key ? (
+                <input
+                  id={f.key}
+                  name={f.key}
+                  value={form?.[f.key] ?? ''}
+                  onChange={handleChange}
+                  className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              ) : (
+                <p className="flex-1 truncate">{user[f.key] ?? ''}</p>
+              )}
+              <button
+                type="button"
+                onClick={() => setEditing(editing === f.key ? null : f.key)}
+                className="text-gray-400 hover:text-white"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+      {editing && (
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700"
+          >
+            Salvar
+          </button>
+        </div>
       )}
-    </form>
+    </div>
   );
 }
-
