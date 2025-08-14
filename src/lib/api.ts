@@ -1,4 +1,5 @@
 import type { ImageJobApi, UiJob } from '../types/image-job';
+import type { UserDto } from '../types/user';
 
 
 export async function createRunpodJob(prompt: string, options: {width: number; height: number;}) {
@@ -58,6 +59,23 @@ export async function getUserHistory(token: string): Promise<ImageJobApi[]> {
   });
   if (!res.ok) throw new Error('Erro ao carregar histórico');
   return (await res.json()) as ImageJobApi[];
+}
+
+export async function getUserId(token: string): Promise<string> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erro ao obter ID do usuário');
+  const id = await res.text();
+  return id.replace(/^"|"$/g, '');
+}
+
+export async function getUserById(id: string, token: string): Promise<UserDto> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erro ao obter usuário');
+  return (await res.json()) as UserDto;
 }
 
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
