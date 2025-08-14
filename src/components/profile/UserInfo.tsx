@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getUserId, getUserById } from '../../lib/api';
+import { getUserId, getUserById, updateUser } from '../../lib/api';
 import type { UserDto } from '../../types/user';
 
 export default function UserInfo() {
@@ -11,6 +11,7 @@ export default function UserInfo() {
   const [user, setUser] = useState<UserDto | null>(null);
   const [form, setForm] = useState<UserDto | null>(null);
   const [editing, setEditing] = useState<keyof UserDto | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => setVisible(true), []);
@@ -20,6 +21,7 @@ export default function UserInfo() {
       if (!token) return;
       try {
         const id = await getUserId(token);
+        setUserId(id);
         const data = await getUserById(id, token);
         setUser(data);
         setForm(data);
@@ -33,6 +35,18 @@ export default function UserInfo() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
+  };
+
+  const handleSave = async () => {
+    if (!token || !userId || !form) return;
+    try {
+      const updated = await updateUser(userId, form, token);
+      setUser(updated);
+      setForm(updated);
+      setEditing(null);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const fields: { key: keyof UserDto; label: string }[] = [
@@ -68,9 +82,7 @@ export default function UserInfo() {
               )}
               <button
                 type="button"
-                onClick={() =>
-                  setEditing(editing === f.key ? null : f.key)
-                }
+                onClick={() => setEditing(editing === f.key ? null : f.key)}
                 className="text-gray-400 hover:text-white"
               >
                 <Pencil className="w-4 h-4" />
@@ -78,6 +90,18 @@ export default function UserInfo() {
             </div>
           </div>
         ))}
+
+      {editing && (
+        <div className="pt-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700"
+          >
+            Salvar
+          </button>
+        </div>
+      )}
     </div>
   );
 }

@@ -78,6 +78,23 @@ export async function getUserById(id: string, token: string): Promise<UserDto> {
   return (await res.json()) as UserDto;
 }
 
+export async function updateUser(
+  id: string,
+  dto: Partial<UserDto>,
+  token: string,
+): Promise<UserDto> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(dto),
+  });
+  if (!res.ok) throw new Error('Erro ao atualizar usuário');
+  return (await res.json()) as UserDto;
+}
+
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
   const rawUrl = j.imageUrl ?? j.imageUrls?.[0] ?? null;     // <<<<<< pega singular OU primeira do array
   return {
