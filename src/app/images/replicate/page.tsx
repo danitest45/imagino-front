@@ -119,15 +119,15 @@ export default function ReplicatePage() {
   const centerImageUrl = selectedImageUrl;
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row">
+    <div className="h-screen w-full flex flex-col lg:flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 animate-fade-in">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-1/3 p-4 flex flex-col h-full">
+      <div className="w-full lg:w-1/3 p-4 flex flex-col h-full bg-black/30 backdrop-blur-md animate-fade-in">
         <label className="mb-2 text-sm text-gray-300">Prompt</label>
         <textarea
           value={prompt}
           onChange={e => setPrompt(e.target.value)}
           placeholder="Descreva a imagem..."
-          className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
         />
         <div className="mt-4 flex flex-col gap-4">
           <div className="flex gap-2">
@@ -135,11 +135,11 @@ export default function ReplicatePage() {
               <button
                 key={ratio}
                 onClick={() => setSelectedAspectRatio(ratio)}
-                className={`px-4 py-2 rounded-lg text-sm ${
+                className={`px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
                   selectedAspectRatio === ratio
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-800 text-gray-300'
-                } hover:bg-purple-500 transition`}
+                } hover:bg-purple-500`}
               >
                 {ratio}
               </button>
@@ -167,7 +167,7 @@ export default function ReplicatePage() {
           <button
             onClick={handleGenerate}
             disabled={loading || !token}
-            className="mt-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
+            className="mt-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:bg-purple-700 hover:scale-105 disabled:opacity-50"
           >
             {loading ? 'Gerando...' : 'Gerar'}
           </button>
@@ -207,9 +207,9 @@ export default function ReplicatePage() {
                   key={job.id}
                   src={job.url!}
                   onClick={() => setSelectedImageUrl(job.url!)}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 ${
+                  className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
                     selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  } hover:border-purple-400 transition`}
+                  } hover:border-purple-400`}
                   alt=""
                 />
               ))}
