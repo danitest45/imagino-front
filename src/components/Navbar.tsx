@@ -42,6 +42,10 @@ export default function Navbar() {
     setMenuOpen(false);
   };
 
+  const avatarLetter = (user?.username || user?.email || 'U')
+    .charAt(0)
+    .toUpperCase();
+
   return (
     <header className="w-full bg-gray-900 border-b border-gray-800 shadow-sm fixed top-0 z-50">
       <div className="w-full px-6 py-4 flex items-center justify-between">
@@ -78,7 +82,7 @@ export default function Navbar() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                'U'
+                avatarLetter
               )}
             </button>
             {menuOpen && (
