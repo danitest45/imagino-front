@@ -108,17 +108,19 @@ export default function ReplicatePage() {
   const centerImageUrl = selectedImageUrl;
 
   return (
-    <div className="min-h-full w-full flex flex-col lg:flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 animate-fade-in">
+    <div className="flex h-full flex-1 flex-col lg:flex-row animate-fade-in">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-1/3 p-4 flex flex-col h-full bg-black/30 backdrop-blur-md animate-fade-in">
-        <label className="mb-2 text-sm text-gray-300">Prompt</label>
-        <textarea
-          value={prompt}
-          onChange={e => setPrompt(e.target.value)}
-          placeholder="Descreva a imagem..."
-          className="h-1/3 p-3 rounded-md bg-gray-800 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
-        />
-        <div className="mt-4 flex flex-col gap-4">
+      <div className="w-full lg:w-1/3 p-6 flex flex-col gap-6 h-full bg-black/40 backdrop-blur-lg animate-fade-in">
+        <div className="flex flex-col gap-2 flex-1">
+          <label className="text-sm text-gray-300">Prompt</label>
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Descreva a imagem..."
+            className="flex-1 p-4 rounded-xl bg-gray-800/60 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+          />
+        </div>
+        <div className="flex flex-col gap-4">
           <div className="flex gap-2">
             {['1:1', '9:16', '16:9'].map(ratio => (
               <button
@@ -135,8 +137,8 @@ export default function ReplicatePage() {
             ))}
           </div>
 
-          <div>
-            <label className="text-sm text-gray-300 mb-1 block">
+          <div className="space-y-1">
+            <label className="text-sm text-gray-300">
               Velocidade x Qualidade ({quality})
             </label>
             <input
@@ -145,7 +147,7 @@ export default function ReplicatePage() {
               max={5}
               value={quality}
               onChange={e => setQuality(Number(e.target.value))}
-              className="w-full"
+              className="w-full accent-purple-500"
             />
             <div className="flex justify-between text-xs text-gray-400">
               <span>Rápido</span>
@@ -156,7 +158,7 @@ export default function ReplicatePage() {
           <button
             onClick={handleGenerate}
             disabled={loading || !token}
-            className="mt-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:bg-purple-700 hover:scale-105 disabled:opacity-50"
+            className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
           >
             {loading ? 'Gerando...' : 'Gerar'}
           </button>
