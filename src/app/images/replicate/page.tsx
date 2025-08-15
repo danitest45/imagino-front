@@ -20,10 +20,9 @@ export default function ReplicatePage() {
   const [quality, setQuality] = useState(3);
   const [images, setImages] = useState<UiJob[]>([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalPrompt, setModalPrompt] = useState('');
-  const [modalImage, setModalImage] = useState('');
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
 
@@ -42,8 +41,10 @@ export default function ReplicatePage() {
     // mantém a mais recente selecionada no centro
     if (ui.length > 0) {
       setSelectedImageUrl(ui[0].url ?? null);
+      setSelectedJobId(ui[0].id);
     } else {
       setSelectedImageUrl(null);
+      setSelectedJobId(null);
     }
   }, [history]);
 
@@ -58,6 +59,7 @@ export default function ReplicatePage() {
 
     setLoading(true);
     setSelectedImageUrl(null);
+    setSelectedJobId(null);
 
     const jobId = await createReplicateJob(prompt, selectedAspectRatio, token);
     const newJob: UiJob = {
@@ -86,6 +88,7 @@ export default function ReplicatePage() {
           prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
         );
         setSelectedImageUrl(fullUrl);
+        setSelectedJobId(jobId);
 
         const updatedHistory = await getUserHistory(token);
         setHistory(updatedHistory);
@@ -167,8 +170,6 @@ export default function ReplicatePage() {
             src={centerImageUrl}
             loading={false}
             onClick={() => {
-              setModalImage(centerImageUrl);
-              setModalPrompt(prompt);
               setModalOpen(true);
             }}
           />
@@ -192,7 +193,10 @@ export default function ReplicatePage() {
                 <img
                   key={job.id}
                   src={job.url!}
-                  onClick={() => setSelectedImageUrl(job.url!)}
+                  onClick={() => {
+                    setSelectedImageUrl(job.url!);
+                    setSelectedJobId(job.id);
+                  }}
                   className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
                     selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                   } hover:border-purple-400`}
@@ -207,8 +211,7 @@ export default function ReplicatePage() {
       <ImageCardModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        src={modalImage}
-        prompt={modalPrompt}
+        jobId={selectedJobId}
       />
     </div>
   );

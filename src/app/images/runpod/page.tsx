@@ -4,30 +4,10 @@ import ImageCard from '../../../components/ImageCard';
 import { useState } from 'react';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useImageJobs } from '../../../hooks/useImageJobs';
-
-
-interface JobCreationResponse {
-  success: boolean;
-    errors: { message: string }[];  
-    content: {
-    jobId: string;
-  };
-}
 export default function Home() {
-    type GeneratedImage = {
-      id: string;
-      status: 'loading' | 'done';
-      url: string | null;
-      resolution: { width: number; height: number };
-    };
-
-    const [images, setImages] = useState<GeneratedImage[]>([]);
-
     const [modalOpen, setModalOpen] = useState(false);
-    const [modalImage, setModalImage] = useState('');
-    const [modalPrompt, setModalPrompt] = useState('');
+    const [modalJobId, setModalJobId] = useState<string | null>(null);
     const [prompt, setPrompt] = useState('');
-    const [jobId, setJobId] = useState('');
     const [loading, setLoading] = useState(false);
     const [resolution, setResolution] = useState({ width: 1024, height: 1024 });
     const { jobs, submitPrompt } = useImageJobs();
@@ -38,7 +18,6 @@ const handleSubmit = async () => {
   if (!prompt.trim()) return;
   setLoading(true);
   await submitPrompt(prompt, resolution);
-  setModalPrompt(prompt);
   setLoading(false);
 };
 
@@ -132,8 +111,7 @@ const handleSubmit = async () => {
                   src={url}
                   loading={false}
                   onClick={() => {
-                    setModalImage(url);
-                    setModalPrompt(prompt);
+                    setModalJobId(job.id);
                     setModalOpen(true);
                   }}
                 />
@@ -141,6 +119,12 @@ const handleSubmit = async () => {
         </div>
       ))}
     </div>
+
+    <ImageCardModal
+      isOpen={modalOpen}
+      onClose={() => setModalOpen(false)}
+      jobId={modalJobId}
+    />
   </main>
 );
 

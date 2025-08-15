@@ -19,3 +19,12 @@ export interface UiJob {
   url: string | null;
   aspectRatio: string;
 }
+
+// Detalhes retornados pelo endpoint GET /api/jobs/details/{jobId}
+export interface JobDetails {
+  imageUrl: string;
+  prompt: string;
+  username: string;
+  createdAt: string;
+  aspectRatio: string;
+}
