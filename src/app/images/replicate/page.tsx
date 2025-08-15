@@ -3,13 +3,12 @@
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useEffect, useState } from 'react';
-import { createReplicateJob, getJobStatus } from '../../../lib/api';
+import { createReplicateJob, getJobStatus, getUserHistory } from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
-import type { ImageJobApi } from '../../../types/image-job';
-import { normalizeUrl } from '../../../lib/api'; 
+import { normalizeUrl } from '../../../lib/api';
 
 
 
@@ -26,7 +25,7 @@ export default function ReplicatePage() {
   const [modalPrompt, setModalPrompt] = useState('');
   const [modalImage, setModalImage] = useState('');
   const { token } = useAuth();
-  const { history, setHistory, loading: historyLoading } = useImageHistory();
+  const { history, setHistory } = useImageHistory();
 
 
   
@@ -88,21 +87,8 @@ export default function ReplicatePage() {
         );
         setSelectedImageUrl(fullUrl);
 
-        setHistory((prev: ImageJobApi[]) => [
-          {
-            id: jobId,
-            jobId,
-            prompt,
-            userId: 'me',
-            status: 'done',
-            imageUrl: rawUrl, // mantém como veio (sem normalizar) — o map normaliza
-            imageUrls: content.imageUrls ?? (rawUrl ? [rawUrl] : []),
-            aspectRatio: selectedAspectRatio,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          },
-          ...prev,
-        ]);
+        const updatedHistory = await getUserHistory(token);
+        setHistory(updatedHistory);
 
         setLoading(false);
       }

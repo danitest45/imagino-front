@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 
 type Props = {
   src?: string;
@@ -25,8 +25,8 @@ export default function ImageCard({ src, loading, onClick }: Props) {
 
       {/* Placeholder de carregamento */}
       {loading && (
-        <div className="flex items-center justify-center w-72 h-72 text-sm text-muted-foreground">
-          Gerando imagem...
+        <div className="flex items-center justify-center w-72 h-72 text-muted-foreground">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       )}
 
