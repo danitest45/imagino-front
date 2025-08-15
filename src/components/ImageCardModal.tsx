@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, Share2, Download } from 'lucide-react';
+import { X, Share2, Download, Loader2 } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { JobDetails } from '../types/image-job';
@@ -20,13 +20,18 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
   const [details, setDetails] = useState<JobDetails | null>(null);
 
   useEffect(() => {
-    if (!isOpen || !jobId || !token) return;
+    if (!isOpen || !jobId || !token) {
+      setDetails(null);
+      return;
+    }
+
+    setDetails(null);
     let ignore = false;
     (async () => {
       try {
         const data = await getJobDetails(jobId, token);
         if (!ignore) setDetails(data);
-      } catch (e) {
+      } catch {
         if (!ignore) setDetails(null);
       }
     })();
@@ -53,7 +58,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
           {details ? (
             <img src={details.imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
           ) : (
-            <div className="text-gray-500">Carregando...</div>
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           )}
         </div>
 
