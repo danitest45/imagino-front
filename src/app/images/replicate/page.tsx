@@ -108,7 +108,7 @@ export default function ReplicatePage() {
   const centerImageUrl = selectedImageUrl;
 
   return (
-    <div className="h-screen w-full flex flex-col lg:flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 animate-fade-in">
+    <div className="min-h-full w-full flex flex-col lg:flex-row bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 animate-fade-in">
       {/* Painel esquerdo: prompt e controles */}
       <div className="w-full lg:w-1/3 p-4 flex flex-col h-full bg-black/30 backdrop-blur-md animate-fade-in">
         <label className="mb-2 text-sm text-gray-300">Prompt</label>
@@ -184,7 +184,7 @@ export default function ReplicatePage() {
 
       {/* Painel direito: histórico */}
       {images.filter(img => img.status === 'done' && img.url).length > 0 && (
-        <div className="w-full lg:w-1/5 p-4">
+        <div className="w-full lg:w-1/5 p-4 h-full bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2">Histórico</h3>
           <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2 overflow-y-auto">
             {images
