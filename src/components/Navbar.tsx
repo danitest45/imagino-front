@@ -1,24 +1,50 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '../context/AuthContext';
+import { getUserById, getUserId } from '../lib/api';
+import type { UserDto } from '../types/user';
 
 export default function Navbar() {
   const auth = useContext(AuthContext);
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserDto | null>(null);
+
+  const token = auth?.token ?? null;
+  const isAuthenticated = auth?.isAuthenticated ?? false;
+  const logout = auth?.logout ?? (() => {});
+
+  useEffect(() => {
+    async function load() {
+      if (!token) return;
+      try {
+        const id = await getUserId(token);
+        const data = await getUserById(id, token);
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    load();
+    const handler = () => load();
+    window.addEventListener('userUpdated', handler);
+    return () => window.removeEventListener('userUpdated', handler);
+  }, [token]);
 
   if (!auth) return null;
-
-  const { isAuthenticated, logout } = auth;
 
   const handleLogout = () => {
     logout();
     router.push('/'); // Redireciona para home após logout
     setMenuOpen(false);
   };
+
+  const avatarLetter = (user?.username || user?.email || 'U')
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <header className="w-full bg-gray-900 border-b border-gray-800 shadow-sm fixed top-0 z-50">
@@ -47,9 +73,17 @@ export default function Navbar() {
           <div className="relative">
             <button
               onClick={() => setMenuOpen((o) => !o)}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white overflow-hidden"
             >
-              U {/* Pode trocar por ícone ou inicial do usuário */}
+              {user?.profileImageUrl ? (
+                <img
+                  src={user.profileImageUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                avatarLetter
+              )}
             </button>
             {menuOpen && (
               <div className="absolute right-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-lg z-50">
