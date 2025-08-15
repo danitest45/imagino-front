@@ -3,27 +3,35 @@
 import React from 'react';
 import { X, Share2, Download } from 'lucide-react';
 
+type ImageInfo = {
+  user: string;
+  date: string;
+  resolution: '1:1' | '9:16' | '16:9';
+  model?: string;
+};
+
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   src: string;
   prompt: string;
+  info?: ImageInfo;
 };
 
 /**
  * Modal para exibir detalhes de uma imagem.
  * Nesta primeira versão os dados exibidos são mockados para fins de layout.
  */
-export default function ImageCardModal({ isOpen, onClose, src, prompt }: Props) {
+export default function ImageCardModal({ isOpen, onClose, src, prompt, info }: Props) {
   if (!isOpen) return null;
 
-  const mock = {
+  const mock: ImageInfo = {
     user: 'deniserobert',
     date: 'April 02, 2024 8:45 PM',
-    model: 'lcm-texas-v1',
-    style: 'Realistic',
-    resolution: '1024x1024',
+    resolution: '1:1',
   };
+
+  const data = info ?? mock;
 
   return (
     <div
@@ -43,8 +51,8 @@ export default function ImageCardModal({ isOpen, onClose, src, prompt }: Props) 
         <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-gray-800 p-6 flex flex-col gap-4 overflow-y-auto">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <p className="font-semibold">{mock.user}</p>
-              <p className="text-xs text-gray-400">{mock.date}</p>
+              <p className="font-semibold">{data.user}</p>
+              <p className="text-xs text-gray-400">{data.date}</p>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-white">
               <X size={20} />
@@ -61,14 +69,13 @@ export default function ImageCardModal({ isOpen, onClose, src, prompt }: Props) 
           </div>
 
           <div className="text-sm space-y-1">
+            {data.model && (
+              <p>
+                <span className="font-semibold">Model:</span> {data.model}
+              </p>
+            )}
             <p>
-              <span className="font-semibold">Model:</span> {mock.model}
-            </p>
-            <p>
-              <span className="font-semibold">Style:</span> {mock.style}
-            </p>
-            <p>
-              <span className="font-semibold">Resolution:</span> {mock.resolution}
+              <span className="font-semibold">Resolution:</span> {data.resolution}
             </p>
           </div>
 
