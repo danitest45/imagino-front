@@ -1,4 +1,4 @@
-import type { ImageJobApi, UiJob } from '../types/image-job';
+import type { ImageJobApi, UiJob, JobDetails } from '../types/image-job';
 import type { UserDto } from '../types/user';
 
 
@@ -31,6 +31,21 @@ export async function getJobStatus(jobId: string, token: string) {
   });
   if (!res.ok) return null;
   return (await res.json()).content;
+}
+
+export async function getJobDetails(jobId: string, token: string): Promise<JobDetails> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/details/${jobId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error('Erro ao obter detalhes do job');
+  const json = await res.json();
+  return {
+    imageUrl: normalizeUrl(json.imageUrl) ?? '',
+    prompt: json.prompt,
+    username: json.username,
+    createdAt: json.createdAt,
+    aspectRatio: json.aspectRatio,
+  };
 }
 
 export async function registerUser(email: string, password: string) {

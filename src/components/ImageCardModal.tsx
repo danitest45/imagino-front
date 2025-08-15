@@ -1,37 +1,43 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Share2, Download } from 'lucide-react';
-
-type ImageInfo = {
-  user: string;
-  date: string;
-  resolution: '1:1' | '9:16' | '16:9';
-  model?: string;
-};
+import { getJobDetails } from '../lib/api';
+import { useAuth } from '../context/AuthContext';
+import type { JobDetails } from '../types/image-job';
 
 type Props = {
   isOpen: boolean;
   onClose: () => void;
-  src: string;
-  prompt: string;
-  info?: ImageInfo;
+  jobId: string | null;
 };
 
 /**
- * Modal para exibir detalhes de uma imagem.
- * Nesta primeira versão os dados exibidos são mockados para fins de layout.
+ * Modal para exibir detalhes de uma imagem buscando dados do backend.
  */
-export default function ImageCardModal({ isOpen, onClose, src, prompt, info }: Props) {
-  if (!isOpen) return null;
+export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
+  const { token } = useAuth();
+  const [details, setDetails] = useState<JobDetails | null>(null);
 
-  const mock: ImageInfo = {
-    user: 'deniserobert',
-    date: 'April 02, 2024 8:45 PM',
-    resolution: '1:1',
-  };
+  useEffect(() => {
+    if (!isOpen || !jobId || !token) return;
+    let ignore = false;
+    (async () => {
+      try {
+        const data = await getJobDetails(jobId, token);
+        if (!ignore) setDetails(data);
+      } catch (e) {
+        if (!ignore) setDetails(null);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, [isOpen, jobId, token]);
 
-  const data = info ?? mock;
+  if (!isOpen || !jobId) return null;
+
+  const date = details ? new Date(details.createdAt).toLocaleString() : '';
 
   return (
     <div
@@ -44,15 +50,19 @@ export default function ImageCardModal({ isOpen, onClose, src, prompt, info }: P
       >
         {/* Imagem */}
         <div className="flex-1 bg-black flex items-center justify-center p-4">
-          <img src={src} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
+          {details ? (
+            <img src={details.imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
+          ) : (
+            <div className="text-gray-500">Carregando...</div>
+          )}
         </div>
 
         {/* Informações */}
         <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-gray-800 p-6 flex flex-col gap-4 overflow-y-auto">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <p className="font-semibold">{data.user}</p>
-              <p className="text-xs text-gray-400">{data.date}</p>
+              <p className="font-semibold">{details?.username}</p>
+              <p className="text-xs text-gray-400">{date}</p>
             </div>
             <button onClick={onClose} className="text-gray-400 hover:text-white">
               <X size={20} />
@@ -60,28 +70,27 @@ export default function ImageCardModal({ isOpen, onClose, src, prompt, info }: P
           </div>
 
           <div className="flex gap-3">
-            <button className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700">
+            <button className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700" disabled={!details}>
               <Share2 size={14} /> Share
             </button>
-            <button className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700">
+            <a
+              className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700"
+              href={details?.imageUrl}
+              download
+            >
               <Download size={14} /> Download
-            </button>
+            </a>
           </div>
 
           <div className="text-sm space-y-1">
-            {data.model && (
-              <p>
-                <span className="font-semibold">Model:</span> {data.model}
-              </p>
-            )}
             <p>
-              <span className="font-semibold">Resolution:</span> {data.resolution}
+              <span className="font-semibold">Resolution:</span> {details?.aspectRatio}
             </p>
           </div>
 
           <div>
             <h4 className="text-sm font-semibold mb-1">Prompt</h4>
-            <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">{prompt}</p>
+            <p className="text-sm text-gray-300 whitespace-pre-wrap break-words">{details?.prompt}</p>
           </div>
         </div>
       </div>
