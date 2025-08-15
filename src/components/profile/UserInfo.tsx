@@ -21,9 +21,9 @@ export default function UserInfo() {
     async function load() {
       if (!token) return;
       try {
-        const id = await getUserId(token);
+        const id = await getUserId();
         setUserId(id);
-        const data = await getUserById(id, token);
+        const data = await getUserById(id);
         setUser(data);
         setForm(data);
       } catch (err) {
@@ -53,7 +53,7 @@ export default function UserInfo() {
   const handleSave = async () => {
     if (!token || !userId || !form) return;
     try {
-      const updated = await updateUser(userId, form, token);
+      const updated = await updateUser(userId, form);
       setUser(updated);
       setForm(updated);
       setEditing(null);

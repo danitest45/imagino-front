@@ -1,5 +1,6 @@
 import type { ImageJobApi, UiJob, JobDetails } from '../types/image-job';
 import type { UserDto } from '../types/user';
+import { fetchWithAuth } from './auth';
 
 
 export async function createRunpodJob(prompt: string, options: {width: number; height: number;}) {
@@ -12,12 +13,11 @@ export async function createRunpodJob(prompt: string, options: {width: number; h
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string, token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
+export async function createReplicateJob(prompt: string, aspectRatio: string) {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ prompt, aspectRatio }),
   });
@@ -25,18 +25,14 @@ export async function createReplicateJob(prompt: string, aspectRatio: string, to
   return json.content.jobId as string;
 }
 
-export async function getJobStatus(jobId: string, token: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getJobStatus(jobId: string) {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`);
   if (!res.ok) return null;
   return (await res.json()).content;
 }
 
-export async function getJobDetails(jobId: string, token: string): Promise<JobDetails> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/details/${jobId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getJobDetails(jobId: string): Promise<JobDetails> {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/details/${jobId}`);
   if (!res.ok) throw new Error('Erro ao obter detalhes do job');
   const json = await res.json();
   return {
@@ -52,7 +48,8 @@ export async function registerUser(email: string, password: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
+    credentials: 'include',
   });
   if (!res.ok) throw new Error((await res.json()).message ?? 'Erro ao registrar');
   return (await res.json()) as { token: string };
@@ -62,33 +59,28 @@ export async function loginUser(email: string, password: string) {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password })
+    body: JSON.stringify({ email, password }),
+    credentials: 'include',
   });
   if (!res.ok) throw new Error('Credenciais inválidas');
   return (await res.json()) as { token: string };
 }
 
-export async function getUserHistory(token: string): Promise<ImageJobApi[]> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/history`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getUserHistory(): Promise<ImageJobApi[]> {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/history`);
   if (!res.ok) throw new Error('Erro ao carregar histórico');
   return (await res.json()) as ImageJobApi[];
 }
 
-export async function getUserId(token: string): Promise<string> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getUserId(): Promise<string> {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/users`);
   if (!res.ok) throw new Error('Erro ao obter ID do usuário');
   const id = await res.text();
   return id.replace(/^"|"$/g, '');
 }
 
-export async function getUserById(id: string, token: string): Promise<UserDto> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getUserById(id: string): Promise<UserDto> {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`);
   if (!res.ok) throw new Error('Erro ao obter usuário');
   return (await res.json()) as UserDto;
 }
@@ -96,13 +88,11 @@ export async function getUserById(id: string, token: string): Promise<UserDto> {
 export async function updateUser(
   id: string,
   dto: Partial<UserDto>,
-  token: string,
 ): Promise<UserDto> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(dto),
   });

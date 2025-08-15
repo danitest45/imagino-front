@@ -14,7 +14,7 @@ export function useImageHistory() {
     async function load() {
       if (!token) return;
       try {
-        const hist = await getUserHistory(token);
+        const hist = await getUserHistory();
         setHistory(hist);
       } catch (e) {
         console.error(e);

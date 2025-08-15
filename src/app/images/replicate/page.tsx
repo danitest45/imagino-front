@@ -61,7 +61,7 @@ export default function ReplicatePage() {
     setSelectedImageUrl(null);
     setSelectedJobId(null);
 
-    const jobId = await createReplicateJob(prompt, selectedAspectRatio, token);
+    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
     const newJob: UiJob = {
       id: jobId,
       status: 'loading',
@@ -72,7 +72,7 @@ export default function ReplicatePage() {
     setImages((prev: UiJob[]) => [newJob, ...prev]);
 
     const poll = setInterval(async () => {
-      const content = await getJobStatus(jobId, token);
+      const content = await getJobStatus(jobId);
       if (!content) return;
       const status = content.status?.toUpperCase();
 
@@ -90,7 +90,7 @@ export default function ReplicatePage() {
         setSelectedImageUrl(fullUrl);
         setSelectedJobId(jobId);
 
-        const updatedHistory = await getUserHistory(token);
+        const updatedHistory = await getUserHistory();
         setHistory(updatedHistory);
 
         setLoading(false);

@@ -1,12 +1,13 @@
 'use client';
 
 import { createContext, useState, useEffect, ReactNode, useContext  } from 'react';
+import { setAccessToken, getAccessToken, refreshAccessToken, logoutRequest } from '../lib/auth';
 
 interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   login: (token: string) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -14,26 +15,31 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(getAccessToken());
+  const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
 
-  // Carrega o token do localStorage na inicialização
+  // Tenta atualizar o token ao carregar a aplicação
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    if (stored) {
-      setToken(stored);
-      setIsAuthenticated(true);
+    async function init() {
+      if (!getAccessToken()) {
+        const refreshed = await refreshAccessToken();
+        if (refreshed) {
+          setToken(getAccessToken());
+          setIsAuthenticated(true);
+        }
+      }
     }
+    init();
   }, []);
 
   const login = (newToken: string) => {
-    localStorage.setItem('token', newToken);
+    setAccessToken(newToken);
     setToken(newToken);
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
+  const logout = async () => {
+    await logoutRequest();
     setToken(null);
     setIsAuthenticated(false);
   };
