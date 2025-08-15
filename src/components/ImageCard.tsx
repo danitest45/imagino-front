@@ -13,7 +13,7 @@ export default function ImageCard({ src, loading, onClick }: Props) {
 
   return (
     <div
-      className="relative inline-block max-w-full max-h-[80vh] rounded-xl overflow-hidden shadow-lg border border-gray-800 cursor-pointer group transform transition-transform duration-200 hover:scale-105"
+      className="relative inline-block max-w-full max-h-[80vh] rounded-xl overflow-hidden shadow-lg border border-gray-800 cursor-pointer group transform transition-all duration-300 hover:scale-105 animate-fade-in"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
