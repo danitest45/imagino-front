@@ -85,6 +85,15 @@ export async function getUserById(id: string): Promise<UserDto> {
   return (await res.json()) as UserDto;
 }
 
+export async function getCredits(): Promise<number> {
+  const res = await fetchWithAuth(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/users/credits`,
+  );
+  if (!res.ok) throw new Error('Erro ao obter créditos');
+  const json = await res.json();
+  return json.credits as number;
+}
+
 export async function updateUser(
   id: string,
   dto: Partial<UserDto>,

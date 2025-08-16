@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import UserInfo from '../../components/profile/UserInfo';
 import Billing from '../../components/profile/Billing';
 import Support from '../../components/profile/Support';
+import { useAuth } from '../../context/AuthContext';
+import { getCredits } from '../../lib/api';
 
 const tabs = [
   { id: 'info', label: 'Informações' },
@@ -13,13 +15,31 @@ const tabs = [
 
 export default function ProfilePage() {
   const [active, setActive] = useState('info');
+  const { token } = useAuth();
+  const [credits, setCredits] = useState<number | null>(null);
+
+  useEffect(() => {
+    async function loadCredits() {
+      if (!token) return;
+      try {
+        const c = await getCredits();
+        setCredits(c);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadCredits();
+  }, [token]);
 
   return (
     <div className="min-h-screen mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6 text-center">Perfil</h1>
 
-        <div className="flex justify-center mb-8">
+        <div className="relative flex justify-center items-center mb-8">
+          <div className="absolute left-0 text-sm text-gray-300">
+            Créditos: {credits ?? '--'}
+          </div>
           <div className="flex bg-gray-900/40 backdrop-blur rounded-full p-1 shadow-inner">
             {tabs.map((tab) => (
               <button
