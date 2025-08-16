@@ -24,15 +24,17 @@ export default function Home() {
   const [selected, setSelected] = useState<{ id: string; url: string } | null>(null);
 
   return (
-    <main className="max-w-7xl mx-auto px-4">
-      <section className="text-center py-10">
-        <h1 className="text-4xl font-bold animate-fade-in">Descubra criações incríveis</h1>
-        <p className="mt-2 text-gray-400 animate-fade-in">
+    <main className="min-h-screen max-w-7xl mx-auto px-4">
+      <section className="text-center py-20">
+        <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-500 text-transparent bg-clip-text animate-fade-in">
+          Descubra criações incríveis
+        </h1>
+        <p className="mt-4 text-lg text-gray-400 animate-fade-in">
           Galeria de imagens geradas pela comunidade Imagino.AI
         </p>
       </section>
 
-      <div className="columns-2 sm:columns-3 md:columns-4 gap-4">
+      <div className="columns-2 sm:columns-3 md:columns-4 gap-4 [column-fill:_balance]">
         {mockImages.map((img) => (
           <div key={img.id} className="mb-4 break-inside-avoid">
             <ImageCard
