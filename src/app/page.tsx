@@ -2,5 +2,5 @@
 import { redirect } from 'next/navigation';
 
 export default function Home() {
-  redirect('/images/runpod');
+  return <div>Home debug</div>;
 }
