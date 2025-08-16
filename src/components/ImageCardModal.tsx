@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { X, Share2, Download, Loader2 } from 'lucide-react';
+import { X, Share2, Download } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { JobDetails } from '../types/image-job';
@@ -10,12 +10,13 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   jobId: string | null;
+  fallbackUrl?: string;
 };
 
 /**
  * Modal para exibir detalhes de uma imagem buscando dados do backend.
  */
-export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
+export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: Props) {
   const { token } = useAuth();
   const [details, setDetails] = useState<JobDetails | null>(null);
 
@@ -40,9 +41,11 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
     };
   }, [isOpen, jobId, token]);
 
-  if (!isOpen || !jobId) return null;
+  if (!isOpen) return null;
 
   const date = details ? new Date(details.createdAt).toLocaleString() : '';
+  const imageUrl = details?.imageUrl ?? fallbackUrl;
+  if (!imageUrl) return null;
 
   return (
     <div
@@ -55,11 +58,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
       >
         {/* Imagem */}
         <div className="flex-1 bg-black flex items-center justify-center p-4">
-          {details ? (
-            <img src={details.imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
-          ) : (
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-          )}
+          <img src={imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
         </div>
 
         {/* Informações */}
@@ -80,7 +79,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
             </button>
             <a
               className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700"
-              href={details?.imageUrl}
+              href={imageUrl}
               download
             >
               <Download size={14} /> Download
