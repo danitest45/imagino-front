@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getUserId, getUserById, updateUser } from '../../lib/api';
@@ -77,9 +78,11 @@ export default function UserInfo() {
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24">
             {(form?.profileImageUrl || user.profileImageUrl) ? (
-              <img
+              <Image
                 src={form?.profileImageUrl || user.profileImageUrl || ''}
                 alt="Foto de perfil"
+                width={96}
+                height={96}
                 className="w-24 h-24 rounded-full object-cover"
               />
             ) : (

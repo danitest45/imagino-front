@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { X, Share2, Download, Loader2 } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
@@ -56,7 +57,13 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
         {/* Imagem */}
         <div className="flex-1 bg-black flex items-center justify-center p-4">
           {details ? (
-            <img src={details.imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
+            <Image
+              src={details.imageUrl}
+              alt="Imagem completa"
+              width={512}
+              height={512}
+              className="max-h-full max-w-full object-contain"
+            />
           ) : (
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           )}

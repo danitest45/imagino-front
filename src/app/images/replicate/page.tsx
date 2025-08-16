@@ -2,6 +2,7 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { createReplicateJob, getJobStatus, getUserHistory } from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
@@ -192,13 +193,15 @@ export default function ReplicatePage() {
             {images
               .filter(img => img.status === 'done' && img.url)
               .map(job => (
-                <img
+                <Image
                   key={job.id}
                   src={job.url!}
                   onClick={() => {
                     setSelectedImageUrl(job.url!);
                     setSelectedJobId(job.id);
                   }}
+                  width={96}
+                  height={96}
                   className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
                     selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                   } hover:border-purple-400`}

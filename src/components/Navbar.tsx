@@ -1,6 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '../context/AuthContext';
@@ -76,9 +77,11 @@ export default function Navbar() {
               className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white overflow-hidden"
             >
               {user?.profileImageUrl ? (
-                <img
+                <Image
                   src={user.profileImageUrl}
                   alt="Avatar"
+                  width={32}
+                  height={32}
                   className="w-full h-full object-cover"
                 />
               ) : (

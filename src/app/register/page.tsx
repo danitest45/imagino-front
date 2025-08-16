@@ -22,7 +22,8 @@ export default function RegisterPage() {
     const { token } = await registerUser(email, password);
     auth.login(token);
     router.push('/images/replicate');
-  } catch (err: unknown) {
+  } catch (error: unknown) {
+    console.error(error);
     setError('Erro ao entrar');
   }
 };

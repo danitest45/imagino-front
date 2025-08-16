@@ -22,7 +22,8 @@ export default function LoginPage() {
       const { token } = await loginUser(email, password);
       auth.login(token);
       router.push('/images/replicate');
-    } catch (err: unknown) {
+    } catch (error: unknown) {
+      console.error(error);
       setError('Erro ao entrar');
     }
   };

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import Image from 'next/image';
 import { Download, Loader2 } from 'lucide-react';
 
 type Props = {
@@ -20,7 +21,13 @@ export default function ImageCard({ src, loading, onClick }: Props) {
     >
       {/* Imagem quando carregada */}
       {src && !loading && (
-        <img src={src} alt="Imagem" className="w-auto h-auto max-w-full max-h-[80vh] object-contain" />
+        <Image
+          src={src}
+          alt="Imagem"
+          width={512}
+          height={512}
+          className="w-auto h-auto max-w-full max-h-[80vh] object-contain"
+        />
       )}
 
       {/* Placeholder de carregamento */}
