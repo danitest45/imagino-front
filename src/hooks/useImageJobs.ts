@@ -22,7 +22,7 @@ export function useImageJobs() {
   // Persistir no localStorage sempre que jobs mudar
   useEffect(() => {
     localStorage.setItem('image-jobs', JSON.stringify(jobs));
-  }, [jobs]);
+  }, [jobs, token]);
 
   // Iniciar polling de jobs pendentes
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useImageJobs() {
     jobs.forEach(job => {
       if (job.status === 'loading') {
         const interval = setInterval(async () => {
-          const status = await getJobStatus(job.id, token);
+          const status = await getJobStatus(job.id);
           if (!status) return;
           const jobStatus = status.status?.toUpperCase();
           if (jobStatus === 'COMPLETED' && status.imageUrls) {
@@ -49,7 +49,7 @@ export function useImageJobs() {
     return () => {
       intervals.forEach(clearInterval);
     };
-  }, [jobs]);
+  }, [jobs, token]);
 
   // Criar um novo job e inserir placeholder
   const submitPrompt = async (prompt: string, resolution: { width: number; height: number }) => {

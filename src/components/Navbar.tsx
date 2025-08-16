@@ -15,14 +15,14 @@ export default function Navbar() {
 
   const token = auth?.token ?? null;
   const isAuthenticated = auth?.isAuthenticated ?? false;
-  const logout = auth?.logout ?? (() => {});
+  const logout = auth?.logout ?? (async () => {});
 
   useEffect(() => {
     async function load() {
       if (!token) return;
       try {
-        const id = await getUserId(token);
-        const data = await getUserById(id, token);
+        const id = await getUserId();
+        const data = await getUserById(id);
         setUser(data);
       } catch (err) {
         console.error(err);
@@ -36,8 +36,8 @@ export default function Navbar() {
 
   if (!auth) return null;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/'); // Redireciona para home após logout
     setMenuOpen(false);
   };

@@ -29,7 +29,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId }: Props) {
     let ignore = false;
     (async () => {
       try {
-        const data = await getJobDetails(jobId, token);
+        const data = await getJobDetails(jobId);
         if (!ignore) setDetails(data);
       } catch {
         if (!ignore) setDetails(null);
