@@ -55,7 +55,7 @@ export default function Navbar() {
             Imagino<span className="text-purple-500">.AI</span>
           </Link>
           <nav className="flex space-x-6 text-white text-sm sm:text-base">
-            <Link href="/images" className="hover:text-purple-400 transition">Images</Link>
+            <Link href="/images/replicate" className="hover:text-purple-400 transition">Images</Link>
             <Link href="/voices" className="hover:text-purple-400 transition">Voz</Link>
             <Link href="/videos" className="hover:text-purple-400 transition">Vídeo</Link>
           </nav>
