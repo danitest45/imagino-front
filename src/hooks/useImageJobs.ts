@@ -37,6 +37,7 @@ export function useImageJobs() {
           if (jobStatus === 'COMPLETED' && status.imageUrls) {
             setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: status.imageUrls } : j));
             clearInterval(interval);
+            window.dispatchEvent(new Event('creditsUpdated'));
           }
           if (jobStatus === 'FAILED') {
             setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: null } : j));
