@@ -92,6 +92,7 @@ export default function ReplicatePage() {
 
         const updatedHistory = await getUserHistory();
         setHistory(updatedHistory);
+        window.dispatchEvent(new Event('creditsUpdated'));
 
         setLoading(false);
       }
