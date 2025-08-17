@@ -1,27 +1,33 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ImageCard from '../components/ImageCard';
 import ImageCardModal from '../components/ImageCardModal';
-
-const mockImages = [
-  { id: 'mock1', url: 'https://picsum.photos/seed/imagino1/500/600' },
-  { id: 'mock2', url: 'https://picsum.photos/seed/imagino2/600/500' },
-  { id: 'mock3', url: 'https://picsum.photos/seed/imagino3/500/500' },
-  { id: 'mock4', url: 'https://picsum.photos/seed/imagino4/400/600' },
-  { id: 'mock5', url: 'https://picsum.photos/seed/imagino5/600/400' },
-  { id: 'mock6', url: 'https://picsum.photos/seed/imagino6/500/650' },
-  { id: 'mock7', url: 'https://picsum.photos/seed/imagino7/650/500' },
-  { id: 'mock8', url: 'https://picsum.photos/seed/imagino8/550/550' },
-  { id: 'mock9', url: 'https://picsum.photos/seed/imagino9/500/700' },
-  { id: 'mock10', url: 'https://picsum.photos/seed/imagino10/700/500' },
-  { id: 'mock11', url: 'https://picsum.photos/seed/imagino11/600/600' },
-  { id: 'mock12', url: 'https://picsum.photos/seed/imagino12/450/600' },
-];
+import { getLatestJobs } from '../lib/api';
+import type { LatestJob } from '../types/image-job';
 
 export default function Home() {
+  const [jobs, setJobs] = useState<LatestJob[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<{ id: string; url: string } | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+    (async () => {
+      try {
+        const latest = await getLatestJobs();
+        if (!ignore) setJobs(latest.filter(j => j.imageUrl));
+      } catch {
+        if (!ignore) setJobs([]);
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    })();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen max-w-7xl mx-auto px-4">
@@ -35,17 +41,23 @@ export default function Home() {
       </section>
 
       <div className="columns-2 sm:columns-3 md:columns-4 gap-4 [column-fill:_balance]">
-        {mockImages.map((img) => (
-          <div key={img.id} className="mb-4 break-inside-avoid">
-            <ImageCard
-              src={img.url}
-              onClick={() => {
-                setSelected(img);
-                setModalOpen(true);
-              }}
-            />
-          </div>
-        ))}
+        {loading
+          ? Array.from({ length: 12 }).map((_, i) => (
+              <div key={`placeholder-${i}`} className="mb-4 break-inside-avoid">
+                <ImageCard loading onClick={() => {}} />
+              </div>
+            ))
+          : jobs.map(job => (
+              <div key={job.id} className="mb-4 break-inside-avoid">
+                <ImageCard
+                  src={job.imageUrl}
+                  onClick={() => {
+                    setSelected({ id: job.id, url: job.imageUrl });
+                    setModalOpen(true);
+                  }}
+                />
+              </div>
+            ))}
       </div>
 
       <ImageCardModal
