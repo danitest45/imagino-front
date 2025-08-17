@@ -28,3 +28,12 @@ export interface JobDetails {
   createdAt: string;
   aspectRatio: string;
 }
+
+export interface LatestJob {
+  id: string;
+  imageUrl: string;
+  prompt: string;
+  username: string | null;
+  createdAt: string;
+  aspectRatio: string | null;
+}

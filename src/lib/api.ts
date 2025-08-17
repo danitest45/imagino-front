@@ -1,4 +1,4 @@
-import type { ImageJobApi, UiJob, JobDetails } from '../types/image-job';
+import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 
@@ -42,6 +42,20 @@ export async function getJobDetails(jobId: string): Promise<JobDetails> {
     createdAt: json.createdAt,
     aspectRatio: json.aspectRatio,
   };
+}
+
+export async function getLatestJobs(): Promise<LatestJob[]> {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/latest`);
+  if (!res.ok) throw new Error('Erro ao carregar jobs');
+  const json = (await res.json()) as Array<Record<string, unknown>>;
+  return json.map(j => ({
+    id: String(j.id ?? j.jobId ?? j.jobID ?? ''),
+    imageUrl: normalizeUrl(String(j.imageUrl ?? j.ImageUrl ?? '')) ?? '',
+    prompt: String(j.prompt ?? j.Prompt ?? ''),
+    username: (j.username ?? j.Username ?? null) as string | null,
+    createdAt: String(j.createdAt ?? j.CreatedAt ?? ''),
+    aspectRatio: (j.aspectRatio ?? j.AspectRatio ?? null) as string | null,
+  }));
 }
 
 export async function registerUser(email: string, password: string) {
