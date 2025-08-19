@@ -67,6 +67,7 @@ export default function ReplicatePage() {
       status: 'loading',
       url: null,
       aspectRatio: selectedAspectRatio,
+      prompt,
     };
 
     setImages((prev: UiJob[]) => [newJob, ...prev]);
@@ -107,6 +108,7 @@ export default function ReplicatePage() {
 
   // escolhe a imagem a ser exibida no centro
   const centerImageUrl = selectedImageUrl;
+  const centerPrompt = images.find(j => j.id === selectedJobId)?.prompt ?? '';
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row animate-fade-in">
@@ -171,6 +173,7 @@ export default function ReplicatePage() {
         {centerImageUrl ? (
           <ImageCard
             src={centerImageUrl}
+            prompt={centerPrompt}
             loading={false}
             onClick={() => {
               setModalOpen(true);

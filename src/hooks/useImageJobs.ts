@@ -9,6 +9,7 @@ export interface ImageJob {
   status: 'loading' | 'done';
   urls: string[] | null;
   resolution: { width: number; height: number };
+  prompt?: string;
 }
 
 export function useImageJobs() {
@@ -55,7 +56,7 @@ export function useImageJobs() {
   // Criar um novo job e inserir placeholder
   const submitPrompt = async (prompt: string, resolution: { width: number; height: number }) => {
     const jobId = await createRunpodJob(prompt, resolution);
-    const placeholder: ImageJob = { id: jobId, status: 'loading', urls: null, resolution };
+    const placeholder: ImageJob = { id: jobId, status: 'loading', urls: null, resolution, prompt };
     setJobs(prev => [placeholder, ...prev]);
     return jobId;
   };

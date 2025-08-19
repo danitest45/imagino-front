@@ -18,6 +18,7 @@ export interface UiJob {
   status: 'loading' | 'done';
   url: string | null;
   aspectRatio: string;
+  prompt?: string;
 }
 
 // Detalhes retornados pelo endpoint GET /api/jobs/details/{jobId}

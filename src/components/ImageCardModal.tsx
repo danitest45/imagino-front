@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { X, Share2, Download } from 'lucide-react';
-import { getJobDetails } from '../lib/api';
+import { getJobDetails, getPresignedDownloadUrl } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { JobDetails } from '../types/image-job';
 
@@ -47,6 +47,16 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
   const imageUrl = details?.imageUrl ?? fallbackUrl;
   if (!imageUrl) return null;
 
+  const handleDownload = async () => {
+    try {
+      const key = new URL(imageUrl).pathname.slice(1);
+      const url = await getPresignedDownloadUrl(key, details?.prompt ?? '');
+      window.location.href = url;
+    } catch (err) {
+      console.error('Erro ao baixar imagem', err);
+    }
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
@@ -77,13 +87,12 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
             <button className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700" disabled={!details}>
               <Share2 size={14} /> Share
             </button>
-            <a
+            <button
               className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700"
-              href={imageUrl}
-              download
+              onClick={handleDownload}
             >
               <Download size={14} /> Download
-            </a>
+            </button>
           </div>
 
           <div className="text-sm space-y-1">

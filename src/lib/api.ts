@@ -44,6 +44,15 @@ export async function getJobDetails(jobId: string): Promise<JobDetails> {
   };
 }
 
+export async function getPresignedDownloadUrl(key: string, prompt: string): Promise<string> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/download/${encodeURIComponent(key)}?prompt=${encodeURIComponent(prompt)}`,
+  );
+  if (!res.ok) throw new Error('Erro ao gerar URL de download');
+  const json = await res.json();
+  return String(json.url ?? json.presignedUrl ?? '');
+}
+
 export async function getLatestJobs(): Promise<LatestJob[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/latest`);
   if (!res.ok) throw new Error('Erro ao carregar jobs');
@@ -130,6 +139,7 @@ export function mapApiToUiJob(j: ImageJobApi): UiJob {
     status: j.status?.toUpperCase() === 'COMPLETED' ? 'done' : 'loading',
     url: normalizeUrl(rawUrl),                               // <<<<<< normaliza
     aspectRatio: j.aspectRatio ?? '1:1',
+    prompt: j.prompt ?? '',
   };
 }
 

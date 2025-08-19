@@ -109,6 +109,7 @@ const handleSubmit = async () => {
                 <ImageCard
                   key={`${job.id}-${i}`}
                   src={url}
+                  prompt={job.prompt}
                   loading={false}
                   onClick={() => {
                     setModalJobId(job.id);
