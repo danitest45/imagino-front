@@ -169,13 +169,14 @@ export default function ReplicatePage() {
       {/* Painel central: imagem selecionada ou estado de geração */}
       <div className="flex-1 p-4 flex items-center justify-center">
         {centerImageUrl ? (
-          <ImageCard
-            src={centerImageUrl}
-            loading={false}
-            onClick={() => {
-              setModalOpen(true);
-            }}
-          />
+            <ImageCard
+              src={centerImageUrl}
+              jobId={selectedJobId ?? undefined}
+              loading={false}
+              onClick={() => {
+                setModalOpen(true);
+              }}
+            />
         ) : loading ? (
           <ImageCard loading={true} onClick={() => {}} />
         ) : (
