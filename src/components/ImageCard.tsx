@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
-import { downloadJob } from '@/lib/download';
+import { downloadJob } from '../lib/download';
 
 type Props = {
   src?: string;

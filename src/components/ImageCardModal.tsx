@@ -5,7 +5,7 @@ import { X, Share2, Download } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { JobDetails } from '../types/image-job';
-import { downloadJob } from '@/lib/download';
+import { downloadJob } from '../lib/download';
 
 type Props = {
   isOpen: boolean;
