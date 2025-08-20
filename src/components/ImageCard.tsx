@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
+import { downloadImage } from '@/lib/download';
 
 type Props = {
   src?: string;
@@ -32,16 +33,16 @@ export default function ImageCard({ src, loading, onClick }: Props) {
 
       {/* Botão de download */}
       {hovered && src && !loading && (
-        <a
-          href={src}
-          download={`imagem-${Date.now()}.png`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
+        <button
+          type="button"
+          onClick={e => {
+            e.stopPropagation();
+            void downloadImage(src, `imagem-${Date.now()}.png`);
+          }}
           className="absolute top-2 right-2 z-10 bg-black/60 p-2 rounded-full text-white hover:bg-black/80 transition"
         >
           <Download size={18} />
-        </a>
+        </button>
       )}
     </div>
   );
