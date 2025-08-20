@@ -48,15 +48,16 @@ export default function Home() {
               </div>
             ))
           : jobs.map(job => (
-              <div key={job.id} className="mb-4 break-inside-avoid">
-                <ImageCard
-                  src={job.imageUrl}
-                  onClick={() => {
-                    setSelected({ id: job.id, url: job.imageUrl });
-                    setModalOpen(true);
-                  }}
-                />
-              </div>
+                <div key={job.id} className="mb-4 break-inside-avoid">
+                  <ImageCard
+                    src={job.imageUrl}
+                    jobId={job.id}
+                    onClick={() => {
+                      setSelected({ id: job.id, url: job.imageUrl });
+                      setModalOpen(true);
+                    }}
+                  />
+                </div>
             ))}
       </div>
 
