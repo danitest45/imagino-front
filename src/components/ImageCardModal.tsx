@@ -5,6 +5,7 @@ import { X, Share2, Download } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
 import type { JobDetails } from '../types/image-job';
+import { handleDownload } from '../lib/download';
 
 type Props = {
   isOpen: boolean;
@@ -77,13 +78,13 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
             <button className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700" disabled={!details}>
               <Share2 size={14} /> Share
             </button>
-            <a
+            <button
               className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-800 hover:bg-gray-700"
-              href={imageUrl}
-              download
+              onClick={e => details && handleDownload(e, imageUrl, details.prompt)}
+              disabled={!details}
             >
               <Download size={14} /> Download
-            </a>
+            </button>
           </div>
 
           <div className="text-sm space-y-1">

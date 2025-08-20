@@ -51,6 +51,7 @@ export default function Home() {
               <div key={job.id} className="mb-4 break-inside-avoid">
                 <ImageCard
                   src={job.imageUrl}
+                  prompt={job.prompt}
                   onClick={() => {
                     setSelected({ id: job.id, url: job.imageUrl });
                     setModalOpen(true);

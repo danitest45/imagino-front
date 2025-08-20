@@ -171,6 +171,7 @@ export default function ReplicatePage() {
         {centerImageUrl ? (
           <ImageCard
             src={centerImageUrl}
+            prompt={prompt}
             loading={false}
             onClick={() => {
               setModalOpen(true);

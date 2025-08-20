@@ -1,14 +1,16 @@
 'use client';
 import { useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
+import { handleDownload } from '../lib/download';
 
 type Props = {
   src?: string;
+  prompt?: string;
   loading?: boolean;
   onClick: () => void;
 };
 
-export default function ImageCard({ src, loading, onClick }: Props) {
+export default function ImageCard({ src, prompt, loading, onClick }: Props) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -31,17 +33,15 @@ export default function ImageCard({ src, loading, onClick }: Props) {
       )}
 
       {/* Botão de download */}
-      {hovered && src && !loading && (
-        <a
-          href={src}
-          download={`imagem-${Date.now()}.png`}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
+      {hovered && src && prompt && !loading && (
+        <button
+          onClick={e => handleDownload(e, src, prompt)}
           className="absolute top-2 right-2 z-10 bg-black/60 p-2 rounded-full text-white hover:bg-black/80 transition"
+          aria-label="Baixar imagem"
+          title="Baixar imagem"
         >
           <Download size={18} />
-        </a>
+        </button>
       )}
     </div>
   );
