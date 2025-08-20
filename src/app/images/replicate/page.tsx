@@ -109,16 +109,16 @@ export default function ReplicatePage() {
   const centerImageUrl = selectedImageUrl;
 
   return (
-    <div className="flex h-full flex-1 flex-col lg:flex-row animate-fade-in">
+    <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-1/3 p-6 flex flex-col gap-6 h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-2 flex-1">
+      <div className="w-full lg:w-[380px] flex-shrink-0 p-6 flex flex-col gap-6 bg-black/40 backdrop-blur-lg animate-fade-in">
+        <div className="flex flex-col gap-2">
           <label className="text-sm text-gray-300">Prompt</label>
           <textarea
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             placeholder="Descreva a imagem..."
-            className="flex-1 p-4 rounded-xl bg-gray-800/60 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+            className="h-48 p-4 rounded-xl bg-gray-800/60 text-white resize-none placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
           />
         </div>
         <div className="flex flex-col gap-4">
@@ -169,6 +169,7 @@ export default function ReplicatePage() {
       {/* Painel central: imagem selecionada ou estado de geração */}
       <div className="flex-1 p-4 flex items-center justify-center">
         {centerImageUrl ? (
+          <div className="max-w-[512px] w-full">
             <ImageCard
               src={centerImageUrl}
               jobId={selectedJobId ?? undefined}
@@ -177,8 +178,11 @@ export default function ReplicatePage() {
                 setModalOpen(true);
               }}
             />
+          </div>
         ) : loading ? (
-          <ImageCard loading={true} onClick={() => {}} />
+          <div className="max-w-[512px] w-full">
+            <ImageCard loading={true} onClick={() => {}} />
+          </div>
         ) : (
           <div className="text-gray-500 italic text-center">
             Digite um prompt e clique em &quot;Gerar&quot; para começar.
@@ -188,7 +192,7 @@ export default function ReplicatePage() {
 
       {/* Painel direito: histórico */}
       {images.filter(img => img.status === 'done' && img.url).length > 0 && (
-        <div className="w-full lg:w-1/5 p-4 h-full bg-black/30 backdrop-blur-md">
+        <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2">Histórico</h3>
           <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2 overflow-y-auto">
             {images
