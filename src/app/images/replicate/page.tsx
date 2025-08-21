@@ -9,6 +9,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 
 
@@ -26,7 +27,7 @@ export default function ReplicatePage() {
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 12;
+  const ITEMS_PER_PAGE = 10;
 
 
   
@@ -204,7 +205,7 @@ export default function ReplicatePage() {
       {doneImages.length > 0 && (
         <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2">Histórico</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-2 overflow-y-auto">
             {paginatedImages.map(job => (
               <img
                 key={job.id}
@@ -221,23 +222,20 @@ export default function ReplicatePage() {
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="flex justify-between mt-2 text-white text-sm">
+            <div className="flex justify-center gap-4 mt-2 text-white">
               <button
                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
                 className="disabled:opacity-50"
               >
-                Anterior
+                <ChevronLeft />
               </button>
-              <span>
-                {currentPage} / {totalPages}
-              </span>
               <button
                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
                 disabled={currentPage === totalPages}
                 className="disabled:opacity-50"
               >
-                Próximo
+                <ChevronRight />
               </button>
             </div>
           )}
