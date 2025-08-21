@@ -9,6 +9,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 
 
@@ -25,6 +26,8 @@ export default function ReplicatePage() {
   const [modalOpen, setModalOpen] = useState(false);
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
 
   
@@ -33,10 +36,11 @@ export default function ReplicatePage() {
     if (!history) return;
     // converte jobs da API para o formato que sua UI já usa
     const ui = history
-      .map(mapApiToUiJob)     // pega imageUrl OU imageUrls[0] e normaliza
-      .filter(j => !!j.url);  
+      .map(mapApiToUiJob) // pega imageUrl OU imageUrls[0] e normaliza
+      .filter(j => !!j.url);
 
     setImages(ui);
+    setCurrentPage(1);
 
     // mantém a mais recente selecionada no centro
     if (ui.length > 0) {
@@ -70,6 +74,7 @@ export default function ReplicatePage() {
     };
 
     setImages((prev: UiJob[]) => [newJob, ...prev]);
+    setCurrentPage(1);
 
     const poll = setInterval(async () => {
       const content = await getJobStatus(jobId);
@@ -107,6 +112,12 @@ export default function ReplicatePage() {
 
   // escolhe a imagem a ser exibida no centro
   const centerImageUrl = selectedImageUrl;
+  const doneImages = images.filter(img => img.status === 'done' && img.url);
+  const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
+  const paginatedImages = doneImages.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
@@ -191,27 +202,43 @@ export default function ReplicatePage() {
       </div>
 
       {/* Painel direito: histórico */}
-      {images.filter(img => img.status === 'done' && img.url).length > 0 && (
+      {doneImages.length > 0 && (
         <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2">Histórico</h3>
-          <div className="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-1 gap-2 overflow-y-auto">
-            {images
-              .filter(img => img.status === 'done' && img.url)
-              .map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  } hover:border-purple-400`}
-                  alt=""
-                />
-              ))}
+          <div className="grid grid-cols-2 gap-2 overflow-hidden">
+            {paginatedImages.map(job => (
+              <img
+                key={job.id}
+                src={job.url!}
+                onClick={() => {
+                  setSelectedImageUrl(job.url!);
+                  setSelectedJobId(job.id);
+                }}
+                className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
+                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                } hover:border-purple-400`}
+                alt=""
+              />
+            ))}
           </div>
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-4 mt-2 text-white">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                disabled={currentPage === 1}
+                className="disabled:opacity-50"
+              >
+                <ChevronLeft />
+              </button>
+              <button
+                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="disabled:opacity-50"
+              >
+                <ChevronRight />
+              </button>
+            </div>
+          )}
         </div>
       )}
 
