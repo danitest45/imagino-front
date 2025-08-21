@@ -205,7 +205,7 @@ export default function ReplicatePage() {
       {doneImages.length > 0 && (
         <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2">Histórico</h3>
-          <div className="grid grid-cols-2 gap-2 overflow-y-auto">
+          <div className="grid grid-cols-2 gap-2 overflow-hidden">
             {paginatedImages.map(job => (
               <img
                 key={job.id}
