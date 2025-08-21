@@ -111,14 +111,14 @@ export default function ReplicatePage() {
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Painel esquerdo: prompt e controles */}
-      <div className="w-full lg:w-[420px] flex-shrink-0 p-6 flex flex-col gap-6 bg-black/40 backdrop-blur-lg animate-fade-in">
+      <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col gap-6 bg-black/40 backdrop-blur-lg animate-fade-in">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-200">Prompt</label>
           <textarea
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             placeholder="Descreva a imagem..."
-            className="h-60 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+            className="h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
           />
         </div>
         <div className="flex flex-col gap-4">
