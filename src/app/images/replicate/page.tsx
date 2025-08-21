@@ -122,59 +122,60 @@ export default function ReplicatePage() {
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col gap-6 bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-gray-200">Prompt</label>
-          <textarea
-            value={prompt}
-            onChange={e => setPrompt(e.target.value)}
-            placeholder="Describe the image..."
-            className="h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
-          />
-        </div>
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2">
-            {['1:1', '9:16', '16:9'].map(ratio => (
-              <button
-                key={ratio}
-                onClick={() => setSelectedAspectRatio(ratio)}
-                className={`px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
-                  selectedAspectRatio === ratio
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-gray-800 text-gray-300'
-                } hover:bg-purple-500`}
-              >
-                {ratio}
-              </button>
-            ))}
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm text-gray-300">
-              Speed vs Quality ({quality})
-            </label>
-            <input
-              type="range"
-              min={1}
-              max={5}
-              value={quality}
-              onChange={e => setQuality(Number(e.target.value))}
-              className="w-full accent-purple-500"
+      <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col h-full bg-black/40 backdrop-blur-lg animate-fade-in">
+        <div className="flex flex-col flex-1 gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-gray-200">Prompt</label>
+            <textarea
+              value={prompt}
+              onChange={e => setPrompt(e.target.value)}
+              placeholder="Describe the image..."
+              className="h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
             />
-            <div className="flex justify-between text-xs text-gray-400">
-              <span>Fast</span>
-              <span>Quality</span>
+          </div>
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-2">
+              {['1:1', '9:16', '16:9'].map(ratio => (
+                <button
+                  key={ratio}
+                  onClick={() => setSelectedAspectRatio(ratio)}
+                  className={`px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
+                    selectedAspectRatio === ratio
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-gray-800 text-gray-300'
+                  } hover:bg-purple-500`}
+                >
+                  {ratio}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm text-gray-300">
+                Speed vs Quality ({quality})
+              </label>
+              <input
+                type="range"
+                min={1}
+                max={5}
+                value={quality}
+                onChange={e => setQuality(Number(e.target.value))}
+                className="w-full accent-purple-500"
+              />
+              <div className="flex justify-between text-xs text-gray-400">
+                <span>Fast</span>
+                <span>Quality</span>
+              </div>
             </div>
           </div>
-
-          <button
-            onClick={handleGenerate}
-            disabled={loading || !token}
-            className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
-          >
-            {loading ? 'Generating...' : 'Generate'}
-          </button>
         </div>
+        <button
+          onClick={handleGenerate}
+          disabled={loading || !token}
+          className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
+        >
+          {loading ? 'Generating...' : 'Generate'}
+        </button>
       </div>
 
       {/* Center panel: selected image or generation state */}
