@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  // Tenta atualizar o token ao carregar a aplicação
+  // Attempts to refresh the token when the app loads
   useEffect(() => {
     async function init() {
       if (!getAccessToken()) {
@@ -60,7 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error('useAuth deve ser usado dentro de <AuthProvider>');
+    throw new Error('useAuth must be used within <AuthProvider>');
   }
   return ctx;
 }

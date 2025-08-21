@@ -55,7 +55,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    router.push('/'); // Redireciona para home após logout
+    router.push('/'); // Redirect to home after logout
     setMenuOpen(false);
   };
 
@@ -73,8 +73,8 @@ export default function Navbar() {
           </Link>
           <nav className="flex space-x-6 text-white text-sm sm:text-base">
             <Link href="/images/replicate" className="hover:text-purple-400 transition">Images</Link>
-            <Link href="/voices" className="hover:text-purple-400 transition">Voz</Link>
-            <Link href="/videos" className="hover:text-purple-400 transition">Vídeo</Link>
+            <Link href="/voices" className="hover:text-purple-400 transition">Voice</Link>
+            <Link href="/videos" className="hover:text-purple-400 transition">Video</Link>
           </nav>
         </div>
 
@@ -84,12 +84,12 @@ export default function Navbar() {
             href="/login"
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
           >
-            Entrar
+            Log in
           </Link>
         ) : (
           <div className="flex items-center space-x-4">
             <span className="text-sm text-gray-300">
-              Créditos: {credits ?? '--'}
+              Credits: {credits ?? '--'}
             </span>
             <div className="relative">
               <button
@@ -113,13 +113,13 @@ export default function Navbar() {
                     onClick={() => setMenuOpen(false)}
                     className="block px-4 py-2 text-white hover:bg-gray-700"
                   >
-                    Perfil
+                    Profile
                   </Link>
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-white hover:bg-gray-700"
                   >
-                    Sair
+                    Log out
                   </button>
                 </div>
               )}

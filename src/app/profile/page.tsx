@@ -8,9 +8,9 @@ import { useAuth } from '../../context/AuthContext';
 import { getCredits } from '../../lib/api';
 
 const tabs = [
-  { id: 'info', label: 'Informações' },
-  { id: 'billing', label: 'Assinaturas' },
-  { id: 'support', label: 'Suporte' },
+  { id: 'info', label: 'Info' },
+  { id: 'billing', label: 'Subscriptions' },
+  { id: 'support', label: 'Support' },
 ];
 
 export default function ProfilePage() {
@@ -34,11 +34,11 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">Perfil</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Profile</h1>
 
         <div className="relative flex justify-center items-center mb-8">
           <div className="absolute left-0 text-sm text-gray-300">
-            Créditos: {credits ?? '--'}
+            Credits: {credits ?? '--'}
           </div>
           <div className="flex bg-gray-900/40 backdrop-blur rounded-full p-1 shadow-inner">
             {tabs.map((tab) => (

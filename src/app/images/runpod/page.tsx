@@ -24,37 +24,37 @@ const handleSubmit = async () => {
     return (
   <main className="min-h-screen bg-gray-950 text-white w-full">
     <div className="w-full max-w-6xl mx-auto px-4 pt-28 space-y-12">
-      {/* Título */}
+      {/* Title */}
       <div className="text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white">
           Imagino<span className="text-purple-500">.AI</span>
         </h1>
         <p className="text-gray-400 mt-2">
-          Transforme ideias em imagens com inteligência artificial.
+          Transform ideas into images with artificial intelligence.
         </p>
       </div>
 
-      {/* Formulário de prompt */}
+      {/* Prompt form */}
         <div className="flex flex-col gap-3 w-full">
-          {/* Campo de prompt com botão de config */}
+          {/* Prompt field with config button */}
           <div className="relative w-full">
             <input
               type="text"
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Digite seu prompt aqui..."
+              placeholder="Type your prompt here..."
               className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
-              onClick={() => alert('Configurações avançadas em breve')}
+              onClick={() => alert('Advanced settings coming soon')}
               className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-white"
-              title="Mais configurações em breve"
+              title="More settings coming soon"
             >
               ⚙️
             </button>
           </div>
 
-          {/* Resolução + botão gerar */}
+          {/* Resolution + generate button */}
             <div className="flex flex-wrap gap-2 justify-between items-center">
               <div className="flex gap-2">
                 <button
@@ -88,13 +88,13 @@ const handleSubmit = async () => {
                 disabled={loading}
                 className="px-6 py-3 bg-purple-600 text-white font-medium rounded-xl hover:bg-purple-700 transition disabled:opacity-50"
               >
-                {loading ? 'Gerando...' : 'Gerar'}
+                {loading ? 'Generating...' : 'Generate'}
               </button>
             </div>
         </div>
 
 
-      {/* Resultado gerado (caso esteja pronto) */}
+      {/* Generated result (if ready) */}
       {jobs.map((job) => (
         <div key={job.id} className="grid grid-cols-2 gap-4 w-full">
           {job.status === 'loading'

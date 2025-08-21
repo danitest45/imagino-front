@@ -9,7 +9,7 @@ export default function PromptConfigModal({ onSelect, onClose }: Props) {
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center px-4">
       <div className="bg-gray-900 rounded-xl p-6 w-full max-w-sm shadow-xl">
-        <h2 className="text-white text-lg font-semibold mb-4">Escolha a resolução</h2>
+        <h2 className="text-white text-lg font-semibold mb-4">Choose resolution</h2>
         <div className="space-y-2">
           <button
             onClick={() => {
@@ -18,7 +18,7 @@ export default function PromptConfigModal({ onSelect, onClose }: Props) {
             }}
             className="w-full py-2 px-4 bg-gray-800 hover:bg-purple-600 rounded-lg text-white text-sm"
           >
-            🟪 Quadrado (1:1)
+            🟪 Square (1:1)
           </button>
           <button
             onClick={() => {

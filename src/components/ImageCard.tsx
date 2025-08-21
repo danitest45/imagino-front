@@ -20,19 +20,19 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {/* Imagem quando carregada */}
+      {/* Image when loaded */}
       {src && !loading && (
-        <img src={src} alt="Imagem" className="w-full h-auto object-cover" />
+        <img src={src} alt="Image" className="w-full h-auto object-cover" />
       )}
 
-      {/* Placeholder de carregamento */}
+      {/* Loading placeholder */}
       {loading && (
         <div className="flex items-center justify-center w-full h-72 text-muted-foreground">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       )}
 
-      {/* Botão de download */}
+      {/* Download button */}
         {hovered && src && !loading && jobId && (
           <button
             type="button"
