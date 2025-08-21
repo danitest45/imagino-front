@@ -64,9 +64,9 @@ export default function UserInfo() {
   };
 
   const fields: { key: keyof UserDto; label: string }[] = [
-    { key: 'email', label: 'E-mail' },
-    { key: 'username', label: 'Nome de usuário' },
-    { key: 'phoneNumber', label: 'Telefone' },
+    { key: 'email', label: 'Email' },
+    { key: 'username', label: 'Username' },
+    { key: 'phoneNumber', label: 'Phone' },
   ];
 
   return (
@@ -79,7 +79,7 @@ export default function UserInfo() {
             {(form?.profileImageUrl || user.profileImageUrl) ? (
               <img
                 src={form?.profileImageUrl || user.profileImageUrl || ''}
-                alt="Foto de perfil"
+                alt="Profile photo"
                 className="w-24 h-24 rounded-full object-cover"
               />
             ) : (
@@ -101,7 +101,7 @@ export default function UserInfo() {
             />
           </div>
           <div className="space-y-1">
-            <p className="text-lg font-medium">{user.username ?? 'Usuário'}</p>
+            <p className="text-lg font-medium">{user.username ?? 'User'}</p>
             <p className="text-sm text-gray-400">{user.email}</p>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function UserInfo() {
             onClick={handleSave}
             className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700"
           >
-            Salvar
+            Save
           </button>
         </div>
       )}

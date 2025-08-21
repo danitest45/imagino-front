@@ -24,8 +24,8 @@ describe('LoginPage interactions', () => {
 
   it('toggles password visibility', async () => {
     renderPage();
-    const passwordInput = screen.getByPlaceholderText('Senha');
-    const toggleButton = screen.getByLabelText(/senha/);
+    const passwordInput = screen.getByPlaceholderText('Password');
+    const toggleButton = screen.getByLabelText(/password/i);
     expect(passwordInput).toHaveAttribute('type', 'password');
     await userEvent.click(toggleButton);
     expect(passwordInput).toHaveAttribute('type', 'text');
@@ -36,7 +36,7 @@ describe('LoginPage interactions', () => {
     const emailInput = screen.getByPlaceholderText('Email');
     await userEvent.click(emailInput);
     expect(emailInput).toHaveFocus();
-    const passwordInput = screen.getByPlaceholderText('Senha');
+    const passwordInput = screen.getByPlaceholderText('Password');
     await userEvent.click(passwordInput);
     expect(passwordInput).toHaveFocus();
   });

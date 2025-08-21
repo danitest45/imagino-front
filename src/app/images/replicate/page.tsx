@@ -34,15 +34,15 @@ export default function ReplicatePage() {
 
   useEffect(() => {
     if (!history) return;
-    // converte jobs da API para o formato que sua UI já usa
+    // convert jobs from the API to the format used by the UI
     const ui = history
-      .map(mapApiToUiJob) // pega imageUrl OU imageUrls[0] e normaliza
+      .map(mapApiToUiJob) // take imageUrl or imageUrls[0] and normalize
       .filter(j => !!j.url);
 
     setImages(ui);
     setCurrentPage(1);
 
-    // mantém a mais recente selecionada no centro
+    // keep the most recent selected in the center
     if (ui.length > 0) {
       setSelectedImageUrl(ui[0].url ?? null);
       setSelectedJobId(ui[0].id);
@@ -57,7 +57,7 @@ export default function ReplicatePage() {
   async function handleGenerate() {
     if (!prompt.trim()) return;
     if (!token) {
-      console.warn('Usuário não autenticado');
+      console.warn('User not authenticated');
       return;
     }
 
@@ -110,7 +110,7 @@ export default function ReplicatePage() {
     }, 2000);
   }
 
-  // escolhe a imagem a ser exibida no centro
+  // choose the image to display in the center
   const centerImageUrl = selectedImageUrl;
   const doneImages = images.filter(img => img.status === 'done' && img.url);
   const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
@@ -121,14 +121,14 @@ export default function ReplicatePage() {
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
-      {/* Painel esquerdo: prompt e controles */}
+      {/* Left panel: prompt and controls */}
       <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col gap-6 bg-black/40 backdrop-blur-lg animate-fade-in">
         <div className="flex flex-col gap-2">
           <label className="text-sm font-medium text-gray-200">Prompt</label>
           <textarea
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
-            placeholder="Descreva a imagem..."
+            placeholder="Describe the image..."
             className="h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
           />
         </div>
@@ -151,7 +151,7 @@ export default function ReplicatePage() {
 
           <div className="space-y-1">
             <label className="text-sm text-gray-300">
-              Velocidade x Qualidade ({quality})
+              Speed vs Quality ({quality})
             </label>
             <input
               type="range"
@@ -162,8 +162,8 @@ export default function ReplicatePage() {
               className="w-full accent-purple-500"
             />
             <div className="flex justify-between text-xs text-gray-400">
-              <span>Rápido</span>
-              <span>Qualidade</span>
+              <span>Fast</span>
+              <span>Quality</span>
             </div>
           </div>
 
@@ -172,12 +172,12 @@ export default function ReplicatePage() {
             disabled={loading || !token}
             className="mt-2 w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
           >
-            {loading ? 'Gerando...' : 'Gerar'}
+            {loading ? 'Generating...' : 'Generate'}
           </button>
         </div>
       </div>
 
-      {/* Painel central: imagem selecionada ou estado de geração */}
+      {/* Center panel: selected image or generation state */}
       <div className="flex-1 p-4 flex items-center justify-center">
         {centerImageUrl ? (
           <div className="max-w-[512px] w-full">
@@ -196,15 +196,15 @@ export default function ReplicatePage() {
           </div>
         ) : (
           <div className="text-gray-500 italic text-center">
-            Digite um prompt e clique em &quot;Gerar&quot; para começar.
+            Type a prompt and click &quot;Generate&quot; to start.
           </div>
         )}
       </div>
 
-      {/* Painel direito: histórico */}
+      {/* Right panel: history */}
       {doneImages.length > 0 && (
         <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2">Histórico</h3>
+          <h3 className="text-white mb-2">History</h3>
           <div className="grid grid-cols-2 gap-2 overflow-hidden">
             {paginatedImages.map(job => (
               <img
@@ -242,7 +242,7 @@ export default function ReplicatePage() {
         </div>
       )}
 
-      {/* Modal para ampliar imagem */}
+      {/* Modal to enlarge image */}
       <ImageCardModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

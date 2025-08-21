@@ -33,7 +33,7 @@ export async function getJobStatus(jobId: string) {
 
 export async function getJobDetails(jobId: string): Promise<JobDetails> {
   const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/details/${jobId}`);
-  if (!res.ok) throw new Error('Erro ao obter detalhes do job');
+  if (!res.ok) throw new Error('Error fetching job details');
   const json = await res.json();
   return {
     imageUrl: normalizeUrl(json.imageUrl) ?? '',
@@ -46,7 +46,7 @@ export async function getJobDetails(jobId: string): Promise<JobDetails> {
 
 export async function getLatestJobs(): Promise<LatestJob[]> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/jobs/latest`);
-  if (!res.ok) throw new Error('Erro ao carregar jobs');
+  if (!res.ok) throw new Error('Error loading jobs');
   const json = (await res.json()) as Array<Record<string, unknown>>;
   return json.map(j => ({
     id: String(j.id ?? j.jobId ?? j.jobID ?? ''),
@@ -65,7 +65,7 @@ export async function registerUser(email: string, password: string) {
     body: JSON.stringify({ email, password }),
     credentials: 'include',
   });
-  if (!res.ok) throw new Error((await res.json()).message ?? 'Erro ao registrar');
+  if (!res.ok) throw new Error((await res.json()).message ?? 'Error registering');
   return (await res.json()) as { token: string };
 }
 
@@ -76,26 +76,26 @@ export async function loginUser(email: string, password: string) {
     body: JSON.stringify({ email, password }),
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Credenciais inválidas');
+  if (!res.ok) throw new Error('Invalid credentials');
   return (await res.json()) as { token: string };
 }
 
 export async function getUserHistory(): Promise<ImageJobApi[]> {
   const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/history`);
-  if (!res.ok) throw new Error('Erro ao carregar histórico');
+  if (!res.ok) throw new Error('Error loading history');
   return (await res.json()) as ImageJobApi[];
 }
 
 export async function getUserId(): Promise<string> {
   const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/users`);
-  if (!res.ok) throw new Error('Erro ao obter ID do usuário');
+  if (!res.ok) throw new Error('Error getting user ID');
   const id = await res.text();
   return id.replace(/^"|"$/g, '');
 }
 
 export async function getUserById(id: string): Promise<UserDto> {
   const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`);
-  if (!res.ok) throw new Error('Erro ao obter usuário');
+  if (!res.ok) throw new Error('Error fetching user');
   return (await res.json()) as UserDto;
 }
 
@@ -103,7 +103,7 @@ export async function getCredits(): Promise<number> {
   const res = await fetchWithAuth(
     `${process.env.NEXT_PUBLIC_API_URL}/api/users/credits`,
   );
-  if (!res.ok) throw new Error('Erro ao obter créditos');
+  if (!res.ok) throw new Error('Error fetching credits');
   const json = await res.json();
   return json.credits as number;
 }
@@ -119,7 +119,7 @@ export async function updateUser(
     },
     body: JSON.stringify(dto),
   });
-  if (!res.ok) throw new Error('Erro ao atualizar usuário');
+  if (!res.ok) throw new Error('Error updating user');
   return (await res.json()) as UserDto;
 }
 

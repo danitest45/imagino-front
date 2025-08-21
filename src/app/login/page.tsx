@@ -23,11 +23,11 @@ export default function LoginPage() {
       auth.login(token);
       router.push('/images/replicate');
     } catch (err: unknown) {
-      setError('Erro ao entrar');
+      setError('Failed to log in');
     }
   };
 
-  // Redireciona usuário para a tela de consentimento do Google
+  // Redirect user to Google's consent screen
   const handleGoogleLogin = () => {
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
     const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
@@ -45,7 +45,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
       <div className="w-full max-w-md p-8 rounded-xl bg-gray-800/80 backdrop-blur-md shadow-2xl animate-fade-in transform transition-all duration-300 hover:scale-[1.02]">
-        <h1 className="text-2xl font-bold text-center text-white mb-6">Entrar</h1>
+        <h1 className="text-2xl font-bold text-center text-white mb-6">Log in</h1>
 
         {error && <p className="text-red-400 mb-4 text-center">{error}</p>}
 
@@ -77,13 +77,13 @@ export default function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={e => setPassword(e.target.value)}
-              placeholder="Senha"
+              placeholder="Password"
               className="w-full pl-10 pr-10 py-2 rounded-md bg-gray-700/60 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
               required
             />
             <button
               type="button"
-              aria-label={showPassword ? 'Esconder senha' : 'Mostrar senha'}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
               aria-pressed={showPassword}
               onClick={() => setShowPassword(s => !s)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 transition-transform transform hover:scale-110"
@@ -95,7 +95,7 @@ export default function LoginPage() {
             type="submit"
             className="w-full py-2 rounded-md bg-purple-600 text-white font-semibold transition-all duration-300 transform hover:bg-purple-700 hover:scale-105"
           >
-            Entrar
+            Log in
           </button>
         </form>
 
@@ -103,13 +103,13 @@ export default function LoginPage() {
           onClick={handleGoogleLogin}
           className="mt-4 w-full py-2 rounded-md bg-red-600 text-white font-semibold transition-all duration-300 transform hover:bg-red-700 hover:scale-105"
         >
-          Entrar com Google
+          Log in with Google
         </button>
 
         <p className="mt-4 text-center text-gray-400">
-          Ainda não tem conta?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/register" className="text-purple-400 hover:underline">
-            Registrar
+            Sign up
           </Link>
         </p>
       </div>

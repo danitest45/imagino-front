@@ -57,12 +57,12 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
         className="bg-gray-900 text-gray-100 max-w-6xl w-full h-full md:h-auto md:max-h-[90vh] rounded-lg overflow-hidden flex flex-col md:flex-row"
         onClick={e => e.stopPropagation()}
       >
-        {/* Imagem */}
+        {/* Image */}
         <div className="flex-1 bg-black flex items-center justify-center p-4">
-          <img src={imageUrl} alt="Imagem completa" className="max-h-full max-w-full object-contain" />
+          <img src={imageUrl} alt="Full image" className="max-h-full max-w-full object-contain" />
         </div>
 
-        {/* Informações */}
+        {/* Information */}
         <div className="w-full md:w-80 lg:w-96 border-t md:border-t-0 md:border-l border-gray-800 p-6 flex flex-col gap-4 overflow-y-auto">
           <div className="flex items-start justify-between">
             <div className="space-y-1">

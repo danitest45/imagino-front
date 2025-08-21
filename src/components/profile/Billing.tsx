@@ -13,21 +13,21 @@ export default function Billing() {
       } transition-opacity duration-300 space-y-6`}
     >
       <section>
-        <h2 className="text-xl font-semibold mb-2">Plano Atual</h2>
+        <h2 className="text-xl font-semibold mb-2">Current Plan</h2>
         <p className="text-sm text-gray-300">
-          Você está no plano{' '}
-          <span className="text-purple-400 font-medium">Free</span>.
+          You are on the{' '}
+          <span className="text-purple-400 font-medium">Free</span> plan.
         </p>
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold mb-2">Histórico de Pagamentos</h3>
+        <h3 className="text-lg font-semibold mb-2">Payment History</h3>
         <table className="w-full text-left text-sm bg-gray-900/40 rounded-lg overflow-hidden">
           <thead>
             <tr className="text-gray-400">
-              <th className="py-2">Data</th>
-              <th className="py-2">Plano</th>
-              <th className="py-2">Valor</th>
+              <th className="py-2">Date</th>
+              <th className="py-2">Plan</th>
+              <th className="py-2">Amount</th>
             </tr>
           </thead>
           <tbody>
