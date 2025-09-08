@@ -6,11 +6,12 @@ import Link from 'next/link';
 import { loginUser } from '../../lib/api';
 import { AuthContext } from '../../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Problem, mapProblemToUI } from '../../lib/errors';
+import { toast } from '../../lib/toast';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const auth = useContext(AuthContext);
@@ -22,8 +23,10 @@ export default function LoginPage() {
       const { token } = await loginUser(email, password);
       auth.login(token);
       router.push('/images/replicate');
-    } catch (err: unknown) {
-      setError('Failed to log in');
+    } catch (err) {
+      const problem = err as Problem;
+      const action = mapProblemToUI(problem);
+      toast(action.message);
     }
   };
 
@@ -46,8 +49,6 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
       <div className="w-full max-w-md p-8 rounded-xl bg-gray-800/80 backdrop-blur-md shadow-2xl animate-fade-in transform transition-all duration-300 hover:scale-[1.02]">
         <h1 className="text-2xl font-bold text-center text-white mb-6">Log in</h1>
-
-        {error && <p className="text-red-400 mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
