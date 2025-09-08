@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { resendVerification } from '../../lib/api';
 import { toast } from '../../lib/toast';
+import { Problem, mapProblemToUI } from '../../lib/errors';
 
 export default function ConfirmEmailSentPage() {
   const [email, setEmail] = useState('');
@@ -20,8 +21,9 @@ export default function ConfirmEmailSentPage() {
     try {
       await resendVerification(email);
       toast('Link reenviado.');
-    } catch {
-      toast('Não foi possível reenviar.');
+    } catch (err) {
+      const action = mapProblemToUI(err as Problem);
+      toast(action.message);
     } finally {
       setLoading(false);
     }

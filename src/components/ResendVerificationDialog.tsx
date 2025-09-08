@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { resendVerification } from '../lib/api';
 import { toast } from '../lib/toast';
+import { Problem, mapProblemToUI } from '../lib/errors';
 
 interface Props {
   open: boolean;
@@ -20,8 +21,9 @@ export default function ResendVerificationDialog({ open, email, onClose }: Props
       await resendVerification(email);
       toast('Link de verificação reenviado.');
       onClose();
-    } catch {
-      toast('Não foi possível reenviar o link.');
+    } catch (err) {
+      const action = mapProblemToUI(err as Problem);
+      toast(action.message);
     } finally {
       setLoading(false);
     }

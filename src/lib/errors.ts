@@ -32,12 +32,6 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
         message: 'Este recurso requer um plano superior',
         cta: '/pricing',
       };
-    case 'TOKEN_EXPIRED':
-      return {
-        kind: 'redirect',
-        message: 'Sessão expirada',
-        cta: '/login',
-      };
     case 'VALIDATION_FAILED': {
       const fields = Array.isArray(meta.fields) ? meta.fields.join(', ') : '';
       return {

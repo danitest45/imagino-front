@@ -2,14 +2,14 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { verifyEmail, resendVerification } from '../../lib/api';
-import { Problem } from '../../lib/errors';
+import { Problem, mapProblemToUI } from '../../lib/errors';
 import { toast } from '../../lib/toast';
 
 export default function VerifyEmailPage() {
   const search = useSearchParams();
   const token = search.get('token') || '';
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [code, setCode] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [loadingResend, setLoadingResend] = useState(false);
   const router = useRouter();
@@ -21,8 +21,9 @@ export default function VerifyEmailPage() {
         setStatus('success');
       } catch (err) {
         const problem = err as Problem;
+        const action = mapProblemToUI(problem);
         setStatus('error');
-        setCode(problem.code ?? null);
+        setMessage(action.message);
       }
     }
     run();
@@ -34,8 +35,9 @@ export default function VerifyEmailPage() {
     try {
       await resendVerification(email);
       toast('Link reenviado.');
-    } catch {
-      toast('Não foi possível reenviar.');
+    } catch (err) {
+      const action = mapProblemToUI(err as Problem);
+      toast(action.message);
     } finally {
       setLoadingResend(false);
     }
@@ -67,13 +69,7 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
       <div className="bg-gray-800/80 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md text-center space-y-4">
         <h1 className="text-2xl font-bold text-white">Erro ao verificar</h1>
-        <p className="text-gray-300">
-          {code === 'TOKEN_EXPIRED'
-            ? 'Link expirado. Clique em Reenviar.'
-            : code === 'TOKEN_CONSUMED'
-            ? 'Este link já foi usado.'
-            : 'Link inválido.'}
-        </p>
+        <p className="text-gray-300">{message}</p>
         <input
           type="email"
           value={email}
