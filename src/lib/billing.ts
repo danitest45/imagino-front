@@ -7,13 +7,14 @@ export interface BillingMe {
 }
 
 export async function getBillingMe(): Promise<BillingMe> {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/billing/me`, { credentials: 'include' });
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/me`, { credentials: 'include' });
   if (!res.ok) throw new Error('Erro ao obter assinatura');
   return res.json();
 }
 
 export async function createCheckoutSession(plan: 'PRO' | 'ULTRA'): Promise<{ url: string }> {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/billing/checkout`, {
+  debugger
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/checkout`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -24,7 +25,7 @@ export async function createCheckoutSession(plan: 'PRO' | 'ULTRA'): Promise<{ ur
 }
 
 export async function createPortalSession(): Promise<{ url: string }> {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/billing/portal`, {
+  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/portal`, {
     method: 'POST',
     credentials: 'include',
   });
