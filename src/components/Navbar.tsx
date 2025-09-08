@@ -75,6 +75,7 @@ export default function Navbar() {
             <Link href="/images/replicate" className="hover:text-purple-400 transition">Images</Link>
             <Link href="/voices" className="hover:text-purple-400 transition">Voice</Link>
             <Link href="/videos" className="hover:text-purple-400 transition">Video</Link>
+            <Link href="/pricing" className="hover:text-purple-400 transition">Planos</Link>
           </nav>
         </div>
 
