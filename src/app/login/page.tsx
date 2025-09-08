@@ -8,11 +8,13 @@ import { AuthContext } from '../../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../lib/errors';
 import { toast } from '../../lib/toast';
+import ResendVerificationDialog from '../../components/ResendVerificationDialog';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [emailModal, setEmailModal] = useState(false);
   const router = useRouter();
   const auth = useContext(AuthContext);
 
@@ -20,13 +22,20 @@ export default function LoginPage() {
     e.preventDefault();
     if (!auth) return;
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userEmail', email);
+      }
       const { token } = await loginUser(email, password);
       auth.login(token);
       router.push('/images/replicate');
     } catch (err) {
       const problem = err as Problem;
-      const action = mapProblemToUI(problem);
-      toast(action.message);
+      if (problem.code === 'EMAIL_NOT_VERIFIED') {
+        setEmailModal(true);
+      } else {
+        const action = mapProblemToUI(problem);
+        toast(action.message);
+      }
     }
   };
 
@@ -46,8 +55,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
-      <div className="w-full max-w-md p-8 rounded-xl bg-gray-800/80 backdrop-blur-md shadow-2xl animate-fade-in transform transition-all duration-300 hover:scale-[1.02]">
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
+        <div className="w-full max-w-md p-8 rounded-xl bg-gray-800/80 backdrop-blur-md shadow-2xl animate-fade-in transform transition-all duration-300 hover:scale-[1.02]">
         <h1 className="text-2xl font-bold text-center text-white mb-6">Log in</h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -113,7 +123,13 @@ export default function LoginPage() {
             Sign up
           </Link>
         </p>
+        </div>
       </div>
-    </div>
+      <ResendVerificationDialog
+        open={emailModal}
+        email={email}
+        onClose={() => setEmailModal(false)}
+      />
+    </>
   );
 }

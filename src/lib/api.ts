@@ -102,6 +102,53 @@ export async function loginUser(email: string, password: string) {
   return (await res.json()) as { token: string };
 }
 
+export async function resendVerification(email: string): Promise<void> {
+  await apiFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-verification`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    },
+  );
+}
+
+export async function verifyEmail(token: string): Promise<void> {
+  await apiFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-email`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    },
+  );
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  await apiFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/forgot`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    },
+  );
+}
+
+export async function resetPassword(
+  token: string,
+  newPassword: string,
+): Promise<void> {
+  await apiFetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/reset`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword }),
+    },
+  );
+}
+
 export async function getUserHistory(): Promise<ImageJobApi[]> {
   const res = await fetchWithAuth(
     `${process.env.NEXT_PUBLIC_API_URL}/api/history`,

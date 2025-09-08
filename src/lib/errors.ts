@@ -60,6 +60,28 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
         kind: 'toast',
         message: problem.detail || 'Erro ao processar pagamento',
       };
+    case 'TOKEN_INVALID':
+      return { kind: 'toast', message: 'Link inválido.' };
+    case 'TOKEN_EXPIRED':
+      return {
+        kind: 'toast',
+        message: 'Link expirado. Clique em Reenviar.',
+      };
+    case 'TOKEN_CONSUMED':
+      return {
+        kind: 'toast',
+        message: 'Este link já foi usado.',
+      };
+    case 'WEAK_PASSWORD':
+      return {
+        kind: 'toast',
+        message: 'Senha fraca. Use 8+ caracteres com número e símbolo.',
+      };
+    case 'EMAIL_NOT_VERIFIED':
+      return {
+        kind: 'toast',
+        message: 'Confirme seu e-mail.',
+      };
     default:
       return {
         kind: 'toast',

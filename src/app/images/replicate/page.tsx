@@ -19,6 +19,7 @@ import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
 import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
 import { useRouter } from 'next/navigation';
+import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
 
 
 
@@ -36,6 +37,7 @@ export default function ReplicatePage() {
   const [outOfCredits, setOutOfCredits] =
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
+  const [emailModal, setEmailModal] = useState(false);
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
@@ -124,7 +126,9 @@ export default function ReplicatePage() {
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
-      if (action.kind === 'toast') {
+      if (problem.code === 'EMAIL_NOT_VERIFIED') {
+        setEmailModal(true);
+      } else if (action.kind === 'toast') {
         toast(action.message);
       } else if (action.kind === 'modal') {
         if (problem.code === 'INSUFFICIENT_CREDITS') {
@@ -288,6 +292,11 @@ export default function ReplicatePage() {
   <UpgradePlanDialog
     open={upgradeDialog}
     onClose={() => setUpgradeDialog(false)}
+  />
+  <ResendVerificationDialog
+    open={emailModal}
+    email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
+    onClose={() => setEmailModal(false)}
   />
 </div>
   );
