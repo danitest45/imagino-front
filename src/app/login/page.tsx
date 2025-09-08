@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { loginUser } from '../../lib/api';
 import { AuthContext } from '../../context/AuthContext';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import ResendVerificationModal from '../../components/ResendVerificationModal';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
   const router = useRouter();
   const auth = useContext(AuthContext);
 
@@ -23,7 +25,11 @@ export default function LoginPage() {
       auth.login(token);
       router.push('/images/replicate');
     } catch (err: unknown) {
-      setError('Failed to log in');
+      if (err instanceof Error && err.message === 'EMAIL_NOT_VERIFIED') {
+        setShowVerifyModal(true);
+      } else {
+        setError('Failed to log in');
+      }
     }
   };
 
@@ -106,6 +112,12 @@ export default function LoginPage() {
           Log in with Google
         </button>
 
+        <p className="mt-4 text-center">
+          <Link href="/forgot-password" className="text-purple-400 hover:underline">
+            Forgot password?
+          </Link>
+        </p>
+
         <p className="mt-4 text-center text-gray-400">
           Don&apos;t have an account?{' '}
           <Link href="/register" className="text-purple-400 hover:underline">
@@ -113,6 +125,13 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
+      {showVerifyModal && (
+        <ResendVerificationModal
+          email={email}
+          open={showVerifyModal}
+          onClose={() => setShowVerifyModal(false)}
+        />
+      )}
     </div>
   );
 }

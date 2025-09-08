@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { registerUser } from '../../lib/api';
+import ConfirmEmailSentPage from './confirm-email-sent';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 
@@ -12,20 +12,27 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const auth = useContext(AuthContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!auth) return;
-  try {
-    const { token } = await registerUser(email, password);
-    auth.login(token);
-    router.push('/images/replicate');
-  } catch (err: unknown) {
-    setError('Failed to register');
+    e.preventDefault();
+    if (!auth) return;
+    setLoading(true);
+    try {
+      await registerUser(email, password);
+      setSuccess(true);
+    } catch {
+      setError('Failed to register');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (success) {
+    return <ConfirmEmailSentPage email={email} />;
   }
-};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
@@ -55,9 +62,10 @@ export default function RegisterPage() {
           />
           <button
             type="submit"
-            className="w-full py-2 rounded-md bg-purple-600 text-white font-semibold transition-all duration-300 transform hover:bg-purple-700 hover:scale-105"
+            className="w-full py-2 rounded-md bg-purple-600 text-white font-semibold transition-all duration-300 transform hover:bg-purple-700 hover:scale-105 disabled:opacity-50"
+            disabled={loading}
           >
-            Register
+            {loading ? 'Enviando…' : 'Register'}
           </button>
         </form>
 

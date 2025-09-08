@@ -2,7 +2,7 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { createReplicateJob, getJobStatus, getUserHistory } from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
 import { useAuth } from '../../../context/AuthContext';
@@ -10,6 +10,7 @@ import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import ResendVerificationModal from '../../../components/ResendVerificationModal';
 
 
 
@@ -24,6 +25,7 @@ export default function ReplicatePage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [verifyModal, setVerifyModal] = useState(false);
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
@@ -54,6 +56,15 @@ export default function ReplicatePage() {
 
 
 
+  const userEmail = useMemo(() => {
+    if (!token) return '';
+    try {
+      return JSON.parse(atob(token.split('.')[1])).email || '';
+    } catch {
+      return '';
+    }
+  }, [token]);
+
   async function handleGenerate() {
     if (!prompt.trim()) return;
     if (!token) {
@@ -65,7 +76,16 @@ export default function ReplicatePage() {
     setSelectedImageUrl(null);
     setSelectedJobId(null);
 
-    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    let jobId: string;
+    try {
+      jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === 'EMAIL_NOT_VERIFIED') {
+        setVerifyModal(true);
+      }
+      setLoading(false);
+      return;
+    }
     const newJob: UiJob = {
       id: jobId,
       status: 'loading',
@@ -244,11 +264,18 @@ export default function ReplicatePage() {
       )}
 
       {/* Modal to enlarge image */}
-      <ImageCardModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        jobId={selectedJobId}
-      />
-    </div>
-  );
-}
+        <ImageCardModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          jobId={selectedJobId}
+        />
+        {verifyModal && (
+          <ResendVerificationModal
+            email={userEmail}
+            open={verifyModal}
+            onClose={() => setVerifyModal(false)}
+          />
+        )}
+      </div>
+    );
+  }

@@ -1,10 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { createCheckoutSession } from '../../lib/billing';
+import { useAuth } from '../../context/AuthContext';
+import ResendVerificationModal from '../../components/ResendVerificationModal';
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<'PRO' | 'ULTRA' | null>(null);
+  const [verifyModal, setVerifyModal] = useState(false);
+  const { token } = useAuth();
+  const email = useMemo(() => {
+    if (!token) return '';
+    try {
+      return JSON.parse(atob(token.split('.')[1])).email || '';
+    } catch {
+      return '';
+    }
+  }, [token]);
 
   const handleSubscribe = async (plan: 'PRO' | 'ULTRA') => {
     try {
@@ -12,7 +24,11 @@ export default function PricingPage() {
       const { url } = await createCheckoutSession(plan);
       window.location.href = url;
     } catch (err) {
-      console.error(err);
+      if (err instanceof Error && err.message === 'EMAIL_NOT_VERIFIED') {
+        setVerifyModal(true);
+      } else {
+        console.error(err);
+      }
       setLoading(null);
     }
   };
@@ -43,6 +59,13 @@ export default function PricingPage() {
           </button>
         </div>
       </div>
+      {verifyModal && (
+        <ResendVerificationModal
+          email={email}
+          open={verifyModal}
+          onClose={() => setVerifyModal(false)}
+        />
+      )}
     </div>
   );
 }

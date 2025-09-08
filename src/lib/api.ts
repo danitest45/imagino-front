@@ -21,6 +21,14 @@ export async function createReplicateJob(prompt: string, aspectRatio: string) {
     },
     body: JSON.stringify({ prompt, aspectRatio }),
   });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    const code = data.code as string | undefined;
+    if (res.status === 403 && code) {
+      throw new Error(code);
+    }
+    throw new Error('Error creating job');
+  }
   const json = await res.json();
   return json.content.jobId as string;
 }
@@ -65,8 +73,12 @@ export async function registerUser(email: string, password: string) {
     body: JSON.stringify({ email, password }),
     credentials: 'include',
   });
-  if (!res.ok) throw new Error((await res.json()).message ?? 'Error registering');
-  return (await res.json()) as { token: string };
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.message ?? 'Error registering');
+  }
+  // Backend now sends the verification e-mail instead of returning a token
+  return (await res.json()) as { token?: string };
 }
 
 export async function loginUser(email: string, password: string) {
@@ -76,8 +88,58 @@ export async function loginUser(email: string, password: string) {
     body: JSON.stringify({ email, password }),
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Invalid credentials');
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    const code = data.code as string | undefined;
+    if (res.status === 403 && code) {
+      const err = new Error(code);
+      throw err;
+    }
+    throw new Error('Invalid credentials');
+  }
   return (await res.json()) as { token: string };
+}
+
+export async function resendVerification(email: string) {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-verification`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function verifyEmail(token: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.code || 'TOKEN_INVALID');
+  }
+  return true;
+}
+
+export async function forgotPassword(email: string) {
+  await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/forgot`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function resetPassword(token: string, newPassword: string) {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/reset`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, newPassword }),
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.code || 'TOKEN_INVALID');
+  }
+  return true;
 }
 
 export async function getUserHistory(): Promise<ImageJobApi[]> {
