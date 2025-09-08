@@ -9,6 +9,8 @@ import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
+import { AppError } from '../../../lib/errors';
+import { useHandleProblem } from '../../../hooks/useHandleProblem';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 
@@ -28,6 +30,7 @@ export default function ReplicatePage() {
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+  const { handleProblem, dialogs } = useHandleProblem();
 
 
   
@@ -65,7 +68,18 @@ export default function ReplicatePage() {
     setSelectedImageUrl(null);
     setSelectedJobId(null);
 
-    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    let jobId: string;
+    try {
+      jobId = await createReplicateJob(prompt, selectedAspectRatio);
+    } catch (err) {
+      if (err instanceof AppError) {
+        handleProblem(err.problem);
+      } else {
+        console.error(err);
+      }
+      setLoading(false);
+      return;
+    }
     const newJob: UiJob = {
       id: jobId,
       status: 'loading',
@@ -120,6 +134,7 @@ export default function ReplicatePage() {
   );
 
   return (
+    <>
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
       <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col h-full bg-black/40 backdrop-blur-lg animate-fade-in">
@@ -250,5 +265,7 @@ export default function ReplicatePage() {
         jobId={selectedJobId}
       />
     </div>
+    {dialogs}
+    </>
   );
 }

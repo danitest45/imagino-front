@@ -23,23 +23,14 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
+import { apiFetch } from './api-client';
+
 export async function fetchWithAuth(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
   const headers = new Headers(init.headers);
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
-  const res = await fetch(input, { ...init, headers, credentials: 'include' });
-  if (res.status === 401) {
-    const refreshed = await refreshAccessToken();
-    if (refreshed) {
-      const retryHeaders = new Headers(init.headers);
-      if (accessToken) {
-        retryHeaders.set('Authorization', `Bearer ${accessToken}`);
-      }
-      return fetch(input, { ...init, headers: retryHeaders, credentials: 'include' });
-    }
-  }
-  return res;
+  return apiFetch(input, { ...init, headers });
 }
 
 export async function logoutRequest(): Promise<void> {
