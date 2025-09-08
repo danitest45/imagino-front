@@ -3,13 +3,22 @@
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useEffect, useState } from 'react';
-import { createReplicateJob, getJobStatus, getUserHistory } from '../../../lib/api';
+import {
+  createReplicateJob,
+  getJobStatus,
+  getUserHistory,
+} from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Problem, mapProblemToUI } from '../../../lib/errors';
+import { toast } from '../../../lib/toast';
+import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
+import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
+import { useRouter } from 'next/navigation';
 
 
 
@@ -24,10 +33,14 @@ export default function ReplicatePage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [outOfCredits, setOutOfCredits] =
+    useState<{ current?: number; needed?: number } | null>(null);
+  const [upgradeDialog, setUpgradeDialog] = useState(false);
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
+  const router = useRouter();
 
 
   
@@ -64,50 +77,67 @@ export default function ReplicatePage() {
     setLoading(true);
     setSelectedImageUrl(null);
     setSelectedJobId(null);
+    try {
+      const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+      const newJob: UiJob = {
+        id: jobId,
+        status: 'loading',
+        url: null,
+        aspectRatio: selectedAspectRatio,
+      };
 
-    const jobId = await createReplicateJob(prompt, selectedAspectRatio);
-    const newJob: UiJob = {
-      id: jobId,
-      status: 'loading',
-      url: null,
-      aspectRatio: selectedAspectRatio,
-    };
+      setImages((prev: UiJob[]) => [newJob, ...prev]);
+      setCurrentPage(1);
 
-    setImages((prev: UiJob[]) => [newJob, ...prev]);
-    setCurrentPage(1);
+      const poll = setInterval(async () => {
+        const content = await getJobStatus(jobId);
+        if (!content) return;
+        const status = content.status?.toUpperCase();
 
-    const poll = setInterval(async () => {
-      const content = await getJobStatus(jobId);
-      if (!content) return;
-      const status = content.status?.toUpperCase();
+        const rawUrl =
+          content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
 
-      const rawUrl =
-        content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
+        if (status === 'COMPLETED') {
+          clearInterval(poll);
 
-      if (status === 'COMPLETED') {
-        clearInterval(poll);
+          const fullUrl = normalizeUrl(rawUrl);
 
-        const fullUrl = normalizeUrl(rawUrl);
+          setImages((prev: UiJob[]) =>
+            prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
+          );
+          setSelectedImageUrl(fullUrl);
+          setSelectedJobId(jobId);
 
-        setImages((prev: UiJob[]) =>
-          prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
-        );
-        setSelectedImageUrl(fullUrl);
-        setSelectedJobId(jobId);
+          const updatedHistory = await getUserHistory();
+          setHistory(updatedHistory);
+          window.dispatchEvent(new Event('creditsUpdated'));
 
-        const updatedHistory = await getUserHistory();
-        setHistory(updatedHistory);
-        window.dispatchEvent(new Event('creditsUpdated'));
+          setLoading(false);
+        }
 
-        setLoading(false);
+        if (status === 'FAILED') {
+          clearInterval(poll);
+          setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
+          setLoading(false);
+        }
+      }, 2000);
+    } catch (err) {
+      const problem = err as Problem;
+      const action = mapProblemToUI(problem);
+      if (action.kind === 'toast') {
+        toast(action.message);
+      } else if (action.kind === 'modal') {
+        if (problem.code === 'INSUFFICIENT_CREDITS') {
+          setOutOfCredits(problem.meta as { current?: number; needed?: number });
+        } else if (problem.code === 'FORBIDDEN_FEATURE') {
+          setUpgradeDialog(true);
+        }
+      } else if (action.kind === 'redirect' && action.cta) {
+        toast(action.message);
+        router.push(action.cta);
       }
-
-      if (status === 'FAILED') {
-        clearInterval(poll);
-        setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
-        setLoading(false);
-      }
-    }, 2000);
+      setLoading(false);
+    }
   }
 
   // choose the image to display in the center
@@ -243,12 +273,22 @@ export default function ReplicatePage() {
         </div>
       )}
 
-      {/* Modal to enlarge image */}
-      <ImageCardModal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        jobId={selectedJobId}
-      />
-    </div>
+  {/* Modal to enlarge image */}
+  <ImageCardModal
+    isOpen={modalOpen}
+    onClose={() => setModalOpen(false)}
+    jobId={selectedJobId}
+  />
+  <OutOfCreditsDialog
+    open={outOfCredits !== null}
+    current={outOfCredits?.current}
+    needed={outOfCredits?.needed}
+    onClose={() => setOutOfCredits(null)}
+  />
+  <UpgradePlanDialog
+    open={upgradeDialog}
+    onClose={() => setUpgradeDialog(false)}
+  />
+</div>
   );
 }

@@ -1,3 +1,5 @@
+import { buildProblem } from './api-client';
+
 export let accessToken: string | null = null;
 
 export function setAccessToken(token: string | null) {
@@ -23,12 +25,15 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
-export async function fetchWithAuth(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+export async function fetchWithAuth(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+): Promise<Response> {
   const headers = new Headers(init.headers);
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
-  const res = await fetch(input, { ...init, headers, credentials: 'include' });
+  let res = await fetch(input, { ...init, headers, credentials: 'include' });
   if (res.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
@@ -36,8 +41,15 @@ export async function fetchWithAuth(input: RequestInfo | URL, init: RequestInit 
       if (accessToken) {
         retryHeaders.set('Authorization', `Bearer ${accessToken}`);
       }
-      return fetch(input, { ...init, headers: retryHeaders, credentials: 'include' });
+      res = await fetch(input, {
+        ...init,
+        headers: retryHeaders,
+        credentials: 'include',
+      });
     }
+  }
+  if (!res.ok) {
+    throw await buildProblem(res);
   }
   return res;
 }
