@@ -32,12 +32,6 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
         message: 'Este recurso requer um plano superior',
         cta: '/pricing',
       };
-    case 'TOKEN_EXPIRED':
-      return {
-        kind: 'redirect',
-        message: 'Sessão expirada',
-        cta: '/login',
-      };
     case 'VALIDATION_FAILED': {
       const fields = Array.isArray(meta.fields) ? meta.fields.join(', ') : '';
       return {
@@ -59,6 +53,28 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
       return {
         kind: 'toast',
         message: problem.detail || 'Erro ao processar pagamento',
+      };
+    case 'TOKEN_INVALID':
+      return { kind: 'toast', message: 'Link inválido.' };
+    case 'TOKEN_EXPIRED':
+      return {
+        kind: 'toast',
+        message: 'Link expirado. Clique em Reenviar.',
+      };
+    case 'TOKEN_CONSUMED':
+      return {
+        kind: 'toast',
+        message: 'Este link já foi usado.',
+      };
+    case 'WEAK_PASSWORD':
+      return {
+        kind: 'toast',
+        message: 'Senha fraca. Use 8+ caracteres com número e símbolo.',
+      };
+    case 'EMAIL_NOT_VERIFIED':
+      return {
+        kind: 'toast',
+        message: 'Confirme seu e-mail.',
       };
     default:
       return {

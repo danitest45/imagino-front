@@ -4,6 +4,8 @@ import ImageCard from '../../../components/ImageCard';
 import { useState } from 'react';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useImageJobs } from '../../../hooks/useImageJobs';
+import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
+import { Problem } from '../../../lib/errors';
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalJobId, setModalJobId] = useState<string | null>(null);
@@ -11,13 +13,21 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const [resolution, setResolution] = useState({ width: 1024, height: 1024 });
     const { jobs, submitPrompt } = useImageJobs();
+    const [emailModal, setEmailModal] = useState(false);
 
     
 
 const handleSubmit = async () => {
   if (!prompt.trim()) return;
   setLoading(true);
+  try {
   await submitPrompt(prompt, resolution);
+  } catch (err) {
+    const problem = err as Problem;
+    if (problem.code === 'EMAIL_NOT_VERIFIED') {
+      setEmailModal(true);
+    }
+  }
   setLoading(false);
 };
 
@@ -125,6 +135,11 @@ const handleSubmit = async () => {
       isOpen={modalOpen}
       onClose={() => setModalOpen(false)}
       jobId={modalJobId}
+    />
+    <ResendVerificationDialog
+      open={emailModal}
+      email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
+      onClose={() => setEmailModal(false)}
     />
   </main>
 );
