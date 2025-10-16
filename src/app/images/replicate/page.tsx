@@ -153,18 +153,20 @@ export default function ReplicatePage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
+  const showCenterOnMobile = !!centerImageUrl || loading;
+
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-4 md:p-6 flex flex-col h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col flex-1 gap-4 md:gap-6">
-          <div className="flex flex-col gap-2">
+      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
+        <div className="flex flex-col gap-4 md:gap-6 lg:flex-1">
+          <div className="mt-4 lg:mt-0 flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-200">Prompt</label>
             <textarea
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="Describe the image..."
-              className="h-48 md:h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+              className="h-40 sm:h-48 md:h-72 p-3 sm:p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
             />
           </div>
           <div className="flex flex-col gap-4">
@@ -173,7 +175,7 @@ export default function ReplicatePage() {
                 <button
                   key={ratio}
                   onClick={() => setSelectedAspectRatio(ratio)}
-                  className={`px-3 md:px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
+                  className={`px-3 md:px-4 py-2 rounded-lg text-sm transition-all transform active:scale-95 hover:scale-105 ${
                     selectedAspectRatio === ratio
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-800 text-gray-300'
@@ -196,7 +198,7 @@ export default function ReplicatePage() {
                 onChange={e => setQuality(Number(e.target.value))}
                 className="w-full accent-purple-500"
               />
-              <div className="flex justify-between text-xs text-gray-400">
+              <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
                 <span>Fast</span>
                 <span>Quality</span>
               </div>
@@ -206,14 +208,40 @@ export default function ReplicatePage() {
         <button
           onClick={handleGenerate}
           disabled={loading || !token}
-          className="mt-4 md:mt-6 w-full px-4 md:px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
+          className="mt-4 md:mt-6 w-full px-4 md:px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform active:scale-95 hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
         >
           {loading ? 'Generating...' : 'Generate'}
         </button>
+
+        {/* Mobile history directly under controls when center is hidden */}
+        {!showCenterOnMobile && doneImages.length > 0 && (
+          <div className="mt-3 lg:hidden">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <h3 className="text-white text-sm">History</h3>
+              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} images</div>}
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+              {doneImages.slice(0, 30).map(job => (
+                <img
+                  key={job.id}
+                  src={job.url!}
+                  onClick={() => {
+                    setSelectedImageUrl(job.url!);
+                    setSelectedJobId(job.id);
+                  }}
+                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
+                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                  }`}
+                  alt=""
+                />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Center panel: selected image or generation state */}
-      <div className="flex-1 p-4 flex items-center justify-center">
+      <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
         {centerImageUrl ? (
           <div className="max-w-[512px] w-full">
             <ImageCard
@@ -230,15 +258,45 @@ export default function ReplicatePage() {
             <ImageCard loading={true} onClick={() => {}} />
           </div>
         ) : (
-          <div className="text-gray-500 italic text-center px-4">
+          <div className="hidden lg:block text-gray-500 italic text-center px-4">
             Type a prompt and click &quot;Generate&quot; to start.
+          </div>
+        )}
+
+        {/* Mobile history carousel (when center is shown) */}
+        {doneImages.length > 0 && showCenterOnMobile && (
+          <div className="mt-4 w-full lg:hidden">
+            <div className="flex items-center justify-between mb-2 px-1">
+              <h3 className="text-white text-sm">History</h3>
+              {totalPages > 1 && (
+                <div className="text-xs text-gray-400">{doneImages.length} images</div>
+              )}
+            </div>
+            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+              {doneImages.slice(0, 30).map(job => (
+                <img
+                  key={job.id}
+                  src={job.url!}
+                  onClick={() => {
+                    setSelectedImageUrl(job.url!);
+                    setSelectedJobId(job.id);
+                  }}
+                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
+                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                  }`}
+                  alt=""
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
 
+      {/* Removed separate mobile history block to avoid layout gap; it's now inside the left panel */}
+
       {/* Right panel: history */}
       {doneImages.length > 0 && (
-        <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
+        <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2 text-sm md:text-base">History</h3>
           <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
             {paginatedImages.map(job => (
