@@ -18,10 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={inter.className}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </head>
       <body className="bg-gray-950 text-white">
         <Providers>
           <Navbar />
-          <div className="pt-20">{children}</div>
+          <div className="pt-16 md:pt-20">{children}</div>
         </Providers>
       </body>
     </html>
