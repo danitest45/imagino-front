@@ -65,13 +65,14 @@ export default function Navbar() {
 
   return (
     <header className="w-full bg-gray-900 border-b border-gray-800 shadow-sm fixed top-0 z-50">
-      <div className="w-full px-6 py-4 flex items-center justify-between">
+      <div className="w-full px-4 md:px-6 py-3 md:py-4 flex items-center justify-between">
         {/* Esquerda: Logo + Abas */}
-        <div className="flex items-center space-x-8">
-          <Link href="/" className="text-white text-2xl font-bold">
+        <div className="flex items-center space-x-4 md:space-x-8">
+          <Link href="/" className="text-white text-xl md:text-2xl font-bold">
             Imagino<span className="text-purple-500">.AI</span>
           </Link>
-          <nav className="flex space-x-6 text-white text-sm sm:text-base">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex space-x-6 text-white text-sm lg:text-base">
             <Link href="/images/replicate" className="hover:text-purple-400 transition">Images</Link>
             <Link href="/voices" className="hover:text-purple-400 transition">Voice</Link>
             <Link href="/videos" className="hover:text-purple-400 transition">Video</Link>
@@ -79,55 +80,138 @@ export default function Navbar() {
           </nav>
         </div>
 
-        {/* Direita: Login ou Avatar */}
-        {!isAuthenticated ? (
-          <Link
-            href="/login"
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-white p-2"
+            aria-label="Toggle menu"
           >
-            Log in
-          </Link>
-        ) : (
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-300">
-              Credits: {credits ?? '--'}
-            </span>
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen((o) => !o)}
-                className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white overflow-hidden"
-              >
-                {user?.profileImageUrl ? (
-                  <img
-                    src={user.profileImageUrl}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  avatarLetter
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Desktop: Login ou Avatar */}
+        <div className="hidden md:flex items-center space-x-4">
+          {!isAuthenticated ? (
+            <Link
+              href="/login"
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+            >
+              Log in
+            </Link>
+          ) : (
+            <>
+              <span className="text-sm text-gray-300">
+                Credits: {credits ?? '--'}
+              </span>
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen((o) => !o)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-purple-600 text-white overflow-hidden"
+                >
+                  {user?.profileImageUrl ? (
+                    <img
+                      src={user.profileImageUrl}
+                      alt="Avatar"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    avatarLetter
+                  )}
+                </button>
+                {menuOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-lg z-50">
+                    <Link
+                      href="/profile"
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-2 text-white hover:bg-gray-700"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-white hover:bg-gray-700"
+                    >
+                      Log out
+                    </button>
+                  </div>
                 )}
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-gray-800 rounded-lg shadow-lg z-50">
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {menuOpen && (
+        <div className="md:hidden bg-gray-800 border-t border-gray-700">
+          <nav className="flex flex-col space-y-1 p-4">
+            <Link 
+              href="/images/replicate" 
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
+              onClick={() => setMenuOpen(false)}
+            >
+              Images
+            </Link>
+            <Link 
+              href="/voices" 
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
+              onClick={() => setMenuOpen(false)}
+            >
+              Voice
+            </Link>
+            <Link 
+              href="/videos" 
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
+              onClick={() => setMenuOpen(false)}
+            >
+              Video
+            </Link>
+            <Link 
+              href="/pricing" 
+              className="px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
+              onClick={() => setMenuOpen(false)}
+            >
+              Planos
+            </Link>
+            
+            {/* Mobile Auth Section */}
+            <div className="border-t border-gray-700 pt-4 mt-4">
+              {!isAuthenticated ? (
+                <Link
+                  href="/login"
+                  className="block w-full bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-center"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Log in
+                </Link>
+              ) : (
+                <div className="space-y-2">
+                  <div className="text-sm text-gray-300 px-4">
+                    Credits: {credits ?? '--'}
+                  </div>
                   <Link
                     href="/profile"
+                    className="block px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-2 text-white hover:bg-gray-700"
                   >
                     Profile
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-white hover:bg-gray-700"
+                    className="w-full text-left px-4 py-2 text-white hover:bg-gray-700 rounded-lg transition"
                   >
                     Log out
                   </button>
                 </div>
               )}
             </div>
-          </div>
-        )}
-      </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

@@ -42,16 +42,16 @@ export default function Billing() {
       {loading ? (
         <p className="text-sm text-gray-300">Carregando...</p>
       ) : !info?.plan ? (
-        <section>
-          <h2 className="text-xl font-semibold mb-2">Você está no plano Free</h2>
-          <Link href="/pricing" className="text-purple-400 hover:underline">
+        <section className="text-center sm:text-left">
+          <h2 className="text-lg sm:text-xl font-semibold mb-2">Você está no plano Free</h2>
+          <Link href="/pricing" className="text-purple-400 hover:underline text-sm sm:text-base">
             Ver Planos
           </Link>
         </section>
       ) : (
         <section className="space-y-4">
           <div>
-            <h2 className="text-xl font-semibold mb-2">
+            <h2 className="text-lg sm:text-xl font-semibold mb-2">
               Plano atual: {info.plan}
             </h2>
             <p className="text-sm text-gray-300">
@@ -65,7 +65,7 @@ export default function Billing() {
           </div>
           <button
             onClick={handleManage}
-            className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
+            className="w-full sm:w-auto bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
           >
             Gerenciar assinatura
           </button>

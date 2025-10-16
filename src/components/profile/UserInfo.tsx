@@ -74,23 +74,23 @@ export default function UserInfo() {
       className={`${visible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 space-y-8`}
     >
       {user && (
-        <div className="flex items-center gap-6">
-          <div className="relative w-24 h-24">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+          <div className="relative w-20 h-20 sm:w-24 sm:h-24">
             {(form?.profileImageUrl || user.profileImageUrl) ? (
               <img
                 src={form?.profileImageUrl || user.profileImageUrl || ''}
                 alt="Profile photo"
-                className="w-24 h-24 rounded-full object-cover"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-700" />
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-700" />
             )}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               className="absolute bottom-0 right-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white"
             >
-              <Pencil className="w-4 h-4" />
+              <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
             </button>
             <input
               type="file"
@@ -100,8 +100,8 @@ export default function UserInfo() {
               onChange={handleImageChange}
             />
           </div>
-          <div className="space-y-1">
-            <p className="text-lg font-medium">{user.username ?? 'User'}</p>
+          <div className="space-y-1 text-center sm:text-left">
+            <p className="text-base sm:text-lg font-medium">{user.username ?? 'User'}</p>
             <p className="text-sm text-gray-400">{user.email}</p>
           </div>
         </div>

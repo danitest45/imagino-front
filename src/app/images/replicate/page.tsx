@@ -156,24 +156,24 @@ export default function ReplicatePage() {
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-6 flex flex-col h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col flex-1 gap-6">
+      <div className="w-full lg:w-[480px] flex-shrink-0 p-4 md:p-6 flex flex-col h-full bg-black/40 backdrop-blur-lg animate-fade-in">
+        <div className="flex flex-col flex-1 gap-4 md:gap-6">
           <div className="flex flex-col gap-2">
             <label className="text-sm font-medium text-gray-200">Prompt</label>
             <textarea
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="Describe the image..."
-              className="h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+              className="h-48 md:h-72 p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
             />
           </div>
           <div className="flex flex-col gap-4">
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {['1:1', '9:16', '16:9'].map(ratio => (
                 <button
                   key={ratio}
                   onClick={() => setSelectedAspectRatio(ratio)}
-                  className={`px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
+                  className={`px-3 md:px-4 py-2 rounded-lg text-sm transition-all transform hover:scale-105 ${
                     selectedAspectRatio === ratio
                       ? 'bg-purple-600 text-white'
                       : 'bg-gray-800 text-gray-300'
@@ -206,7 +206,7 @@ export default function ReplicatePage() {
         <button
           onClick={handleGenerate}
           disabled={loading || !token}
-          className="mt-6 w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
+          className="mt-4 md:mt-6 w-full px-4 md:px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
         >
           {loading ? 'Generating...' : 'Generate'}
         </button>
@@ -230,7 +230,7 @@ export default function ReplicatePage() {
             <ImageCard loading={true} onClick={() => {}} />
           </div>
         ) : (
-          <div className="text-gray-500 italic text-center">
+          <div className="text-gray-500 italic text-center px-4">
             Type a prompt and click &quot;Generate&quot; to start.
           </div>
         )}
@@ -239,8 +239,8 @@ export default function ReplicatePage() {
       {/* Right panel: history */}
       {doneImages.length > 0 && (
         <div className="w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2">History</h3>
-          <div className="grid grid-cols-2 gap-2 overflow-hidden">
+          <h3 className="text-white mb-2 text-sm md:text-base">History</h3>
+          <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
             {paginatedImages.map(job => (
               <img
                 key={job.id}
@@ -249,7 +249,7 @@ export default function ReplicatePage() {
                   setSelectedImageUrl(job.url!);
                   setSelectedJobId(job.id);
                 }}
-                className={`cursor-pointer rounded-md border-2 object-cover w-24 h-24 transition-all transform hover:scale-105 ${
+                className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 lg:w-24 lg:h-24 transition-all transform hover:scale-105 ${
                   selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                 } hover:border-purple-400`}
                 alt=""
@@ -261,16 +261,16 @@ export default function ReplicatePage() {
               <button
                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="disabled:opacity-50"
+                className="disabled:opacity-50 p-1"
               >
-                <ChevronLeft />
+                <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="disabled:opacity-50"
+                className="disabled:opacity-50 p-1"
               >
-                <ChevronRight />
+                <ChevronRight size={16} />
               </button>
             </div>
           )}
