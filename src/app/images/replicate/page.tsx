@@ -92,34 +92,47 @@ export default function ReplicatePage() {
       setCurrentPage(1);
 
       const poll = setInterval(async () => {
-        const content = await getJobStatus(jobId);
-        if (!content) return;
-        const status = content.status?.toUpperCase();
+        try {
+          const content = await getJobStatus(jobId);
+          if (!content) return;
+          const status = content.status?.toUpperCase();
 
-        const rawUrl =
-          content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
+          const rawUrl =
+            content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
 
-        if (status === 'COMPLETED') {
+          if (status === 'COMPLETED') {
+            clearInterval(poll);
+
+            const fullUrl = normalizeUrl(rawUrl);
+
+            setImages((prev: UiJob[]) =>
+              prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
+            );
+            setSelectedImageUrl(fullUrl);
+            setSelectedJobId(jobId);
+
+            // Adicionar tratamento de erro para getUserHistory
+            try {
+              const updatedHistory = await getUserHistory();
+              setHistory(updatedHistory);
+            } catch (historyError) {
+              console.warn('Failed to update history:', historyError);
+              // Continuar sem quebrar o fluxo principal
+            }
+            
+            window.dispatchEvent(new Event('creditsUpdated'));
+            setLoading(false);
+          }
+
+          if (status === 'FAILED') {
+            clearInterval(poll);
+            setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
+            setLoading(false);
+          }
+        } catch (pollError) {
+          console.error('Polling error:', pollError);
+          // Opcional: limpar o interval em caso de erro persistente
           clearInterval(poll);
-
-          const fullUrl = normalizeUrl(rawUrl);
-
-          setImages((prev: UiJob[]) =>
-            prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
-          );
-          setSelectedImageUrl(fullUrl);
-          setSelectedJobId(jobId);
-
-          const updatedHistory = await getUserHistory();
-          setHistory(updatedHistory);
-          window.dispatchEvent(new Event('creditsUpdated'));
-
-          setLoading(false);
-        }
-
-        if (status === 'FAILED') {
-          clearInterval(poll);
-          setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
           setLoading(false);
         }
       }, 2000);
