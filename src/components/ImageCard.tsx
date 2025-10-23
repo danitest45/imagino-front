@@ -22,7 +22,7 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
     >
       {src && !loading ? (
         <>
-          <img src={src} alt="Imagem gerada" className="h-full w-full object-cover" />
+          <img src={src} alt="Generated image" className="h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
         </>
       ) : (
@@ -36,11 +36,11 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4 pt-12 text-xs font-medium text-gray-200">
           <div className="flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-wide">
             <SparklesIcon />
-            Destaque da comunidade
+            Community spotlight
           </div>
           <div className="flex items-center gap-2 rounded-full bg-black/40 px-3 py-1 text-[11px]">
             <Maximize2 className="h-3.5 w-3.5" />
-            Ampliar
+            Enlarge
           </div>
         </div>
       )}

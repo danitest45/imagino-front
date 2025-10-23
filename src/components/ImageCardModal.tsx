@@ -15,7 +15,7 @@ type Props = {
 };
 
 /**
- * Modal para exibir detalhes de uma imagem buscando dados do backend.
+ * Modal that fetches image details from the backend before rendering.
  */
 export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: Props) {
   const { token } = useAuth();
@@ -45,7 +45,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
   const date = useMemo(() => {
     if (!details) return '';
     try {
-      return new Date(details.createdAt).toLocaleString('pt-BR', {
+      return new Date(details.createdAt).toLocaleString('en-US', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
@@ -72,21 +72,21 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/40 text-white transition hover:bg-black/60"
-          aria-label="Fechar"
+          aria-label="Close"
         >
           <X className="h-4 w-4" />
         </button>
 
         <div className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black p-4 sm:p-8">
           <div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
-          <img src={imageUrl} alt="Imagem gerada" className="relative max-h-full max-w-full rounded-[22px] object-contain shadow-2xl" />
+          <img src={imageUrl} alt="Generated image" className="relative max-h-full max-w-full rounded-[22px] object-contain shadow-2xl" />
         </div>
 
         <aside className="flex w-full flex-col gap-5 border-t border-white/5 bg-black/40 p-6 text-sm text-gray-200 md:w-96 md:border-l md:border-t-0 md:bg-black/30">
           <div className="space-y-3">
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-fuchsia-200">Projeto</p>
-              <h3 className="text-lg font-semibold text-white">{details?.username ?? 'Artista'}</h3>
+              <p className="text-xs font-semibold uppercase tracking-[0.25em] text-fuchsia-200">Project</p>
+              <h3 className="text-lg font-semibold text-white">{details?.username ?? 'Creator'}</h3>
               <p className="text-xs text-gray-400">{date}</p>
             </div>
 
@@ -99,7 +99,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
               )}
               <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] uppercase tracking-wide text-white/80">
                 <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-                IA generativa
+                Generative AI
               </span>
             </div>
           </div>
@@ -112,7 +112,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
                 disabled
               >
                 <Share2 className="h-4 w-4" />
-                Compartilhar em breve
+                Sharing soon
               </button>
               {jobId && (
                 <button
@@ -121,13 +121,13 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
                   onClick={() => downloadJob(jobId)}
                 >
                   <Download className="h-4 w-4" />
-                  Baixar
+                  Download
                 </button>
               )}
             </div>
 
             <div className="space-y-2">
-              <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">Prompt criativo</h4>
+              <h4 className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-400">Creative prompt</h4>
               <div className="rounded-2xl border border-white/10 bg-black/40 p-4 text-sm text-gray-200">
                 {details?.prompt ? (
                   <p className="whitespace-pre-wrap leading-relaxed">{details.prompt}</p>

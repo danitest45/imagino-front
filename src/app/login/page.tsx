@@ -56,9 +56,9 @@ export default function LoginPage() {
 
   const highlights = useMemo(
     () => [
-      'Acesso a modelos premium e presets exclusivos.',
-      'Painel centralizado com histórico completo de criações.',
-      'Segurança de nível empresarial para equipes e agências.',
+      'Access tuned imagino.AI models and exclusive preset libraries.',
+      'Centralized dashboard with full creation history and version tracking.',
+      'Enterprise-grade security with SSO, SAML, and granular roles.',
     ],
     [],
   );
@@ -74,13 +74,13 @@ export default function LoginPage() {
             <div className="relative hidden min-h-full flex-col justify-between bg-gradient-to-br from-fuchsia-600/30 via-purple-600/20 to-cyan-500/20 p-10 lg:flex">
               <div className="space-y-4">
                 <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-100">
-                  Bem-vindo de volta
+                  Welcome back
                 </span>
                 <h1 className="text-3xl font-semibold text-white">
-                  Entre para continuar criando imagens extraordinárias com o Imagino Studio.
+                  Sign in to keep creating extraordinary visuals with imagino.AI.
                 </h1>
                 <p className="text-sm text-slate-100/80">
-                  Sincronize projetos entre dispositivos, compartilhe variações com a equipe e mantenha sua biblioteca sempre organizada.
+                  Sync projects across devices, share variations with your team, and keep your creative library organized automatically.
                 </p>
               </div>
               <ul className="space-y-3 text-sm text-slate-100/80">
@@ -93,18 +93,18 @@ export default function LoginPage() {
               </ul>
               <div className="mt-8 rounded-2xl border border-white/10 bg-black/40 p-4 text-xs text-slate-200/70">
                 <p>
-                  Dica: use sua conta corporativa para habilitar autenticação em dois fatores e acesso a workspaces compartilhados.
+                  Tip: use your company email to enable single sign-on, two-factor authentication, and shared workspaces.
                 </p>
               </div>
             </div>
 
             <div className="flex flex-col justify-center space-y-6 p-8 sm:p-10">
               <div>
-                <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">Acesse sua conta</h2>
+                <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">Sign in to imagino.AI</h2>
                 <p className="mt-2 text-center text-sm text-gray-400">
-                  Não tem login?{' '}
+                  Don&apos;t have an account?{' '}
                   <Link href="/register" className="font-medium text-fuchsia-300 hover:text-fuchsia-200">
-                    Crie uma conta em segundos
+                    Create one in seconds
                   </Link>
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                   <label htmlFor="email" className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                    E-mail
+                    Email
                   </label>
                   <div className="relative">
                     <Mail
@@ -126,7 +126,7 @@ export default function LoginPage() {
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="nome@empresa.com"
+                      placeholder="you@company.com"
                       className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-4 text-sm text-white placeholder:text-gray-500 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
                       autoComplete="email"
                       required
@@ -136,7 +136,7 @@ export default function LoginPage() {
 
                 <div className="space-y-2">
                   <label htmlFor="password" className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                    Senha
+                    Password
                   </label>
                   <div className="relative">
                     <Lock
@@ -157,7 +157,7 @@ export default function LoginPage() {
                     />
                     <button
                       type="button"
-                      aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                       aria-pressed={showPassword}
                       onClick={() => setShowPassword(s => !s)}
                       className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/10 hover:text-white"
@@ -169,7 +169,7 @@ export default function LoginPage() {
 
                 <div className="flex items-center justify-between text-sm">
                   <Link href="/forgot-password" className="font-medium text-fuchsia-300 hover:text-fuchsia-200">
-                    Esqueci minha senha
+                    Forgot password?
                   </Link>
                 </div>
 
@@ -177,7 +177,7 @@ export default function LoginPage() {
                   type="submit"
                   className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
                 >
-                  Entrar
+                  Sign in
                 </button>
               </form>
 
@@ -186,7 +186,7 @@ export default function LoginPage() {
                   <span className="w-full border-t border-white/10" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-slate-950/80 px-4 text-gray-500">ou continue com</span>
+                  <span className="bg-slate-950/80 px-4 text-gray-500">or continue with</span>
                 </div>
               </div>
 
@@ -212,7 +212,7 @@ export default function LoginPage() {
                     fill="#EA4335"
                   />
                 </svg>
-                Continuar com Google
+                Continue with Google
               </button>
             </div>
           </div>

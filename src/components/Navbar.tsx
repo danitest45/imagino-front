@@ -8,10 +8,10 @@ import { getUserById, getUserId, getCredits } from '../lib/api';
 import type { UserDto } from '../types/user';
 
 const navLinks = [
-  { href: '/images/replicate', label: 'Imagens' },
-  { href: '/voices', label: 'Vozes' },
-  { href: '/videos', label: 'Vídeos' },
-  { href: '/pricing', label: 'Planos' },
+  { href: '/images/replicate', label: 'Images' },
+  { href: '/voices', label: 'Voices' },
+  { href: '/videos', label: 'Videos' },
+  { href: '/pricing', label: 'Pricing' },
 ];
 
 export default function Navbar() {
@@ -104,11 +104,11 @@ export default function Navbar() {
           <Link
             href="/"
             className="relative flex items-center text-lg sm:text-xl font-semibold text-white tracking-tight"
+            aria-label="imagino.AI home"
           >
             <span className="mr-1 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2 py-1 text-xs font-bold uppercase text-white shadow-lg shadow-purple-500/30">
-              Imagino
+              imagino.AI
             </span>
-            <span className="hidden sm:inline text-gray-200">Studio</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-2 rounded-full bg-white/5 px-1 py-1 text-sm text-gray-300 shadow-inner shadow-white/5">
@@ -135,7 +135,7 @@ export default function Navbar() {
           <button
             className="inline-flex items-center justify-center rounded-full p-2 text-gray-300 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 lg:hidden"
             onClick={() => setMobileOpen(o => !o)}
-            aria-label="Abrir menu"
+            aria-label="Open navigation menu"
           >
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
@@ -148,19 +148,19 @@ export default function Navbar() {
                 href="/pricing"
                 className="rounded-full bg-white/5 px-4 py-2 text-sm font-medium text-gray-100 transition hover:bg-white/10"
               >
-                Ver planos
+                View pricing
               </Link>
               <Link
                 href="/login"
                 className="rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
               >
-                Entrar
+                Sign in
               </Link>
             </div>
           ) : (
             <div className="flex items-center gap-3">
               <span className="hidden sm:inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-white/80">
-                Créditos
+                Credits
                 <strong className="text-white">{credits ?? '--'}</strong>
               </span>
               <div ref={profileRef} className="relative">
@@ -178,7 +178,7 @@ export default function Navbar() {
                 {profileOpen && (
                   <div className="absolute right-0 mt-3 w-52 overflow-hidden rounded-2xl border border-white/10 bg-gray-950/95 shadow-xl shadow-purple-500/10 backdrop-blur-lg">
                     <div className="px-4 py-3">
-                      <p className="text-sm font-medium text-white">{user?.username ?? 'Conta'}</p>
+                      <p className="text-sm font-medium text-white">{user?.username ?? 'Account'}</p>
                       <p className="text-xs text-gray-400">{user?.email}</p>
                     </div>
                     <div className="border-t border-white/5" />
@@ -187,13 +187,13 @@ export default function Navbar() {
                       onClick={() => setProfileOpen(false)}
                       className="block px-4 py-3 text-sm text-gray-200 transition hover:bg-white/5"
                     >
-                      Meu perfil
+                      My profile
                     </Link>
                     <button
                       onClick={handleLogout}
                       className="flex w-full items-center justify-between px-4 py-3 text-left text-sm text-red-300 transition hover:bg-red-500/10"
                     >
-                      Sair
+                      Sign out
                       <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7" />
                         <path strokeLinecap="round" strokeLinejoin="round" d="M7 20h4a2 2 0 002-2v-1" />
@@ -241,20 +241,20 @@ export default function Navbar() {
                   className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Entrar
+                  Sign in
                 </Link>
                 <Link
                   href="/register"
                   className="flex items-center justify-center rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Criar conta
+                  Create account
                 </Link>
               </>
             ) : (
               <div className="space-y-3 rounded-2xl border border-white/5 bg-white/5 p-4">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-gray-400">Créditos</p>
+                  <p className="text-xs uppercase tracking-wide text-gray-400">Credits</p>
                   <p className="text-lg font-semibold text-white">{credits ?? '--'}</p>
                 </div>
                 <Link
@@ -262,7 +262,7 @@ export default function Navbar() {
                   className="block rounded-xl px-4 py-3 text-sm font-medium text-gray-200 transition hover:bg-white/10"
                   onClick={() => setMobileOpen(false)}
                 >
-                  Meu perfil
+                  My profile
                 </Link>
                 <button
                   onClick={() => {
@@ -271,7 +271,7 @@ export default function Navbar() {
                   }}
                   className="flex w-full items-center justify-center rounded-xl bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-200 transition hover:bg-red-500/25"
                 >
-                  Sair
+                  Sign out
                 </button>
               </div>
             )}

@@ -29,13 +29,17 @@ export async function createRunpodJob(
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string) {
+export async function createReplicateJob(prompt: string, aspectRatio: string, quality?: number) {
   const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ prompt, aspectRatio }),
+    body: JSON.stringify({
+      prompt,
+      aspectRatio,
+      ...(typeof quality === 'number' ? { quality } : {}),
+    }),
   });
   const json = await res.json();
   return json.content.jobId as string;
