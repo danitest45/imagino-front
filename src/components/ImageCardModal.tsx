@@ -62,11 +62,11 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-10 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/80 px-4 py-12 sm:items-center sm:py-16 backdrop-blur"
       onClick={onClose}
     >
       <div
-        className="relative flex h-full w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/90 shadow-2xl shadow-purple-500/20 backdrop-blur-xl md:h-auto md:max-h-[90vh] md:flex-row"
+        className="relative flex w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/10 bg-slate-950/90 shadow-2xl shadow-purple-500/20 backdrop-blur-xl sm:max-h-[92vh] md:max-h-[88vh] md:flex-row"
         onClick={e => e.stopPropagation()}
       >
         <button
