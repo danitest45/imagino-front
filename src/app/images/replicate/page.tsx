@@ -22,6 +22,31 @@ import { useRouter } from 'next/navigation';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
 
 
+const aspectRatioOptions = [
+  { value: '1:1', label: 'Square', helper: 'Social posts' },
+  { value: '9:16', label: 'Portrait', helper: 'Stories & reels' },
+  { value: '16:9', label: 'Landscape', helper: 'Decks & video stills' },
+];
+
+const promptSuggestions = [
+  {
+    title: 'Neon city portrait',
+    prompt:
+      'Cinematic portrait of a cyberpunk explorer lit by neon reflections, ultra-detailed, 85mm photo',
+  },
+  {
+    title: 'Product spotlight',
+    prompt:
+      'Minimalist product render of a smart home speaker on a marble table, dramatic studio lighting',
+  },
+  {
+    title: 'Floating lab concept',
+    prompt:
+      'Concept art of a floating botanical laboratory above the clouds, illustrated in watercolor style',
+  },
+];
+
+
 
 
 
@@ -80,7 +105,7 @@ export default function ReplicatePage() {
     setSelectedImageUrl(null);
     setSelectedJobId(null);
     try {
-      const jobId = await createReplicateJob(prompt, selectedAspectRatio);
+      const jobId = await createReplicateJob(prompt, selectedAspectRatio, quality);
       const newJob: UiJob = {
         id: jobId,
         status: 'loading',
@@ -111,7 +136,7 @@ export default function ReplicatePage() {
             setSelectedImageUrl(fullUrl);
             setSelectedJobId(jobId);
 
-            // Adicionar tratamento de erro para getUserHistory
+            // Gracefully handle failures when refreshing the user history
             try {
               const updatedHistory = await getUserHistory();
               setHistory(updatedHistory);
@@ -172,66 +197,115 @@ export default function ReplicatePage() {
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
       <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-4 md:gap-6 lg:flex-1">
-          <div className="mt-4 lg:mt-0 flex flex-col gap-2">
-            <label className="text-sm font-medium text-gray-200">Prompt</label>
+        <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
+                imagino.AI studio
+              </span>
+              <span className="text-[11px] text-gray-400">Credits update live</span>
+            </div>
+            <p className="mt-3 text-sm text-gray-200">
+              Use the creative brief below to guide lighting, composition, and brand voice before generating.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
+                Creative brief
+              </label>
+              <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
+            </div>
             <textarea
+              id="prompt"
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
-              placeholder="Describe the image..."
-              className="h-40 sm:h-48 md:h-72 p-3 sm:p-4 rounded-xl bg-gray-800/60 text-white text-base resize-none placeholder-gray-500 border border-gray-700 shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors hover:bg-gray-700"
+              placeholder="Describe the scene, subject, style, and lighting you want to see..."
+              className="h-40 sm:h-48 md:h-72 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
             />
-          </div>
-          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap gap-2">
-              {['1:1', '9:16', '16:9'].map(ratio => (
+              {promptSuggestions.map(suggestion => (
                 <button
-                  key={ratio}
-                  onClick={() => setSelectedAspectRatio(ratio)}
-                  className={`px-3 md:px-4 py-2 rounded-lg text-sm transition-all transform active:scale-95 hover:scale-105 ${
-                    selectedAspectRatio === ratio
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-800 text-gray-300'
-                  } hover:bg-purple-500`}
+                  key={suggestion.title}
+                  type="button"
+                  onClick={() => setPrompt(suggestion.prompt)}
+                  className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
                 >
-                  {ratio}
+                  <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
+                  <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                    {suggestion.prompt}
+                  </span>
                 </button>
               ))}
             </div>
+          </div>
 
-            <div className="space-y-1">
-              <label className="text-sm text-gray-300">
-                Speed vs Quality ({quality})
-              </label>
-              <input
-                type="range"
-                min={1}
-                max={5}
-                value={quality}
-                onChange={e => setQuality(Number(e.target.value))}
-                className="w-full accent-purple-500"
-              />
-              <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
-                <span>Fast</span>
-                <span>Quality</span>
-              </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-white">Aspect ratio</p>
+              <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">{selectedAspectRatio}</span>
+            </div>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {aspectRatioOptions.map(option => (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setSelectedAspectRatio(option.value)}
+                  className={`rounded-xl border px-3 py-3 text-left text-xs transition ${
+                    selectedAspectRatio === option.value
+                      ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/20 text-white'
+                      : 'border-white/10 bg-black/30 text-gray-300 hover:border-white/20 hover:text-white'
+                  }`}
+                >
+                  <span className="block text-sm font-semibold">{option.label}</span>
+                  <span className="mt-1 block text-[11px] text-gray-400">
+                    {option.helper}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-white">Quality priority</p>
+              <span className="text-xs text-gray-400">Level {quality}</span>
+            </div>
+            <p className="text-[11px] text-gray-500">
+              Move right for more detail, or left for faster previews and explorations.
+            </p>
+            <input
+              type="range"
+              min={1}
+              max={5}
+              value={quality}
+              onChange={e => setQuality(Number(e.target.value))}
+              className="w-full accent-fuchsia-400"
+            />
+            <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
+              <span>Faster previews</span>
+              <span>Highest fidelity</span>
             </div>
           </div>
         </div>
         <button
           onClick={handleGenerate}
           disabled={loading || !token}
-          className="mt-4 md:mt-6 w-full px-4 md:px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 text-white font-medium rounded-xl transition-all duration-300 transform active:scale-95 hover:from-purple-500 hover:to-purple-400 hover:scale-105 disabled:opacity-50"
+          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? 'Generating...' : 'Generate'}
+          {loading ? 'Generating...' : 'Generate with imagino.AI'}
         </button>
+        <p className="mt-2 text-center text-[11px] text-gray-500">
+          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+        </p>
 
         {/* Mobile history directly under controls when center is hidden */}
         {!showCenterOnMobile && doneImages.length > 0 && (
           <div className="mt-3 lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">History</h3>
-              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} images</div>}
+              <h3 className="text-white text-sm">Recent renders</h3>
+              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
             </div>
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
               {doneImages.slice(0, 30).map(job => (
@@ -271,8 +345,8 @@ export default function ReplicatePage() {
             <ImageCard loading={true} onClick={() => {}} />
           </div>
         ) : (
-          <div className="hidden lg:block text-gray-500 italic text-center px-4">
-            Type a prompt and click &quot;Generate&quot; to start.
+          <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
+            Draft your creative brief and press &quot;Generate with imagino.AI&quot; to begin.
           </div>
         )}
 
@@ -280,9 +354,9 @@ export default function ReplicatePage() {
         {doneImages.length > 0 && showCenterOnMobile && (
           <div className="mt-4 w-full lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">History</h3>
+              <h3 className="text-white text-sm">Recent renders</h3>
               {totalPages > 1 && (
-                <div className="text-xs text-gray-400">{doneImages.length} images</div>
+                <div className="text-xs text-gray-400">{doneImages.length} renders</div>
               )}
             </div>
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
@@ -310,7 +384,7 @@ export default function ReplicatePage() {
       {/* Right panel: history */}
       {doneImages.length > 0 && (
         <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2 text-sm md:text-base">History</h3>
+          <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
           <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
             {paginatedImages.map(job => (
               <img

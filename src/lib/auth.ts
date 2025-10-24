@@ -1,4 +1,5 @@
 import { buildProblem } from './api-client';
+import { apiUrl } from './config';
 
 export let accessToken: string | null = null;
 
@@ -12,7 +13,7 @@ export function getAccessToken(): string | null {
 
 export async function refreshAccessToken(): Promise<boolean> {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh`, {
+    const res = await fetch(apiUrl('/api/auth/refresh'), {
       method: 'POST',
       credentials: 'include',
     });
@@ -56,7 +57,7 @@ export async function fetchWithAuth(
 
 export async function logoutRequest(): Promise<void> {
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
+    await fetch(apiUrl('/api/auth/logout'), {
       method: 'POST',
       credentials: 'include',
     });

@@ -20,19 +20,86 @@
 }
 
 body {
-  background:
-    radial-gradient(at top left, rgba(99,102,241,0.15), transparent 50%),
-    radial-gradient(at top right, rgba(236,72,153,0.15), transparent 50%),
-    var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  color: var(--foreground);
+  background:
+    radial-gradient(at 10% 15%, rgba(129, 140, 248, 0.18), transparent 60%),
+    radial-gradient(at 90% 10%, rgba(236, 72, 153, 0.22), transparent 58%),
+    radial-gradient(at 50% 95%, rgba(45, 212, 191, 0.14), transparent 55%),
+    #06030f;
+  position: relative;
+  overflow-x: hidden;
 }
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: auto -30% -30% auto;
+  width: clamp(320px, 40vw, 520px);
+  aspect-ratio: 1;
+  background: radial-gradient(circle at center, rgba(129, 140, 248, 0.45), transparent 60%);
+  filter: blur(90px);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: -1;
+}
+
+body::after {
+  inset: auto auto -35% -25%;
+  background: radial-gradient(circle at center, rgba(236, 72, 153, 0.35), transparent 65%);
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.glow-accent {
+  position: absolute;
+  width: clamp(280px, 28vw, 420px);
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(129, 140, 248, 0.3), transparent 65%);
+  filter: blur(80px);
+  opacity: 0.45;
+  animation: pulseGlow 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.06);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(129, 140, 248, 0.7), rgba(236, 72, 153, 0.6));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(236, 72, 153, 0.7));
 }

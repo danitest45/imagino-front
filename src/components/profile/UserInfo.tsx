@@ -63,90 +63,114 @@ export default function UserInfo() {
     }
   };
 
-  const fields: { key: keyof UserDto; label: string }[] = [
-    { key: 'email', label: 'Email' },
-    { key: 'username', label: 'Username' },
-    { key: 'phoneNumber', label: 'Phone' },
+  const fields: { key: keyof UserDto; label: string; helper?: string }[] = [
+    { key: 'email', label: 'Email address', helper: 'Where we send receipts and important updates.' },
+    { key: 'username', label: 'Display name', helper: 'Shown on shared creations and community feeds.' },
+    { key: 'phoneNumber', label: 'Phone number', helper: 'Optional. Enables faster support follow-ups.' },
   ];
 
   return (
-    <div
-      className={`${visible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-300 space-y-8`}
-    >
+    <div className={`${visible ? 'opacity-100' : 'opacity-0'} space-y-10 transition-opacity duration-300`}>
       {user && (
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
-          <div className="relative w-20 h-20 sm:w-24 sm:h-24">
-            {(form?.profileImageUrl || user.profileImageUrl) ? (
-              <img
-                src={form?.profileImageUrl || user.profileImageUrl || ''}
-                alt="Profile photo"
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover"
+        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/0 p-6 shadow-[0_35px_80px_-50px_rgba(168,85,247,0.6)] backdrop-blur xl:p-8">
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-500/20 to-cyan-400/20 blur-3xl" aria-hidden />
+          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:text-left">
+            <div className="relative">
+              <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-black/40 p-1 shadow-inner shadow-purple-500/30">
+                {(form?.profileImageUrl || user.profileImageUrl) ? (
+                  <img
+                    src={form?.profileImageUrl || user.profileImageUrl || ''}
+                    alt="Profile avatar"
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-purple-500/40 to-fuchsia-500/40 text-2xl font-semibold text-white">
+                    {(user.username ?? 'U').slice(0, 1).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-2 right-2 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
+              >
+                <Pencil className="h-3.5 w-3.5" /> Edit
+              </button>
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleImageChange}
               />
-            ) : (
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-gray-700" />
-            )}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white"
-            >
-              <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
-            </button>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleImageChange}
-            />
+            </div>
+            <div className="space-y-3">
+              <div>
+                <h2 className="text-2xl font-semibold text-white">{user.username ?? 'imagino.AI creator'}</h2>
+                <p className="text-sm text-gray-300">{user.email}</p>
+              </div>
+              <p className="max-w-xl text-sm leading-relaxed text-gray-300">
+                Personalize your presence across the imagino.AI ecosystem. Your details sync across web, mobile, and future device experiences.
+              </p>
+            </div>
           </div>
-          <div className="space-y-1 text-center sm:text-left">
-            <p className="text-base sm:text-lg font-medium">{user.username ?? 'User'}</p>
-            <p className="text-sm text-gray-400">{user.email}</p>
-          </div>
-        </div>
+        </section>
       )}
 
       {user && (
-        <div className="grid gap-6 sm:grid-cols-2">
-          {fields.map((f) => (
-            <div key={f.key} className="space-y-1">
-              <label className="block text-sm" htmlFor={f.key}>
-                {f.label}
-              </label>
-              <div className="flex items-center gap-2">
-                {editing === f.key ? (
-                  <input
-                    id={f.key}
-                    name={f.key}
-                    value={form?.[f.key] ?? ''}
-                    onChange={handleChange}
-                    className="w-full bg-gray-900/40 border border-gray-700 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                ) : (
-                  <p className="flex-1 truncate">{user[f.key] ?? ''}</p>
-                )}
+        <section className="grid gap-6 md:grid-cols-2">
+          {fields.map(field => (
+            <div key={field.key} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-5 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40">
+              <div className="absolute -right-12 top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-cyan-400/10 blur-3xl" aria-hidden />
+              <div className="relative flex items-start justify-between gap-3">
+                <div className="flex-1 space-y-3">
+                  <label className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400" htmlFor={field.key}>
+                    {field.label}
+                  </label>
+                  {editing === field.key ? (
+                    <input
+                      id={field.key}
+                      name={field.key}
+                      value={form?.[field.key] ?? ''}
+                      onChange={handleChange}
+                      className="w-full rounded-xl border border-white/20 bg-black/60 px-4 py-3 text-sm text-white shadow-sm focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/30"
+                    />
+                  ) : (
+                    <p className="text-sm text-white/90">{user[field.key] ?? '—'}</p>
+                  )}
+                  {field.helper && <p className="text-xs text-gray-400">{field.helper}</p>}
+                </div>
                 <button
                   type="button"
-                  onClick={() => setEditing(editing === f.key ? null : f.key)}
-                  className="text-gray-400 hover:text-white"
+                  onClick={() => setEditing(editing === field.key ? null : field.key)}
+                  className="relative inline-flex h-9 items-center justify-center rounded-full border border-white/15 bg-white/5 px-3 text-xs font-semibold uppercase tracking-[0.3em] text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Pencil className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
           ))}
-        </div>
+        </section>
       )}
 
       {editing && (
-        <div className="pt-4 flex justify-end">
+        <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setForm(user);
+              setEditing(null);
+            }}
+            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-transparent px-5 py-2 text-sm font-semibold text-gray-300 transition hover:border-white/25 hover:text-white"
+          >
+            Cancel
+          </button>
           <button
             type="button"
             onClick={handleSave}
-            className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
           >
-            Save
+            Save changes
           </button>
         </div>
       )}

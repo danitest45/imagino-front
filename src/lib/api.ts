@@ -2,6 +2,7 @@ import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-j
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
+import { apiUrl, API_BASE_URL } from './config';
 
 
 export async function createRunpodJob(
@@ -9,7 +10,7 @@ export async function createRunpodJob(
   options: { width: number; height: number },
 ) {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/comfy`,
+    apiUrl('/api/comfy'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -29,13 +30,17 @@ export async function createRunpodJob(
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string) {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/replicate/jobs`, {
+export async function createReplicateJob(prompt: string, aspectRatio: string, quality?: number) {
+  const res = await fetchWithAuth(apiUrl('/api/replicate/jobs'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ prompt, aspectRatio }),
+    body: JSON.stringify({
+      prompt,
+      aspectRatio,
+      ...(typeof quality === 'number' ? { quality } : {}),
+    }),
   });
   const json = await res.json();
   return json.content.jobId as string;
@@ -44,7 +49,7 @@ export async function createReplicateJob(prompt: string, aspectRatio: string) {
 export async function getJobStatus(jobId: string) {
   try {
     const res = await fetchWithAuth(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/${jobId}`,
+      apiUrl(`/api/jobs/${jobId}`),
     );
     return (await res.json()).content;
   } catch {
@@ -54,7 +59,7 @@ export async function getJobStatus(jobId: string) {
 
 export async function getJobDetails(jobId: string): Promise<JobDetails> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/details/${jobId}`,
+    apiUrl(`/api/jobs/details/${jobId}`),
   );
   const json = await res.json();
   return {
@@ -68,7 +73,7 @@ export async function getJobDetails(jobId: string): Promise<JobDetails> {
 
 export async function getLatestJobs(): Promise<LatestJob[]> {
   const res = await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/jobs/latest`,
+    apiUrl('/api/jobs/latest'),
   );
   const json = (await res.json()) as Array<Record<string, unknown>>;
   return json.map(j => ({
@@ -83,7 +88,7 @@ export async function getLatestJobs(): Promise<LatestJob[]> {
 
 export async function registerUser(email: string, password: string) {
   const res = await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/register`,
+    apiUrl('/api/auth/register'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -94,7 +99,7 @@ export async function registerUser(email: string, password: string) {
 }
 
 export async function loginUser(email: string, password: string) {
-  const res = await apiFetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`, {
+  const res = await apiFetch(apiUrl('/api/auth/login'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -104,7 +109,7 @@ export async function loginUser(email: string, password: string) {
 
 export async function resendVerification(email: string): Promise<void> {
   await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/resend-verification`,
+    apiUrl('/api/auth/resend-verification'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -115,7 +120,7 @@ export async function resendVerification(email: string): Promise<void> {
 
 export async function verifyEmail(token: string): Promise<void> {
   await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/verify-email`,
+    apiUrl('/api/auth/verify-email'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -126,7 +131,7 @@ export async function verifyEmail(token: string): Promise<void> {
 
 export async function forgotPassword(email: string): Promise<void> {
   await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/forgot`,
+    apiUrl('/api/auth/password/forgot'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -140,7 +145,7 @@ export async function resetPassword(
   newPassword: string,
 ): Promise<void> {
   await apiFetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/auth/password/reset`,
+    apiUrl('/api/auth/password/reset'),
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -151,14 +156,14 @@ export async function resetPassword(
 
 export async function getUserHistory(): Promise<ImageJobApi[]> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/history`,
+    apiUrl('/api/history'),
   );
   return (await res.json()) as ImageJobApi[];
 }
 
 export async function getUserId(): Promise<string> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+    apiUrl('/api/users'),
   );
   const id = await res.text();
   return id.replace(/^"|"$/g, '');
@@ -166,14 +171,14 @@ export async function getUserId(): Promise<string> {
 
 export async function getUserById(id: string): Promise<UserDto> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`,
+    apiUrl(`/api/users/${id}`),
   );
   return (await res.json()) as UserDto;
 }
 
 export async function getCredits(): Promise<number> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/credits`,
+    apiUrl('/api/users/credits'),
   );
   const json = await res.json();
   return json.credits as number;
@@ -184,7 +189,7 @@ export async function updateUser(
   dto: Partial<UserDto>,
 ): Promise<UserDto> {
   const res = await fetchWithAuth(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/users/${id}`,
+    apiUrl(`/api/users/${id}`),
     {
       method: 'PUT',
       headers: {
@@ -209,6 +214,11 @@ export function mapApiToUiJob(j: ImageJobApi): UiJob {
 export function normalizeUrl(pathOrUrl?: string | null): string | null {
   if (!pathOrUrl) return null;
   if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) return pathOrUrl;
-  const base = process.env.NEXT_PUBLIC_API_URL ?? '';
-  return `${base}${pathOrUrl}`;
+  const cleanedPath = pathOrUrl.startsWith('/')
+    ? pathOrUrl
+    : `/${pathOrUrl}`;
+  if (!API_BASE_URL) {
+    return cleanedPath;
+  }
+  return `${API_BASE_URL}${cleanedPath}`;
 }
