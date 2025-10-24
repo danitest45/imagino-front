@@ -1,4 +1,5 @@
 import { fetchWithAuth } from '../lib/auth';
+import { apiUrl } from './config';
 
 export interface BillingMe {
   plan?: 'PRO' | 'ULTRA' | null;
@@ -7,14 +8,14 @@ export interface BillingMe {
 }
 
 export async function getBillingMe(): Promise<BillingMe> {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/me`, { credentials: 'include' });
+  const res = await fetchWithAuth(apiUrl('/api/billing/me'), { credentials: 'include' });
   if (!res.ok) throw new Error('Erro ao obter assinatura');
   return res.json();
 }
 
 export async function createCheckoutSession(plan: 'PRO' | 'ULTRA'): Promise<{ url: string }> {
   debugger
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/checkout`, {
+  const res = await fetchWithAuth(apiUrl('/api/billing/checkout'), {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -25,7 +26,7 @@ export async function createCheckoutSession(plan: 'PRO' | 'ULTRA'): Promise<{ ur
 }
 
 export async function createPortalSession(): Promise<{ url: string }> {
-  const res = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/api/billing/portal`, {
+  const res = await fetchWithAuth(apiUrl('/api/billing/portal'), {
     method: 'POST',
     credentials: 'include',
   });
