@@ -1,4 +1,6 @@
-const rawApiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+const rawApiBaseUrl =
+  process.env.NEXT_PUBLIC_API_URL ??
+  (process.env.NODE_ENV === 'development' ? 'https://localhost:44362' : '');
 const trimmedApiBaseUrl = rawApiBaseUrl.endsWith('/')
   ? rawApiBaseUrl.slice(0, -1)
   : rawApiBaseUrl;
