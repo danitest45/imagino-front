@@ -5,6 +5,12 @@ import { apiFetch } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
 
 
+export async function getReplicateModels() {
+  const res = await apiFetch(apiUrl('/api/replicate/models'));
+  return (await res.json()) as Array<{ id: string; title: string; description: string }>;
+}
+
+
 export async function createRunpodJob(
   prompt: string,
   options: { width: number; height: number },
@@ -30,17 +36,25 @@ export async function createRunpodJob(
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string, quality?: number) {
+export async function createReplicateJob(
+  prompt: string,
+  aspectRatio: string,
+  quality?: number,
+  modelId = 'flux-dev',
+) {
+  const body: {
+    prompt: string;
+    aspectRatio: string;
+    modelId: string;
+    qualityLevel?: number;
+  } = { prompt, aspectRatio, modelId };
+  if (typeof quality === 'number') body.qualityLevel = quality;
   const res = await fetchWithAuth(apiUrl('/api/replicate/jobs'), {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      prompt,
-      aspectRatio,
-      ...(typeof quality === 'number' ? { quality } : {}),
-    }),
+    body: JSON.stringify(body),
   });
   const json = await res.json();
   return json.content.jobId as string;

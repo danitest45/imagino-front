@@ -13,7 +13,7 @@ export default function GoogleAuthPage() {
     const token = params.get('token');
     if (token && auth) {
       auth.login(token);
-      router.push('/images/replicate');
+      router.push('/images/flux-dev');
     } else {
       router.push('/login');
     }

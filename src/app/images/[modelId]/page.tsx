@@ -7,20 +7,20 @@ import {
   createReplicateJob,
   getJobStatus,
   getUserHistory,
+  getReplicateModels,
+  mapApiToUiJob,
+  normalizeUrl,
 } from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
-import { mapApiToUiJob } from '../../../lib/api';
-import { normalizeUrl } from '../../../lib/api';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
 import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
-
 
 const aspectRatioOptions = [
   { value: '1:1', label: 'Square', helper: 'Social posts' },
@@ -46,11 +46,9 @@ const promptSuggestions = [
   },
 ];
 
-
-
-
-
-export default function ReplicatePage() {
+export default function ModelPage() {
+  const params = useParams<{ modelId?: string }>();
+  const selectedModelId = params?.modelId ?? 'flux-dev';
   const [prompt, setPrompt] = useState('');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
   const [quality, setQuality] = useState(3);
@@ -66,23 +64,32 @@ export default function ReplicatePage() {
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
+  const [modelInfo, setModelInfo] = useState<
+    { id: string; title: string; description: string } | null
+  >(null);
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
 
-
-  
+  useEffect(() => {
+    getReplicateModels()
+      .then(models => {
+        const info = models.find(m => m.id === selectedModelId) ?? null;
+        setModelInfo(info);
+      })
+      .catch(() => {
+        setModelInfo(null);
+      });
+  }, [selectedModelId]);
 
   useEffect(() => {
     if (!history) return;
-    // convert jobs from the API to the format used by the UI
     const ui = history
-      .map(mapApiToUiJob) // take imageUrl or imageUrls[0] and normalize
+      .map(mapApiToUiJob)
       .filter(j => !!j.url);
 
     setImages(ui);
     setCurrentPage(1);
 
-    // keep the most recent selected in the center
     if (ui.length > 0) {
       setSelectedImageUrl(ui[0].url ?? null);
       setSelectedJobId(ui[0].id);
@@ -91,8 +98,6 @@ export default function ReplicatePage() {
       setSelectedJobId(null);
     }
   }, [history]);
-
-
 
   async function handleGenerate() {
     if (!prompt.trim()) return;
@@ -105,7 +110,12 @@ export default function ReplicatePage() {
     setSelectedImageUrl(null);
     setSelectedJobId(null);
     try {
-      const jobId = await createReplicateJob(prompt, selectedAspectRatio, quality);
+      const jobId = await createReplicateJob(
+        prompt,
+        selectedAspectRatio,
+        quality,
+        selectedModelId,
+      );
       const newJob: UiJob = {
         id: jobId,
         status: 'loading',
@@ -136,15 +146,13 @@ export default function ReplicatePage() {
             setSelectedImageUrl(fullUrl);
             setSelectedJobId(jobId);
 
-            // Gracefully handle failures when refreshing the user history
             try {
               const updatedHistory = await getUserHistory();
               setHistory(updatedHistory);
             } catch (historyError) {
               console.warn('Failed to update history:', historyError);
-              // Continuar sem quebrar o fluxo principal
             }
-            
+
             window.dispatchEvent(new Event('creditsUpdated'));
             setLoading(false);
           }
@@ -156,7 +164,6 @@ export default function ReplicatePage() {
           }
         } catch (pollError) {
           console.error('Polling error:', pollError);
-          // Opcional: limpar o interval em caso de erro persistente
           clearInterval(poll);
           setLoading(false);
         }
@@ -182,7 +189,6 @@ export default function ReplicatePage() {
     }
   }
 
-  // choose the image to display in the center
   const centerImageUrl = selectedImageUrl;
   const doneImages = images.filter(img => img.status === 'done' && img.url);
   const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
@@ -195,16 +201,18 @@ export default function ReplicatePage() {
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
-      {/* Left panel: prompt and controls */}
       <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
         <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
             <div className="flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
-                imagino.AI studio
+                {modelInfo?.title ?? 'imagino.AI studio'}
               </span>
               <span className="text-[11px] text-gray-400">Credits update live</span>
             </div>
+            {modelInfo?.description && (
+              <p className="mt-2 text-xs text-gray-400">{modelInfo.description}</p>
+            )}
             <p className="mt-3 text-sm text-gray-200">
               Use the creative brief below to guide lighting, composition, and brand voice before generating.
             </p>
@@ -300,7 +308,6 @@ export default function ReplicatePage() {
           Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
         </p>
 
-        {/* Mobile history directly under controls when center is hidden */}
         {!showCenterOnMobile && doneImages.length > 0 && (
           <div className="mt-3 lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
@@ -327,7 +334,6 @@ export default function ReplicatePage() {
         )}
       </div>
 
-      {/* Center panel: selected image or generation state */}
       <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
         {centerImageUrl ? (
           <div className="max-w-[512px] w-full">
@@ -350,7 +356,6 @@ export default function ReplicatePage() {
           </div>
         )}
 
-        {/* Mobile history carousel (when center is shown) */}
         {doneImages.length > 0 && showCenterOnMobile && (
           <div className="mt-4 w-full lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
@@ -379,9 +384,6 @@ export default function ReplicatePage() {
         )}
       </div>
 
-      {/* Removed separate mobile history block to avoid layout gap; it's now inside the left panel */}
-
-      {/* Right panel: history */}
       {doneImages.length > 0 && (
         <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
@@ -402,47 +404,47 @@ export default function ReplicatePage() {
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="flex justify-center gap-4 mt-2 text-white">
+            <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
               <button
-                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                type="button"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-1 text-xs text-gray-300 transition hover:border-white/20 hover:text-white"
                 disabled={currentPage === 1}
-                className="disabled:opacity-50 p-1"
               >
-                <ChevronLeft size={16} />
+                <ChevronLeft className="h-4 w-4" />
+                Prev
               </button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
               <button
-                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                type="button"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                className="inline-flex items-center gap-1 rounded-full border border-white/10 px-2 py-1 text-xs text-gray-300 transition hover:border-white/20 hover:text-white"
                 disabled={currentPage === totalPages}
-                className="disabled:opacity-50 p-1"
               >
-                <ChevronRight size={16} />
+                Next
+                <ChevronRight className="h-4 w-4" />
               </button>
             </div>
           )}
         </div>
       )}
 
-  {/* Modal to enlarge image */}
-  <ImageCardModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    jobId={selectedJobId}
-  />
-  <OutOfCreditsDialog
-    open={outOfCredits !== null}
-    current={outOfCredits?.current}
-    needed={outOfCredits?.needed}
-    onClose={() => setOutOfCredits(null)}
-  />
-  <UpgradePlanDialog
-    open={upgradeDialog}
-    onClose={() => setUpgradeDialog(false)}
-  />
-  <ResendVerificationDialog
-    open={emailModal}
-    email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
-    onClose={() => setEmailModal(false)}
-  />
-</div>
+      <ImageCardModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        imageUrl={selectedImageUrl}
+        jobId={selectedJobId ?? undefined}
+      />
+      <OutOfCreditsDialog
+        open={!!outOfCredits}
+        onOpenChange={() => setOutOfCredits(null)}
+        currentCredits={outOfCredits?.current}
+        requiredCredits={outOfCredits?.needed}
+      />
+      <UpgradePlanDialog open={upgradeDialog} onOpenChange={setUpgradeDialog} />
+      <ResendVerificationDialog open={emailModal} onOpenChange={setEmailModal} />
+    </div>
   );
 }
