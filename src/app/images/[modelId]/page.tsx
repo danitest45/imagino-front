@@ -434,17 +434,21 @@ export default function ModelPage() {
       <ImageCardModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
-        imageUrl={selectedImageUrl}
-        jobId={selectedJobId ?? undefined}
+        jobId={selectedJobId}
+        fallbackUrl={selectedImageUrl ?? undefined}
       />
       <OutOfCreditsDialog
-        open={!!outOfCredits}
-        onOpenChange={() => setOutOfCredits(null)}
-        currentCredits={outOfCredits?.current}
-        requiredCredits={outOfCredits?.needed}
+        open={outOfCredits !== null}
+        current={outOfCredits?.current}
+        needed={outOfCredits?.needed}
+        onClose={() => setOutOfCredits(null)}
       />
-      <UpgradePlanDialog open={upgradeDialog} onOpenChange={setUpgradeDialog} />
-      <ResendVerificationDialog open={emailModal} onOpenChange={setEmailModal} />
+      <UpgradePlanDialog open={upgradeDialog} onClose={() => setUpgradeDialog(false)} />
+      <ResendVerificationDialog
+        open={emailModal}
+        email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
+        onClose={() => setEmailModal(false)}
+      />
     </div>
   );
 }
