@@ -57,7 +57,22 @@ export async function createReplicateJob(
     body: JSON.stringify(body),
   });
   const json = await res.json();
-  return json.content.jobId as string;
+  const jobId =
+    typeof json === 'string'
+      ? json
+      : (json?.jobId ??
+          json?.jobID ??
+          json?.id ??
+          json?.content?.jobId ??
+          json?.content?.jobID ??
+          json?.content?.id ??
+          null);
+
+  if (!jobId) {
+    throw new Error('Replicate job response did not include a jobId');
+  }
+
+  return String(jobId);
 }
 
 export async function getJobStatus(jobId: string) {
