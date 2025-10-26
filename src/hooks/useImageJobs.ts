@@ -109,7 +109,7 @@ export function useImageJobs() {
     let shouldNotifyCredits = false;
     setJobs(prev => {
       let updated = false;
-      const next = prev.map(job => {
+      const next = prev.map((job): ImageJob => {
         if (job.id !== jobId) return job;
         updated = true;
         if (
@@ -122,9 +122,9 @@ export function useImageJobs() {
         }
         return {
           ...job,
-          status: 'done',
+          status: 'done' as const,
           urls: result.success ? result.urls ?? job.urls ?? null : null,
-        };
+        } satisfies ImageJob;
       });
       return updated ? next : prev;
     });
@@ -199,7 +199,7 @@ export function useImageJobs() {
   const submitPrompt = useCallback(
     async (prompt: string, resolution: { width: number; height: number }) => {
       const jobId = await createRunpodJob(prompt, resolution);
-      const placeholder: ImageJob = { id: jobId, status: 'loading', urls: null, resolution };
+      const placeholder: ImageJob = { id: jobId, status: 'loading' as const, urls: null, resolution };
       setJobs(prev => [placeholder, ...prev]);
       return jobId;
     },

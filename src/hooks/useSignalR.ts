@@ -71,26 +71,24 @@ export function useSignalR(
       setConnectionState(builtConnection.state);
     };
 
-    builtConnection.onreconnected((id) => {
+    builtConnection.onreconnected((id: string | undefined) => {
       handleStateChange();
       onReconnected?.(id ?? undefined);
     });
 
-    builtConnection.onclose((error) => {
+    builtConnection.onclose((error?: Error | undefined) => {
       handleStateChange();
-      if (error instanceof Error) {
+      if (error instanceof Error || typeof error === 'undefined') {
         onClose?.(error);
-      } else if (error) {
-        onClose?.(new Error(String(error)));
       } else {
-        onClose?.();
+        onClose?.(new Error(String(error)));
       }
     });
 
     builtConnection
       .start()
       .then(handleStateChange)
-      .catch((err) => {
+      .catch((err: unknown) => {
         console.error('SignalR connection failed to start', err);
         onClose?.(err instanceof Error ? err : new Error(String(err)));
       });
