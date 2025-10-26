@@ -8,9 +8,16 @@ const models = [
   {
     id: 'replicate',
     href: '/images/replicate',
-    title: 'Replicate Studio',
-    description: 'Flagship diffusion tuned for vivid marketing visuals.',
+    title: 'Flux 1.1 Pro',
+    description: 'Modelo difusor calibrado para renders de marketing.',
     badge: 'Premium',
+  },
+  {
+    id: 'seedream-4',
+    href: '/images/seedream-4',
+    title: 'Seedream 4',
+    description: 'Gera imagens 2K de alta qualidade com 4:3.',
+    badge: 'Novo',
   },
 ];
 
