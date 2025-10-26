@@ -48,7 +48,9 @@ const promptSuggestions = [
 
 export default function ModelPage() {
   const params = useParams<{ modelId?: string }>();
-  const selectedModelId = params?.modelId ?? 'flux-dev';
+  const routeModelId = params?.modelId ?? 'flux-dev';
+  const selectedModelId =
+    routeModelId && routeModelId.toLowerCase() === 'replicate' ? 'flux-dev' : routeModelId;
   const [prompt, setPrompt] = useState('');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
   const [quality, setQuality] = useState(3);
@@ -73,13 +75,16 @@ export default function ModelPage() {
   useEffect(() => {
     getReplicateModels()
       .then(models => {
-        const info = models.find(m => m.id === selectedModelId) ?? null;
+        const info =
+          models.find(m => m.id === routeModelId) ??
+          models.find(m => m.id === selectedModelId) ??
+          null;
         setModelInfo(info);
       })
       .catch(() => {
         setModelInfo(null);
       });
-  }, [selectedModelId]);
+  }, [routeModelId, selectedModelId]);
 
   useEffect(() => {
     if (!history) return;
