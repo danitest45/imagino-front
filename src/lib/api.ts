@@ -43,7 +43,7 @@ export async function createReplicateJob(prompt: string, aspectRatio: string, qu
     }),
   });
   const json = await res.json();
-  return json.content.jobId as string;
+  return json.jobId as string;
 }
 
 export async function getJobStatus(jobId: string) {
@@ -51,7 +51,7 @@ export async function getJobStatus(jobId: string) {
     const res = await fetchWithAuth(
       apiUrl(`/api/jobs/${jobId}`),
     );
-    return (await res.json()).content;
+    return (await res.json());
   } catch {
     return null;
   }
