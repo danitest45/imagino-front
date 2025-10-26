@@ -1,8 +1,8 @@
 // hooks/useImageJobs.ts
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { createRunpodJob, getJobStatus } from '../lib/api';
 import { useAuth } from '../context/AuthContext';
-
+import { JobUpdate, useSignalR } from './useSignalR';
 
 export interface ImageJob {
   id: string;
@@ -11,54 +11,151 @@ export interface ImageJob {
   resolution: { width: number; height: number };
 }
 
+interface JobResult {
+  success: boolean;
+  urls: string[] | null;
+}
+
+const COMPLETED_STATUSES = new Set(['COMPLETED', 'SUCCEEDED', 'DONE']);
+const FAILED_STATUSES = new Set(['FAILED', 'CANCELLED', 'ERROR']);
+
+function normalizeResult(status?: string | null, urls?: string[] | null): JobResult | null {
+  const normalizedStatus = status?.toUpperCase() ?? null;
+
+  if (normalizedStatus && COMPLETED_STATUSES.has(normalizedStatus)) {
+    if (urls && urls.length > 0) {
+      return { success: true, urls };
+    }
+    return null;
+  }
+  if (normalizedStatus && FAILED_STATUSES.has(normalizedStatus)) {
+    return { success: false, urls: null };
+  }
+  if (!normalizedStatus && urls && urls.length > 0) {
+    return { success: true, urls };
+  }
+  return null;
+}
+
 export function useImageJobs() {
   const { token } = useAuth();
   const [jobs, setJobs] = useState<ImageJob[]>(() => {
     if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem('image-jobs');
-    return saved ? JSON.parse(saved) as ImageJob[] : [];
+    return saved ? (JSON.parse(saved) as ImageJob[]) : [];
   });
+  const jobsRef = useRef<ImageJob[]>(jobs);
 
-  // Persistir no localStorage sempre que jobs mudar
   useEffect(() => {
+    jobsRef.current = jobs;
+  }, [jobs]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
     localStorage.setItem('image-jobs', JSON.stringify(jobs));
-  }, [jobs, token]);
+  }, [jobs]);
 
-  // Iniciar polling de jobs pendentes
-  useEffect(() => {
+  const finalizeJob = useCallback((jobId: string, result: JobResult) => {
+    let shouldNotifyCredits = false;
+    setJobs(prev => {
+      let updated = false;
+      const next = prev.map(job => {
+        if (job.id !== jobId) return job;
+        updated = true;
+        if (
+          job.status === 'loading' &&
+          result.success &&
+          result.urls &&
+          result.urls.length > 0
+        ) {
+          shouldNotifyCredits = true;
+        }
+        return {
+          ...job,
+          status: 'done',
+          urls: result.success ? result.urls ?? job.urls ?? null : null,
+        };
+      });
+      return updated ? next : prev;
+    });
+    if (shouldNotifyCredits && typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('creditsUpdated'));
+    }
+  }, []);
+
+  const refreshJobs = useCallback(async () => {
     if (!token) return;
-    const intervals: NodeJS.Timeout[] = [];
-    jobs.forEach(job => {
-      if (job.status === 'loading') {
-        const interval = setInterval(async () => {
-          const status = await getJobStatus(job.id);
-          if (!status) return;
-          const jobStatus = status.status?.toUpperCase();
-          if (jobStatus === 'COMPLETED' && status.imageUrls) {
-            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: status.imageUrls } : j));
-            clearInterval(interval);
-            window.dispatchEvent(new Event('creditsUpdated'));
-          }
-          if (jobStatus === 'FAILED') {
-            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: null } : j));
-            clearInterval(interval);
-          }
-        }, 2000);
-        intervals.push(interval);
+    const pending = jobsRef.current.filter(job => job.status === 'loading');
+    if (!pending.length) return;
+
+    const statuses = await Promise.all(
+      pending.map(async job => {
+        const status = await getJobStatus(job.id);
+        return { jobId: job.id, status };
+      }),
+    );
+
+    statuses.forEach(({ jobId, status }) => {
+      if (!status) return;
+      let urls: string[] | null = null;
+      const rawUrls = status.imageUrls;
+      if (Array.isArray(rawUrls)) {
+        urls = rawUrls;
+      } else if (typeof rawUrls === 'string') {
+        urls = [rawUrls];
+      }
+      const result = normalizeResult(status.status ?? null, urls);
+      if (result) {
+        finalizeJob(jobId, result);
       }
     });
-    return () => {
-      intervals.forEach(clearInterval);
-    };
-  }, [jobs, token]);
+  }, [finalizeJob, token]);
 
-  // Criar um novo job e inserir placeholder
-  const submitPrompt = async (prompt: string, resolution: { width: number; height: number }) => {
-    const jobId = await createRunpodJob(prompt, resolution);
-    const placeholder: ImageJob = { id: jobId, status: 'loading', urls: null, resolution };
-    setJobs(prev => [placeholder, ...prev]);
-    return jobId;
-  };
+  useEffect(() => {
+    void refreshJobs();
+  }, [refreshJobs]);
+
+  const handleJobCompleted = useCallback((job: JobUpdate) => {
+    const jobId = job.jobId ?? job.id;
+    if (!jobId) return;
+    let urls: string[] | null = null;
+    if (Array.isArray(job.imageUrls)) {
+      urls = job.imageUrls;
+    } else if (Array.isArray(job.resultImageUrls)) {
+      urls = job.resultImageUrls;
+    } else if (typeof job.imageUrl === 'string') {
+      urls = [job.imageUrl];
+    }
+    const result = normalizeResult(job.status ?? null, urls);
+    if (result) {
+      finalizeJob(jobId, result);
+    }
+  }, [finalizeJob]);
+
+  const handleReconnect = useCallback(() => {
+    void refreshJobs();
+  }, [refreshJobs]);
+
+  const handleClose = useCallback(() => {
+    void refreshJobs();
+  }, [refreshJobs]);
+
+  useSignalR(token, {
+    onJobCompleted: handleJobCompleted,
+    onReconnected: handleReconnect,
+    onClose: handleClose,
+  });
+
+  const submitPrompt = useCallback(
+    async (prompt: string, resolution: { width: number; height: number }) => {
+      const jobId = await createRunpodJob(prompt, resolution);
+      const placeholder: ImageJob = { id: jobId, status: 'loading', urls: null, resolution };
+      setJobs(prev => [placeholder, ...prev]);
+      return jobId;
+    },
+    [],
+  );
 
   return { jobs, submitPrompt };
 }
+
