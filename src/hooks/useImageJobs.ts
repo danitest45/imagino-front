@@ -37,12 +37,62 @@ function normalizeResult(status?: string | null, urls?: string[] | null): JobRes
   return null;
 }
 
+function reviveStoredJobs(raw: unknown): ImageJob[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+
+  return raw
+    .map((entry) => {
+      if (!entry || typeof entry !== 'object') {
+        return null;
+      }
+
+      const id = typeof (entry as { id?: unknown }).id === 'string' ? (entry as { id: string }).id : null;
+      if (!id) {
+        return null;
+      }
+
+      const statusValue = (entry as { status?: unknown }).status;
+      const status: ImageJob['status'] = statusValue === 'done' ? 'done' : 'loading';
+
+      const resolutionValue = (entry as { resolution?: unknown }).resolution;
+      const width =
+        resolutionValue && typeof (resolutionValue as { width?: unknown }).width === 'number'
+          ? (resolutionValue as { width: number }).width
+          : 1024;
+      const height =
+        resolutionValue && typeof (resolutionValue as { height?: unknown }).height === 'number'
+          ? (resolutionValue as { height: number }).height
+          : 1024;
+
+      const urlsValue = (entry as { urls?: unknown }).urls;
+      const urls = Array.isArray(urlsValue)
+        ? urlsValue.filter((url): url is string => typeof url === 'string')
+        : null;
+
+      return {
+        id,
+        status,
+        urls: urls && urls.length > 0 ? urls : null,
+        resolution: { width, height },
+      } satisfies ImageJob;
+    })
+    .filter((job): job is ImageJob => job !== null);
+}
+
 export function useImageJobs() {
   const { token } = useAuth();
   const [jobs, setJobs] = useState<ImageJob[]>(() => {
     if (typeof window === 'undefined') return [];
     const saved = localStorage.getItem('image-jobs');
-    return saved ? (JSON.parse(saved) as ImageJob[]) : [];
+    if (!saved) return [];
+    try {
+      return reviveStoredJobs(JSON.parse(saved));
+    } catch (error) {
+      console.error('Failed to parse stored image jobs', error);
+      return [];
+    }
   });
   const jobsRef = useRef<ImageJob[]>(jobs);
 
