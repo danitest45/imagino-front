@@ -66,14 +66,9 @@ export async function getImageModelDetails(
   slug: string,
   include: string[] = ['versions', 'presets'],
 ): Promise<PublicImageModelDetails> {
-  const params = new URLSearchParams();
-  if (include.length) {
-    params.set('include', include.join(','));
-  }
-  const query = params.toString();
-  const res = await apiFetch(
-    apiUrl(`/api/image/models/${slug}${query ? `?${query}` : ''}`),
-  );
+  const inc = include.length ? `?include=${include.join(',')}` : '';
+  const path = `/api/image/models/${slug.toLowerCase()}${inc}`;
+  const res = await apiFetch(apiUrl(path));
   return (await res.json()) as PublicImageModelDetails;
 }
 
