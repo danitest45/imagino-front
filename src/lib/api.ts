@@ -1,4 +1,5 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
+import type { PublicImageModelDetails, PublicImageModelSummary } from '../types/image';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
@@ -41,6 +42,69 @@ export async function createReplicateJob(prompt: string, aspectRatio: string, qu
       aspectRatio,
       ...(typeof quality === 'number' ? { quality } : {}),
     }),
+  });
+  const json = await res.json();
+  return json.jobId as string;
+}
+
+export async function listImageModels(
+  visibility: 'public' | 'premium' | 'internal' = 'public',
+  include: string[] = ['defaultversion', 'presets'],
+): Promise<PublicImageModelSummary[]> {
+  const params = new URLSearchParams({ visibility });
+  if (include.length) {
+    params.set('include', include.join(','));
+  }
+  const query = params.toString();
+  const res = await apiFetch(
+    apiUrl(`/api/image/models${query ? `?${query}` : ''}`),
+  );
+  return (await res.json()) as PublicImageModelSummary[];
+}
+
+export async function getImageModelDetails(
+  slug: string,
+  include: string[] = ['versions', 'presets'],
+): Promise<PublicImageModelDetails> {
+  const params = new URLSearchParams();
+  if (include.length) {
+    params.set('include', include.join(','));
+  }
+  const query = params.toString();
+  const res = await apiFetch(
+    apiUrl(`/api/image/models/${slug}${query ? `?${query}` : ''}`),
+  );
+  return (await res.json()) as PublicImageModelDetails;
+}
+
+type CreateImageJobParams = {
+  presetId?: string;
+  model?: string;
+  version?: string;
+  prompt: string;
+} & Record<string, unknown>;
+
+export async function createImageJob(
+  params: CreateImageJobParams,
+): Promise<string> {
+  const { presetId, model, version, prompt, ...options } = params;
+  const body: Record<string, unknown> = {
+    params: { prompt, ...options },
+  };
+  if (presetId) {
+    body['presetId'] = presetId;
+  } else {
+    if (model) {
+      body['model'] = model;
+    }
+    if (version) {
+      body['version'] = version;
+    }
+  }
+  const res = await fetchWithAuth(apiUrl('/api/image/jobs'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
   const json = await res.json();
   return json.jobId as string;
