@@ -49,6 +49,7 @@ export default function ImageModelPage({ params }: PageProps) {
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const { token } = useAuth();
   const { history, setHistory } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
@@ -59,6 +60,12 @@ export default function ImageModelPage({ params }: PageProps) {
     setPrompt('');
     setSelectedVersion(undefined);
   }, [slug]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setUserEmail(localStorage.getItem('userEmail'));
+    }
+  }, []);
 
   useEffect(() => {
     let ignore = false;
@@ -464,13 +471,17 @@ export default function ImageModelPage({ params }: PageProps) {
       />
 
       <OutOfCreditsDialog
-        isOpen={!!outOfCredits}
+        open={!!outOfCredits}
         onClose={() => setOutOfCredits(null)}
-        currentCredits={outOfCredits?.current}
-        neededCredits={outOfCredits?.needed}
+        current={outOfCredits?.current}
+        needed={outOfCredits?.needed}
       />
-      <UpgradePlanDialog isOpen={upgradeDialog} onClose={() => setUpgradeDialog(false)} />
-      <ResendVerificationDialog isOpen={emailModal} onClose={() => setEmailModal(false)} />
+      <UpgradePlanDialog open={upgradeDialog} onClose={() => setUpgradeDialog(false)} />
+      <ResendVerificationDialog
+        open={emailModal}
+        email={userEmail}
+        onClose={() => setEmailModal(false)}
+      />
     </div>
   );
 }
