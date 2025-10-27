@@ -1,8 +1,75 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
+import type {
+  PublicImageModelDetails,
+  PublicImageModelSummary,
+} from '../types/image';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
+
+
+// Lista modelos públicos de imagem com opção de incluir versão padrão e presets.
+export async function listImageModels(
+  visibility: 'public' | 'premium' | 'internal' = 'public',
+  include: string[] = ['defaultversion', 'presets'],
+): Promise<PublicImageModelSummary[]> {
+  const includeParam = include.length ? `&include=${include.join(',')}` : '';
+  const res = await apiFetch(
+    apiUrl(`/api/image/models?visibility=${visibility}${includeParam}`),
+  );
+  return (await res.json()) as PublicImageModelSummary[];
+}
+
+// Obtém detalhes de um modelo específico (incluindo versões e presets).
+export async function getImageModelDetails(
+  slug: string,
+  include: string[] = ['versions', 'presets'],
+): Promise<PublicImageModelDetails> {
+  const includeParam = include.length ? `include=${include.join(',')}` : '';
+  const query = includeParam ? `?${includeParam}` : '';
+  const res = await apiFetch(
+    apiUrl(`/api/image/models/${slug}${query}`),
+  );
+  return (await res.json()) as PublicImageModelDetails;
+}
+
+// Cria um job de imagem. Aceita preset ou (model + version).
+export async function createImageJob(
+  params: {
+    presetId?: string;
+    model?: string;
+    version?: string;
+    prompt: string;
+  } & Record<string, unknown>,
+): Promise<string> {
+  const { presetId, model, version, prompt, ...rest } = params;
+  const body: Record<string, unknown> = {
+    params: {
+      prompt,
+      ...rest,
+    },
+  };
+
+  if (presetId) {
+    body.presetId = presetId;
+  } else {
+    if (model) {
+      body.model = model;
+    }
+    if (version) {
+      body.version = version;
+    }
+  }
+
+  const res = await fetchWithAuth(apiUrl('/api/image/jobs'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const json = await res.json();
+  return json.jobId as string;
+}
 
 
 export async function createRunpodJob(

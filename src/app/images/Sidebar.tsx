@@ -1,21 +1,16 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
-
-const models = [
-  {
-    id: 'replicate',
-    href: '/images/replicate',
-    title: 'Replicate Studio',
-    description: 'Flagship diffusion tuned for vivid marketing visuals.',
-    badge: 'Premium',
-  },
-];
+import { usePublicImageModels } from '../../hooks/usePublicImageModels';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { models } = usePublicImageModels('public');
+
+  const modelCards = useMemo(() => models, [models]);
 
   return (
     <aside className="sticky top-24 flex h-[calc(100vh-6rem)] w-72 flex-col gap-8 rounded-r-[40px] border border-white/5 border-l-transparent bg-black/30 px-6 py-8 text-sm text-gray-200 shadow-[0_30px_80px_-40px_rgba(168,85,247,0.45)] backdrop-blur-xl">
@@ -32,12 +27,26 @@ export default function Sidebar() {
       </div>
 
       <nav className="space-y-3">
-        {models.map(model => {
-          const active = pathname === model.href;
+        {modelCards.map(model => {
+          const href = `/images/${model.slug}`;
+          const active = pathname === href;
+          const enabledCapabilities = Object.entries(model.capabilities)
+            .filter(([, enabled]) => enabled)
+            .map(([key]) => key)
+            .join(', ');
+          const badge =
+            model.visibility === 'Premium'
+              ? 'Premium'
+              : model.visibility === 'Internal'
+                ? 'Internal'
+                : 'Public';
+          const description = enabledCapabilities
+            ? `Supports ${enabledCapabilities}`
+            : 'Image generation';
           return (
             <Link
-              key={model.id}
-              href={model.href}
+              key={model.slug}
+              href={href}
               className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
                 active
                   ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/25 via-purple-500/20 to-cyan-400/20 shadow-lg shadow-purple-500/40'
@@ -48,10 +57,10 @@ export default function Sidebar() {
               <div className="relative flex items-start justify-between">
                 <div>
                   <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-200">
-                    <Sparkles className="h-3.5 w-3.5" /> {model.badge}
+                    <Sparkles className="h-3.5 w-3.5" /> {badge}
                   </p>
-                  <h3 className="mt-3 text-lg font-semibold text-white">{model.title}</h3>
-                  <p className="mt-2 text-sm text-gray-400">{model.description}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{model.displayName}</h3>
+                  <p className="mt-2 text-sm text-gray-400">{description}</p>
                 </div>
                 <span
                   className={`mt-1 inline-flex h-9 items-center rounded-full border px-3 text-xs font-semibold uppercase tracking-[0.3em] ${
@@ -64,6 +73,11 @@ export default function Sidebar() {
             </Link>
           );
         })}
+        {modelCards.length === 0 && (
+          <div className="rounded-3xl border border-white/10 bg-black/40 p-5 text-sm text-gray-400">
+            No public models available yet.
+          </div>
+        )}
       </nav>
 
       <div className="mt-auto space-y-2 rounded-3xl border border-white/10 bg-black/40 p-5 text-xs text-gray-400">
