@@ -28,11 +28,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 10;
 
-type PageProps = {
+type ImageModelPageProps = {
   params: { slug: string };
 };
 
-export default function ImageModelPage({ params }: PageProps) {
+export default function ImageModelPage({ params }: ImageModelPageProps) {
   const { slug } = params;
   const [model, setModel] = useState<PublicImageModelDetails | null>(null);
   const [loadingModel, setLoadingModel] = useState(true);
