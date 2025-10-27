@@ -16,7 +16,7 @@ export interface PublicImageModelVersionSummary {
 export interface PublicImageModelSummary {
   slug: string;
   displayName: string;
-  capabilities: { image: boolean; inpaint: boolean; upscale: boolean };
+  capabilities?: { image: boolean; inpaint: boolean; upscale: boolean };
   visibility: 'Public' | 'Premium' | 'Internal';
   status: 'Active' | 'Deprecated';
   defaultVersionTag?: string;

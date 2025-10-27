@@ -15,9 +15,9 @@ function getBadgeLabel(visibility: PublicImageModelSummary['visibility']): strin
 
 function getDescription(model: PublicImageModelSummary): string {
   const parts: string[] = [];
-  if (model.capabilities.image) parts.push('Generation');
-  if (model.capabilities.inpaint) parts.push('Inpainting');
-  if (model.capabilities.upscale) parts.push('Upscaling');
+  if (model.capabilities?.image) parts.push('Generation');
+  if (model.capabilities?.inpaint) parts.push('Inpainting');
+  if (model.capabilities?.upscale) parts.push('Upscaling');
   return parts.length > 0 ? parts.join(' • ') : 'Image creation model';
 }
 
