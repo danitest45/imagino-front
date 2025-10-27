@@ -2,11 +2,11 @@ import ImageModelClient from './ImageModelClient';
 
 type ImageModelPageParams = { slug: string };
 
-export default function ImageModelPage({
-  params,
-}: {
-  params: ImageModelPageParams;
-}) {
-  const { slug } = params;
-  return <ImageModelClient slug={slug} />;
+type ImageModelPageProps = {
+  params: ImageModelPageParams | Promise<ImageModelPageParams>;
+};
+
+export default function ImageModelPage({ params }: ImageModelPageProps) {
+  const resolvedParams = params as ImageModelPageParams;
+  return <ImageModelClient slug={resolvedParams.slug} />;
 }
