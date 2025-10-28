@@ -3,19 +3,25 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
+import { usePublicImageModels } from '../../hooks/usePublicImageModels';
 
-const models = [
-  {
-    id: 'replicate',
-    href: '/images/replicate',
-    title: 'Replicate Studio',
-    description: 'Flagship diffusion tuned for vivid marketing visuals.',
-    badge: 'Premium',
-  },
-];
+function resolveBadge(visibility: string | undefined): string {
+  return visibility?.toLowerCase() === 'public' ? 'Public' : 'Premium';
+}
+
+function isProblem(value: unknown): value is { detail?: string; title?: string } {
+  return Boolean(value) && typeof value === 'object';
+}
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { models, loading, error } = usePublicImageModels();
+
+  const errorMessage = error
+    ? isProblem(error)
+      ? (error.detail as string | undefined) ?? (error.title as string | undefined) ?? 'Erro ao carregar modelos'
+      : error.message
+    : null;
 
   return (
     <aside className="sticky top-24 flex h-[calc(100vh-6rem)] w-72 flex-col gap-8 rounded-r-[40px] border border-white/5 border-l-transparent bg-black/30 px-6 py-8 text-sm text-gray-200 shadow-[0_30px_80px_-40px_rgba(168,85,247,0.45)] backdrop-blur-xl">
@@ -32,12 +38,20 @@ export default function Sidebar() {
       </div>
 
       <nav className="space-y-3">
+        {loading && <p className="text-xs text-gray-400">Carregando modelos...</p>}
+        {errorMessage && !loading && (
+          <p className="rounded-2xl border border-rose-400/40 bg-rose-500/10 px-4 py-3 text-xs text-rose-200">{errorMessage}</p>
+        )}
+        {!loading && !errorMessage && models.length === 0 && (
+          <p className="text-xs text-gray-400">Nenhum modelo público disponível.</p>
+        )}
         {models.map(model => {
-          const active = pathname === model.href;
+          const href = `/images/${model.slug.toLowerCase()}`;
+          const active = pathname === href;
           return (
             <Link
-              key={model.id}
-              href={model.href}
+              key={model.slug}
+              href={href}
               className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
                 active
                   ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/25 via-purple-500/20 to-cyan-400/20 shadow-lg shadow-purple-500/40'
@@ -48,17 +62,17 @@ export default function Sidebar() {
               <div className="relative flex items-start justify-between">
                 <div>
                   <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-200">
-                    <Sparkles className="h-3.5 w-3.5" /> {model.badge}
+                    <Sparkles className="h-3.5 w-3.5" /> {resolveBadge(model.visibility)}
                   </p>
-                  <h3 className="mt-3 text-lg font-semibold text-white">{model.title}</h3>
-                  <p className="mt-2 text-sm text-gray-400">{model.description}</p>
+                  <h3 className="mt-3 text-lg font-semibold text-white">{model.displayName}</h3>
+                  <p className="mt-2 text-sm text-gray-400">Status: {model.status}</p>
                 </div>
                 <span
                   className={`mt-1 inline-flex h-9 items-center rounded-full border px-3 text-xs font-semibold uppercase tracking-[0.3em] ${
                     active ? 'border-white/20 bg-white/10 text-white' : 'border-white/10 text-gray-400'
                   }`}
                 >
-                  Active
+                  {active ? 'Active' : 'View'}
                 </span>
               </div>
             </Link>

@@ -27,7 +27,7 @@ export default function LoginPage() {
       }
       const { token } = await loginUser(email, password);
       auth.login(token);
-      router.push('/images/replicate');
+      router.push('/images');
     } catch (err) {
       const problem = err as Problem;
       if (problem.code === 'EMAIL_NOT_VERIFIED') {

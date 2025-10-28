@@ -1,4 +1,5 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
+import type { PublicImageModelDetails, PublicImageModelSummary } from '../types/image-model';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
@@ -30,31 +31,29 @@ export async function createRunpodJob(
   return json.content.jobId as string;
 }
 
-export async function createReplicateJob(prompt: string, aspectRatio: string, quality?: number) {
-  const res = await fetchWithAuth(apiUrl('/api/replicate/jobs'), {
+export async function listImageModels(): Promise<PublicImageModelSummary[]> {
+  const res = await apiFetch(apiUrl('/api/image/models?visibility=public&include=defaultversion,presets'));
+  return res.json();
+}
+
+export async function getImageModelDetails(slug: string): Promise<PublicImageModelDetails> {
+  const normalizedSlug = slug.toLowerCase();
+  const res = await apiFetch(apiUrl(`/api/image/models/${normalizedSlug}?include=versions,presets`));
+  return res.json();
+}
+
+export async function createImageJob(body: unknown): Promise<{ jobId: string }> {
+  const res = await fetchWithAuth(apiUrl('/api/image/jobs'), {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt,
-      aspectRatio,
-      ...(typeof quality === 'number' ? { quality } : {}),
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
   });
-  const json = await res.json();
-  return json.jobId as string;
+  return res.json();
 }
 
 export async function getJobStatus(jobId: string) {
-  try {
-    const res = await fetchWithAuth(
-      apiUrl(`/api/jobs/${jobId}`),
-    );
-    return (await res.json());
-  } catch {
-    return null;
-  }
+  const res = await apiFetch(apiUrl(`/api/jobs/${jobId}`));
+  return res.json();
 }
 
 export async function getJobDetails(jobId: string): Promise<JobDetails> {

@@ -31,11 +31,19 @@ export function useImageJobs() {
     jobs.forEach(job => {
       if (job.status === 'loading') {
         const interval = setInterval(async () => {
-          const status = await getJobStatus(job.id);
-          if (!status) return;
-          const jobStatus = status.status?.toUpperCase();
-          if (jobStatus === 'COMPLETED' && status.imageUrls) {
-            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: status.imageUrls } : j));
+          let status: unknown;
+          try {
+            status = await getJobStatus(job.id);
+          } catch {
+            return;
+          }
+          const data = status as { status?: string | null; imageUrls?: unknown };
+          const jobStatus = data.status?.toUpperCase();
+          const imageUrls = Array.isArray(data.imageUrls)
+            ? data.imageUrls.filter((url): url is string => typeof url === 'string')
+            : null;
+          if (jobStatus === 'COMPLETED') {
+            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: imageUrls } : j));
             clearInterval(interval);
             window.dispatchEvent(new Event('creditsUpdated'));
           }
