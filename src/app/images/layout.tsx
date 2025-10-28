@@ -1,7 +1,5 @@
 import Sidebar from './Sidebar';
-import dynamic from 'next/dynamic';
-
-const MobileModelNav = dynamic(() => import('./MobileModelNav'), { ssr: false });
+import MobileModelNav from './MobileModelNav';
 
 
 export default function ImagesLayout({
