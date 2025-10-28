@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { usePublicImageModels } from '../../hooks/usePublicImageModels';
 
-function getBadgeLabel(visibility: string | undefined): string {
-  return visibility?.toLowerCase() === 'public' ? 'Public' : 'Premium';
+function getBadgeLabel(visibility: unknown): string {
+  return typeof visibility === 'string' && visibility.toLowerCase() === 'public' ? 'Public' : 'Premium';
 }
 
 export default function MobileModelNav() {
@@ -22,7 +22,11 @@ export default function MobileModelNav() {
         <span className="text-xs text-gray-300">Nenhum modelo</span>
       )}
       {models.map(model => {
-        const href = `/images/${model.slug.toLowerCase()}`;
+        const slug = typeof model.slug === 'string' ? model.slug.toLowerCase() : '';
+        if (!slug) {
+          return null;
+        }
+        const href = `/images/${slug}`;
         const active = pathname === href;
         return (
           <Link

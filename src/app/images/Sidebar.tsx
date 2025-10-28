@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { usePublicImageModels } from '../../hooks/usePublicImageModels';
 
-function resolveBadge(visibility: string | undefined): string {
-  return visibility?.toLowerCase() === 'public' ? 'Public' : 'Premium';
+function resolveBadge(visibility: unknown): string {
+  return typeof visibility === 'string' && visibility.toLowerCase() === 'public' ? 'Public' : 'Premium';
 }
 
 function isProblem(value: unknown): value is { detail?: string; title?: string } {
@@ -46,7 +46,11 @@ export default function Sidebar() {
           <p className="text-xs text-gray-400">Nenhum modelo público disponível.</p>
         )}
         {models.map(model => {
-          const href = `/images/${model.slug.toLowerCase()}`;
+          const slug = typeof model.slug === 'string' ? model.slug.toLowerCase() : '';
+          if (!slug) {
+            return null;
+          }
+          const href = `/images/${slug}`;
           const active = pathname === href;
           return (
             <Link
