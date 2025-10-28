@@ -222,3 +222,18 @@ export function normalizeUrl(pathOrUrl?: string | null): string | null {
   }
   return `${API_BASE_URL}${cleanedPath}`;
 }
+
+export type PublicImageModelSummary = {
+  slug: string;
+  displayName: string;
+  visibility: 'Public' | 'Premium' | string;
+  status: string;
+  defaultVersionTag?: string | null;
+};
+
+export async function listImageModels(): Promise<PublicImageModelSummary[]> {
+  const url = `/api/image/models?visibility=public&include=defaultversion`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error('Failed to load image models');
+  return (await res.json()) as PublicImageModelSummary[];
+}
