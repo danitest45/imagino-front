@@ -1,8 +1,99 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
 import type { UserDto } from '../types/user';
-import { fetchWithAuth } from './auth';
+import { fetchWithAuth, getAccessToken } from './auth';
 import { apiFetch } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
+
+export interface ImageModelSummary {
+  slug: string;
+  name: string;
+  visibility?: string | null;
+  defaultVersionTag?: string | null;
+}
+
+export interface ImageModelVersion {
+  tag: string;
+}
+
+export interface ImageModelDetails extends ImageModelSummary {
+  versions?: ImageModelVersion[];
+}
+
+export interface CreateImageJobPayload {
+  model: string;
+  version: string;
+  params: Record<string, unknown>;
+}
+
+function resolveHeaders(headers?: HeadersInit): HeadersInit | undefined {
+  if (!headers) return undefined;
+  if (headers instanceof Headers) {
+    return Object.fromEntries(headers.entries());
+  }
+  if (Array.isArray(headers)) {
+    return Object.fromEntries(headers);
+  }
+  return headers;
+}
+
+export async function listImageModels(init: RequestInit = {}): Promise<ImageModelSummary[]> {
+  const url = apiUrl('/api/image/models?visibility=public&include=defaultversion');
+  const options: RequestInit = {
+    cache: 'no-store',
+    ...init,
+    headers: resolveHeaders(init.headers),
+  };
+
+  if (typeof window !== 'undefined' && getAccessToken()) {
+    const res = await fetchWithAuth(url, options);
+    return (await res.json()) as ImageModelSummary[];
+  }
+
+  const res = await apiFetch(url, options);
+  return (await res.json()) as ImageModelSummary[];
+}
+
+export async function getImageModelDetails(
+  slug: string,
+  init: RequestInit = {},
+): Promise<ImageModelDetails> {
+  const url = apiUrl(`/api/image/models/${slug}?include=versions`);
+  const options: RequestInit = {
+    cache: 'no-store',
+    ...init,
+    headers: resolveHeaders(init.headers),
+  };
+
+  if (typeof window !== 'undefined' && getAccessToken()) {
+    const res = await fetchWithAuth(url, options);
+    return (await res.json()) as ImageModelDetails;
+  }
+
+  const res = await apiFetch(url, options);
+  return (await res.json()) as ImageModelDetails;
+}
+
+export async function createImageJob(payload: CreateImageJobPayload): Promise<string> {
+  const res = await fetchWithAuth(
+    apiUrl('/api/image/jobs'),
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    },
+  );
+  const json = (await res.json()) as Record<string, unknown>;
+  const jobId =
+    (json.jobId as string | undefined) ??
+    (json.id as string | undefined) ??
+    (json.jobID as string | undefined) ??
+    (json.JobId as string | undefined) ??
+    (json.job_id as string | undefined);
+  if (!jobId) {
+    throw new Error('Invalid job response');
+  }
+  return jobId;
+}
 
 
 export async function createRunpodJob(
