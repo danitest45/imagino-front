@@ -1,4 +1,5 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
+import type { PublicImageModelSummary } from '../types/image-model';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
@@ -84,6 +85,24 @@ export async function getLatestJobs(): Promise<LatestJob[]> {
     createdAt: String(j.createdAt ?? j.CreatedAt ?? ''),
     aspectRatio: (j.aspectRatio ?? j.AspectRatio ?? null) as string | null,
   }));
+}
+
+export async function getPublicImageModels(): Promise<PublicImageModelSummary[]> {
+  const res = await apiFetch(
+    apiUrl('/api/image/models?visibility=public'),
+  );
+  const json = await res.json();
+
+  if (!Array.isArray(json)) {
+    return [];
+  }
+
+  return json
+    .map(model => ({
+      slug: String(model.slug ?? model.Slug ?? ''),
+      displayName: String(model.displayName ?? model.DisplayName ?? ''),
+    }))
+    .filter(model => model.slug && model.displayName);
 }
 
 export async function registerUser(email: string, password: string) {

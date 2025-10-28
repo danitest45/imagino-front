@@ -2,20 +2,40 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getPublicImageModels } from '../../lib/api';
+import type { PublicImageModelSummary } from '../../types/image-model';
 
-const models = [
+const fallbackModels: PublicImageModelSummary[] = [
   {
-    id: 'replicate',
-    href: '/images/replicate',
-    title: 'Replicate Studio',
-    description: 'Flagship diffusion tuned for vivid marketing visuals.',
-    badge: 'Premium',
+    slug: 'replicate',
+    displayName: 'Replicate Studio',
   },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [models, setModels] = useState<PublicImageModelSummary[]>(fallbackModels);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadModels() {
+      try {
+        const data = await getPublicImageModels();
+        if (!active || data.length === 0) return;
+        setModels(data);
+      } catch (error) {
+        console.error('Failed to fetch image models', error);
+      }
+    }
+
+    loadModels();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <aside className="sticky top-24 flex h-[calc(100vh-6rem)] w-72 flex-col gap-8 rounded-r-[40px] border border-white/5 border-l-transparent bg-black/30 px-6 py-8 text-sm text-gray-200 shadow-[0_30px_80px_-40px_rgba(168,85,247,0.45)] backdrop-blur-xl">
@@ -33,33 +53,40 @@ export default function Sidebar() {
 
       <nav className="space-y-3">
         {models.map(model => {
-          const active = pathname === model.href;
+          const href = `/images/${model.slug}`;
+          const active = pathname === href;
+          const disabled = true;
           return (
             <Link
-              key={model.id}
-              href={model.href}
+              key={model.slug}
+              href={href}
+              aria-disabled={disabled}
+              tabIndex={disabled ? -1 : undefined}
+              onClick={event => {
+                if (disabled) {
+                  event.preventDefault();
+                }
+              }}
+              onKeyDown={event => {
+                if (disabled && (event.key === 'Enter' || event.key === ' ')) {
+                  event.preventDefault();
+                }
+              }}
+              title={disabled ? 'More models coming soon' : undefined}
               className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
                 active
                   ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/25 via-purple-500/20 to-cyan-400/20 shadow-lg shadow-purple-500/40'
                   : 'border-white/10 bg-black/40 hover:border-fuchsia-400/40 hover:bg-black/50'
-              }`}
+              } ${disabled ? 'cursor-not-allowed' : ''}`}
             >
-              <div className="absolute -top-6 right-6 h-20 w-20 rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-500/20 to-cyan-400/20 blur-2xl" aria-hidden />
-              <div className="relative flex items-start justify-between">
-                <div>
-                  <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-fuchsia-200">
-                    <Sparkles className="h-3.5 w-3.5" /> {model.badge}
-                  </p>
-                  <h3 className="mt-3 text-lg font-semibold text-white">{model.title}</h3>
-                  <p className="mt-2 text-sm text-gray-400">{model.description}</p>
-                </div>
+              <div className="relative flex items-center justify-between">
+                <h3 className="text-base font-semibold text-white">{model.displayName}</h3>
                 <span
-                  className={`mt-1 inline-flex h-9 items-center rounded-full border px-3 text-xs font-semibold uppercase tracking-[0.3em] ${
-                    active ? 'border-white/20 bg-white/10 text-white' : 'border-white/10 text-gray-400'
+                  className={`inline-flex h-3 w-3 shrink-0 rounded-full ${
+                    active ? 'bg-fuchsia-400' : 'bg-white/30'
                   }`}
-                >
-                  Active
-                </span>
+                  aria-hidden
+                />
               </div>
             </Link>
           );
