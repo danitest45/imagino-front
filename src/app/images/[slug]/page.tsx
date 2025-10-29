@@ -13,7 +13,7 @@ import {
   mapApiToUiJob,
   normalizeUrl,
 } from '../../../lib/api';
-import type { UiJob } from '../../../types/image-job';
+import type { UiJob, ImageJobApi } from '../../../types/image-job';
 import type {
   ImageModelDetails,
   ImageModelVersionDetails,
@@ -27,6 +27,12 @@ import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
 import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
+
+type ModelAwareJob = ImageJobApi & {
+  model?: string;
+  modelSlug?: string;
+  provider?: string;
+};
 
 const promptSuggestions = [
   {
@@ -112,8 +118,8 @@ export default function ImageModelPage() {
   useEffect(() => {
     if (!history) return;
     const filtered = history.filter(job => {
-      const raw = job as Record<string, unknown>;
-      const jobModel = (raw.model ?? raw.modelSlug ?? raw.provider) as string | undefined;
+      const raw = job as ModelAwareJob;
+      const jobModel = raw.model ?? raw.modelSlug ?? raw.provider;
       if (!jobModel) return true;
       return jobModel === slug;
     });
