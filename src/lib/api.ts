@@ -189,7 +189,10 @@ export async function getImageModelDetails(slug: string): Promise<ImageModelDeta
   const versionsRaw = Array.isArray(json?.versions) ? json.versions : [];
   const versions = versionsRaw
     .map(mapVersionSummary)
-    .filter((version): version is ImageModelVersionSummary => !!version);
+    .filter(
+      (version: ImageModelVersionSummary | null): version is ImageModelVersionSummary =>
+        !!version,
+    );
 
   const defaultVersionTag = String(
     json?.defaultVersionTag ?? json?.defaultVersion ?? versions[0]?.tag ?? '',
