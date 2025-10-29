@@ -55,29 +55,15 @@ export default function Sidebar() {
         {models.map(model => {
           const href = `/images/${model.slug}`;
           const active = pathname === href;
-          const disabled = true;
           return (
             <Link
               key={model.slug}
               href={href}
-              aria-disabled={disabled}
-              tabIndex={disabled ? -1 : undefined}
-              onClick={event => {
-                if (disabled) {
-                  event.preventDefault();
-                }
-              }}
-              onKeyDown={event => {
-                if (disabled && (event.key === 'Enter' || event.key === ' ')) {
-                  event.preventDefault();
-                }
-              }}
-              title={disabled ? 'More models coming soon' : undefined}
               className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
                 active
                   ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/25 via-purple-500/20 to-cyan-400/20 shadow-lg shadow-purple-500/40'
                   : 'border-white/10 bg-black/40 hover:border-fuchsia-400/40 hover:bg-black/50'
-              } ${disabled ? 'cursor-not-allowed' : ''}`}
+              }`}
             >
               <div className="relative flex items-center justify-between">
                 <h3 className="text-base font-semibold text-white">{model.displayName}</h3>
