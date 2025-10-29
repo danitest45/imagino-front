@@ -31,6 +31,8 @@ export interface JsonSchemaProperty {
   format?: string;
   default?: unknown;
   contentMediaType?: string;
+  minLength?: number;
+  maxLength?: number;
 }
 
 export interface JsonSchema {
