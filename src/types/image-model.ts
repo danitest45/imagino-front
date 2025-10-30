@@ -11,6 +11,7 @@ export interface ImageModelVersionSummary {
 }
 
 export interface ImageModelDetails {
+  id?: string;
   slug: string;
   displayName: string;
   capabilities: string[];

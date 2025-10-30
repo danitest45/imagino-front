@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   createImageJob,
   getImageModelDetails,
-  getImageModelVersion,
+  getPublicModelVersion,
   getJobStatus,
   getUserHistory,
   mapApiToUiJob,
@@ -94,7 +94,6 @@ export default function ImageModelPage() {
   const [details, setDetails] = useState<ImageModelDetails | null>(null);
   const [detailsLoading, setDetailsLoading] = useState(true);
   const [detailsError, setDetailsError] = useState<string | null>(null);
-  const [selectedVersionTag, setSelectedVersionTag] = useState<string>('');
   const [versionDetails, setVersionDetails] = useState<ImageModelVersionDetails | null>(null);
   const [versionLoading, setVersionLoading] = useState(false);
   const [versionError, setVersionError] = useState<string | null>(null);
@@ -148,8 +147,11 @@ export default function ImageModelPage() {
     getImageModelDetails(slug)
       .then(data => {
         if (!active) return;
+        console.debug('[ImageModelPage] Loaded model details', {
+          slug,
+          defaultVersionTag: data.defaultVersionTag,
+        });
         setDetails(data);
-        setSelectedVersionTag(data.defaultVersionTag);
       })
       .catch(error => {
         if (!active) return;
@@ -167,19 +169,29 @@ export default function ImageModelPage() {
     };
   }, [slug]);
 
+  const defaultVersionTag = details?.defaultVersionTag ?? '';
+  const versionLabel = detailsLoading ? 'Carregando...' : defaultVersionTag || 'default';
+
   useEffect(() => {
-    if (!slug || !selectedVersionTag) return;
+    if (!slug || !defaultVersionTag) return;
     let active = true;
     setVersionLoading(true);
     setVersionError(null);
 
-    const versionId = details?.versions.find(v => v.tag === selectedVersionTag)?.id;
+    const versionId = details?.versions.find(v => v.tag === defaultVersionTag)?.id;
+    const modelId = details?.id;
 
-    getImageModelVersion(
+    console.debug('[ImageModelPage] Resolving version schema', {
       slug,
-      selectedVersionTag,
-      versionId ? { versionId } : undefined,
-    )
+      defaultVersionTag,
+      versionId,
+    });
+
+    getPublicModelVersion(slug, defaultVersionTag, {
+      modelId,
+      versionId,
+      versions: details?.versions,
+    })
       .then(data => {
         if (!active) return;
         setVersionDetails(data);
@@ -199,7 +211,7 @@ export default function ImageModelPage() {
     return () => {
       active = false;
     };
-  }, [slug, selectedVersionTag, details]);
+  }, [slug, defaultVersionTag, details]);
 
   useEffect(() => {
     if (!versionDetails?.paramSchema?.properties) {
@@ -472,7 +484,7 @@ export default function ImageModelPage() {
   }
 
   async function handleGenerate() {
-    if (!slug || !selectedVersionTag || !schemaAvailable) return;
+    if (!slug || !defaultVersionTag || !schemaAvailable) return;
     if (missingRequired) {
       toast('Preencha os campos obrigatórios antes de gerar.');
       return;
@@ -507,7 +519,11 @@ export default function ImageModelPage() {
     });
 
     try {
-      const jobId = await createImageJob(slug, selectedVersionTag, params);
+      const versionTag = defaultVersionTag;
+      if (!versionTag) {
+        throw new Error('Model default version not available');
+      }
+      const jobId = await createImageJob(slug, versionTag, params);
       const newJob: UiJob = {
         id: jobId,
         status: 'loading',
@@ -581,7 +597,8 @@ export default function ImageModelPage() {
     }
   }
 
-  const isGenerateDisabled = loading || !token || !schemaAvailable || missingRequired;
+  const isGenerateDisabled =
+    loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
@@ -602,27 +619,14 @@ export default function ImageModelPage() {
             {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
           </div>
 
-          {details?.versions?.length ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-white">Model version</p>
-                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                  {selectedVersionTag}
-                </span>
-              </div>
-              <select
-                value={selectedVersionTag}
-                onChange={event => setSelectedVersionTag(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-              >
-                {details.versions.map(version => (
-                  <option key={version.tag} value={version.tag}>
-                    {version.displayName ?? version.tag}
-                  </option>
-                ))}
-              </select>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold text-white">Model version</p>
+              <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
+                {versionLabel}
+              </span>
             </div>
-          ) : null}
+          </div>
 
           {promptKey && schemaAvailable && !versionLoading ? (
             <div className="flex flex-col gap-3">
