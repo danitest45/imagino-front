@@ -1,5 +1,11 @@
 import type { ImageJobApi, UiJob, JobDetails, LatestJob } from '../types/image-job';
-import type { PublicImageModelSummary } from '../types/image-model';
+import type {
+  PublicImageModelSummary,
+  ImageModelDetails,
+  ImageModelVersionDetails,
+  ImageModelVersionSummary,
+  JsonSchema,
+} from '../types/image-model';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch } from './api-client';
@@ -103,6 +109,252 @@ export async function getPublicImageModels(): Promise<PublicImageModelSummary[]>
       displayName: String(model.displayName ?? model.DisplayName ?? ''),
     }))
     .filter(model => model.slug && model.displayName);
+}
+
+function parseJsonSchema(schema: unknown): JsonSchema | null {
+  if (!schema) return null;
+  if (typeof schema === 'string') {
+    try {
+      const parsed = JSON.parse(schema);
+      return typeof parsed === 'object' && parsed !== null ? (parsed as JsonSchema) : null;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof schema === 'object') {
+    return schema as JsonSchema;
+  }
+  return null;
+}
+
+function parseDefaults(raw: unknown): Record<string, unknown> | null {
+  if (!raw) return null;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : null;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof raw === 'object') {
+    return raw as Record<string, unknown>;
+  }
+  return null;
+}
+
+function mapVersionSummary(version: unknown): ImageModelVersionSummary | null {
+  if (!version || typeof version !== 'object') {
+    return null;
+  }
+  const record = version as Record<string, unknown>;
+  const tag = String(record.tag ?? record.versionTag ?? '');
+  if (!tag) {
+    return null;
+  }
+  const id = String(record.id ?? record.versionId ?? '');
+  return {
+    id,
+    tag,
+    displayName: record.displayName ? String(record.displayName) : undefined,
+    status: record.status ? String(record.status) : undefined,
+  };
+}
+
+function mapVersionDetails(
+  version: unknown,
+  fallback: { id?: string; tag?: string } = {},
+): ImageModelVersionDetails {
+  const record = (version && typeof version === 'object'
+    ? (version as Record<string, unknown>)
+    : {}) as Record<string, unknown>;
+  const id = String(record.id ?? record.versionId ?? fallback.id ?? '');
+  const tag = String(record.tag ?? record.versionTag ?? fallback.tag ?? '');
+  return {
+    id,
+    tag,
+    paramSchema: parseJsonSchema(record.paramSchema),
+    defaults: parseDefaults(record.defaults),
+  };
+}
+
+export async function getImageModelDetails(slug: string): Promise<ImageModelDetails> {
+  const res = await apiFetch(
+    apiUrl(`/api/image/models/${slug}?include=versions`),
+  );
+  if (!res.ok) {
+    throw new Error('Failed to fetch model details');
+  }
+  const json = await res.json();
+  const versionsRaw = Array.isArray(json?.versions) ? json.versions : [];
+  const versions = versionsRaw
+    .map(mapVersionSummary)
+    .filter(
+      (version: ImageModelVersionSummary | null): version is ImageModelVersionSummary =>
+        !!version,
+    );
+
+  const defaultVersionTag = String(
+    json?.defaultVersionTag ?? json?.defaultVersion ?? versions[0]?.tag ?? '',
+  );
+
+  if (!json?.slug && !slug) {
+    throw new Error('Model slug not found');
+  }
+
+  return {
+    id: json?.id ? String(json.id) : undefined,
+    slug: String(json?.slug ?? slug),
+    displayName: String(json?.displayName ?? json?.name ?? slug),
+    capabilities: Array.isArray(json?.capabilities) ? json.capabilities.map((cap: unknown) => String(cap)) : [],
+    visibility: json?.visibility ? String(json.visibility) : undefined,
+    status: json?.status ? String(json.status) : undefined,
+    defaultVersionTag,
+    versions,
+  };
+}
+
+interface VersionLookupOptions {
+  modelId?: string;
+  versionId?: string;
+  versions?: ImageModelVersionSummary[];
+}
+
+export async function getPublicModelVersion(
+  slug: string,
+  versionTag: string,
+  options: VersionLookupOptions = {},
+): Promise<ImageModelVersionDetails> {
+  const publicUrl = apiUrl(`/api/image/models/${slug}/versions/${versionTag}`);
+
+  try {
+    const publicRes = await apiFetch(publicUrl);
+    console.debug('[ImageModelApi] Fetching version schema', {
+      slug,
+      versionTag,
+      url: publicUrl,
+      status: publicRes.status,
+    });
+    if (publicRes.ok) {
+      const json = await publicRes.json();
+      return mapVersionDetails(json, { tag: versionTag });
+    }
+    if (publicRes.status !== 401 && publicRes.status !== 403 && publicRes.status !== 404) {
+      throw new Error('Failed to fetch version details');
+    }
+  } catch (error) {
+    console.debug('[ImageModelApi] Public version lookup failed, falling back to admin route', {
+      slug,
+      versionTag,
+      url: publicUrl,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  // TODO: Remove admin fallback once the public version details endpoint is available.
+  let versionId = options.versionId;
+  let modelId = options.modelId;
+  const knownVersions = options.versions;
+
+  if (!versionId && knownVersions) {
+    versionId = knownVersions.find(v => v.tag === versionTag)?.id;
+  }
+
+  if (!versionId && !modelId) {
+    try {
+      const details = await getImageModelDetails(slug);
+      modelId = details.id ?? modelId;
+      versionId = details.versions.find(v => v.tag === versionTag)?.id ?? versionId;
+    } catch (detailsError) {
+      console.debug('[ImageModelApi] Failed to reuse model details during admin fallback', {
+        slug,
+        versionTag,
+        error: detailsError instanceof Error ? detailsError.message : String(detailsError),
+      });
+    }
+  }
+
+  if (!versionId && modelId) {
+    const adminListUrl = apiUrl(
+      `/api/admin/image/versions?modelId=${encodeURIComponent(modelId)}`,
+    );
+    const adminListRes = await fetchWithAuth(adminListUrl);
+    console.debug('[ImageModelApi] Fetching admin version list', {
+      slug,
+      versionTag,
+      url: adminListUrl,
+      status: adminListRes.status,
+    });
+    if (!adminListRes.ok) {
+      if (adminListRes.status === 401 || adminListRes.status === 403) {
+        throw new Error('Admin authorization required');
+      }
+      throw new Error('Failed to fetch version list from admin API');
+    }
+    const listJson = await adminListRes.json();
+    if (Array.isArray(listJson)) {
+      const match = listJson.find(entry => {
+        if (!entry || typeof entry !== 'object') return false;
+        const record = entry as Record<string, unknown>;
+        const tag = String(record.tag ?? record.versionTag ?? '');
+        return tag === versionTag;
+      }) as Record<string, unknown> | undefined;
+      if (match) {
+        versionId = String(match.id ?? match.versionId ?? '');
+      }
+    }
+  }
+
+  if (!versionId) {
+    throw new Error('Version not found');
+  }
+
+  const adminUrl = apiUrl(`/api/admin/image/versions/${encodeURIComponent(versionId)}`);
+  const adminRes = await fetchWithAuth(adminUrl);
+  console.debug('[ImageModelApi] Fetching admin version details', {
+    slug,
+    versionTag,
+    url: adminUrl,
+    status: adminRes.status,
+  });
+
+  if (!adminRes.ok) {
+    if (adminRes.status === 401 || adminRes.status === 403) {
+      throw new Error('Admin authorization required');
+    }
+    throw new Error('Failed to fetch version details');
+  }
+
+  const json = await adminRes.json();
+  return mapVersionDetails(json, { id: versionId, tag: versionTag });
+}
+
+export async function createImageJob(
+  modelSlug: string,
+  versionTag: string,
+  params: Record<string, unknown>,
+): Promise<string> {
+  const res = await fetchWithAuth(
+    apiUrl('/api/jobs'),
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: modelSlug,
+        version: versionTag,
+        params,
+      }),
+    },
+  );
+
+  if (!res.ok) {
+    throw new Error('Failed to create image job');
+  }
+
+  const json = await res.json();
+  return String(json.jobId ?? json.id ?? '');
 }
 
 export async function registerUser(email: string, password: string) {
