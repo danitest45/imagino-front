@@ -239,19 +239,19 @@ export async function getImageModelVersionDetails(
 
 export async function createImageJob(
   modelSlug: string,
-  versionTag: string,
   params: Record<string, unknown>,
+  options?: { presetId?: string | null },
 ): Promise<string> {
   const res = await fetchWithAuth(
-    apiUrl('/api/jobs'),
+    apiUrl('/api/image/jobs'),
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: modelSlug,
-        version: versionTag,
+        modelSlug,
+        presetId: options?.presetId ?? null,
         params,
       }),
     },
