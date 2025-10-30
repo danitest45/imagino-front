@@ -7,7 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   createImageJob,
   getImageModelDetails,
-  getPublicModelVersion,
+  getImageModelVersionDetails,
   getJobStatus,
   getUserHistory,
   mapApiToUiJob,
@@ -87,6 +87,38 @@ function isImageUploadField(
   return /image/i.test(key);
 }
 
+function isPrimaryParamField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  if (isPromptField(key, property)) return false;
+
+  const normalize = (value: string | undefined) =>
+    (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+  const normalizedKey = normalize(key);
+  const normalizedTitle = normalize(property.title);
+
+  const matchesPrimary = (value: string) => {
+    if (!value) return false;
+    if (value.includes('width') || value.includes('height')) return true;
+    if (value.includes('resolution') || value.includes('megapixel')) return true;
+    if (value.includes('dimension') || value.includes('size')) return true;
+    if (value.includes('aspectratio') || value.endsWith('aspect')) return true;
+    if (value.includes('outputquality') || value === 'quality' || value.endsWith('quality')) return true;
+    if (value.includes('outputformat') || (value.endsWith('format') && value.includes('output'))) {
+      return true;
+    }
+    if (value.includes('numoutputs') || value.includes('numimages') || value.endsWith('outputs')) {
+      return true;
+    }
+    return false;
+  };
+
+  return matchesPrimary(normalizedKey) || matchesPrimary(normalizedTitle);
+}
+
 export default function ImageModelPage() {
   const params = useParams();
   const slugParam = params?.slug;
@@ -104,6 +136,7 @@ export default function ImageModelPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
   const [outOfCredits, setOutOfCredits] =
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
@@ -173,27 +206,33 @@ export default function ImageModelPage() {
   const versionLabel = detailsLoading ? 'Carregando...' : defaultVersionTag || 'default';
 
   useEffect(() => {
-    if (!slug || !defaultVersionTag) return;
+    if (!slug) return;
+    if (!defaultVersionTag) {
+      setVersionDetails(null);
+      if (!detailsLoading) {
+        setVersionError('Detalhes indisponíveis para este modelo.');
+      }
+      setVersionLoading(false);
+      return;
+    }
+
     let active = true;
     setVersionLoading(true);
     setVersionError(null);
 
-    const versionId = details?.versions.find(v => v.tag === defaultVersionTag)?.id;
-    const modelId = details?.id;
-
     console.debug('[ImageModelPage] Resolving version schema', {
       slug,
       defaultVersionTag,
-      versionId,
     });
 
-    getPublicModelVersion(slug, defaultVersionTag, {
-      modelId,
-      versionId,
-      versions: details?.versions,
-    })
+    getImageModelVersionDetails(slug, defaultVersionTag)
       .then(data => {
         if (!active) return;
+        if (!data) {
+          setVersionDetails(null);
+          setVersionError('Detalhes indisponíveis para este modelo.');
+          return;
+        }
         setVersionDetails(data);
       })
       .catch(error => {
@@ -211,7 +250,17 @@ export default function ImageModelPage() {
     return () => {
       active = false;
     };
-  }, [slug, defaultVersionTag, details]);
+  }, [slug, defaultVersionTag, detailsLoading]);
+
+  useEffect(() => {
+    setAdvancedSettingsOpen(false);
+  }, [slug, defaultVersionTag]);
+
+  useEffect(() => {
+    if (detailsLoading) {
+      setVersionError(null);
+    }
+  }, [detailsLoading]);
 
   useEffect(() => {
     if (!versionDetails?.paramSchema?.properties) {
@@ -268,6 +317,24 @@ export default function ImageModelPage() {
     () => orderedKeys.filter(key => key !== promptKey),
     [orderedKeys, promptKey],
   );
+
+  const primaryKeys = useMemo(
+    () =>
+      otherKeys.filter(key =>
+        isPrimaryParamField(key, schemaProperties[key]),
+      ),
+    [otherKeys, schemaProperties],
+  );
+
+  const advancedKeys = useMemo(
+    () =>
+      otherKeys.filter(
+        key => !isPrimaryParamField(key, schemaProperties[key]),
+      ),
+    [otherKeys, schemaProperties],
+  );
+
+  const hasAdvancedFields = advancedKeys.length > 0;
 
   const promptValue = promptKey
     ? (typeof formValues[promptKey] === 'string' ? (formValues[promptKey] as string) : '')
@@ -671,14 +738,31 @@ export default function ImageModelPage() {
           )}
 
           {!versionLoading && schemaAvailable && (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
-              {otherKeys.map(renderField)}
-            </div>
+            <>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
+                {primaryKeys.length > 0 ? (
+                  primaryKeys.map(renderField)
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    Todos os parâmetros deste modelo estão nas configurações avançadas.
+                  </p>
+                )}
+              </div>
+              {hasAdvancedFields && (
+                <button
+                  type="button"
+                  onClick={() => setAdvancedSettingsOpen(true)}
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition duration-200 hover:border-fuchsia-400/50 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+                >
+                  Configurações avançadas
+                </button>
+              )}
+            </>
           )}
 
           {!versionLoading && !schemaAvailable && (
             <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-              {versionError ?? 'Detalhes do modelo não disponíveis.'}
+              {versionError ?? 'Detalhes indisponíveis para este modelo.'}
             </div>
           )}
         </div>
@@ -807,6 +891,52 @@ export default function ImageModelPage() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {advancedSettingsOpen && schemaAvailable && hasAdvancedFields && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setAdvancedSettingsOpen(false)}
+          />
+          <div className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950/95 p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-white">Configurações avançadas</h2>
+                <p className="mt-1 text-sm text-gray-400">
+                  Personalize parâmetros adicionais do modelo.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAdvancedSettingsOpen(false)}
+                className="rounded-full border border-white/10 bg-white/5 p-1 text-gray-300 transition hover:border-fuchsia-400/40 hover:text-white"
+                aria-label="Fechar configurações avançadas"
+              >
+                <span className="block h-5 w-5 text-xl leading-5">×</span>
+              </button>
+            </div>
+            <div className="mt-6 max-h-[60vh] overflow-y-auto pr-1 space-y-4">
+              {advancedKeys.map(renderField)}
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setAdvancedSettingsOpen(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdvancedSettingsOpen(false)}
+                className="rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+              >
+                Salvar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

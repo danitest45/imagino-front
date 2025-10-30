@@ -180,7 +180,7 @@ function mapVersionDetails(
 
 export async function getImageModelDetails(slug: string): Promise<ImageModelDetails> {
   const res = await apiFetch(
-    apiUrl(`/api/image/models/${slug}?include=versions`),
+    apiUrl(`/api/image/models/${slug}?include=versions,defaultversion`),
   );
   if (!res.ok) {
     throw new Error('Failed to fetch model details');
@@ -195,7 +195,11 @@ export async function getImageModelDetails(slug: string): Promise<ImageModelDeta
     );
 
   const defaultVersionTag = String(
-    json?.defaultVersionTag ?? json?.defaultVersion ?? versions[0]?.tag ?? '',
+    json?.defaultVersionTag ??
+      json?.defaultVersion?.tag ??
+      json?.defaultVersion ??
+      versions[0]?.tag ??
+      '',
   );
 
   if (!json?.slug && !slug) {
@@ -214,119 +218,23 @@ export async function getImageModelDetails(slug: string): Promise<ImageModelDeta
   };
 }
 
-interface VersionLookupOptions {
-  modelId?: string;
-  versionId?: string;
-  versions?: ImageModelVersionSummary[];
-}
-
-export async function getPublicModelVersion(
+export async function getImageModelVersionDetails(
   slug: string,
   versionTag: string,
-  options: VersionLookupOptions = {},
-): Promise<ImageModelVersionDetails> {
-  const publicUrl = apiUrl(`/api/image/models/${slug}/versions/${versionTag}`);
+): Promise<ImageModelVersionDetails | null> {
+  const res = await apiFetch(
+    apiUrl(`/api/image/models/${slug}/versions/${versionTag}`),
+  );
 
-  try {
-    const publicRes = await apiFetch(publicUrl);
-    console.debug('[ImageModelApi] Fetching version schema', {
-      slug,
-      versionTag,
-      url: publicUrl,
-      status: publicRes.status,
-    });
-    if (publicRes.ok) {
-      const json = await publicRes.json();
-      return mapVersionDetails(json, { tag: versionTag });
-    }
-    if (publicRes.status !== 401 && publicRes.status !== 403 && publicRes.status !== 404) {
-      throw new Error('Failed to fetch version details');
-    }
-  } catch (error) {
-    console.debug('[ImageModelApi] Public version lookup failed, falling back to admin route', {
-      slug,
-      versionTag,
-      url: publicUrl,
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
-
-  // TODO: Remove admin fallback once the public version details endpoint is available.
-  let versionId = options.versionId;
-  let modelId = options.modelId;
-  const knownVersions = options.versions;
-
-  if (!versionId && knownVersions) {
-    versionId = knownVersions.find(v => v.tag === versionTag)?.id;
-  }
-
-  if (!versionId && !modelId) {
-    try {
-      const details = await getImageModelDetails(slug);
-      modelId = details.id ?? modelId;
-      versionId = details.versions.find(v => v.tag === versionTag)?.id ?? versionId;
-    } catch (detailsError) {
-      console.debug('[ImageModelApi] Failed to reuse model details during admin fallback', {
-        slug,
-        versionTag,
-        error: detailsError instanceof Error ? detailsError.message : String(detailsError),
-      });
-    }
-  }
-
-  if (!versionId && modelId) {
-    const adminListUrl = apiUrl(
-      `/api/admin/image/versions?modelId=${encodeURIComponent(modelId)}`,
-    );
-    const adminListRes = await fetchWithAuth(adminListUrl);
-    console.debug('[ImageModelApi] Fetching admin version list', {
-      slug,
-      versionTag,
-      url: adminListUrl,
-      status: adminListRes.status,
-    });
-    if (!adminListRes.ok) {
-      if (adminListRes.status === 401 || adminListRes.status === 403) {
-        throw new Error('Admin authorization required');
-      }
-      throw new Error('Failed to fetch version list from admin API');
-    }
-    const listJson = await adminListRes.json();
-    if (Array.isArray(listJson)) {
-      const match = listJson.find(entry => {
-        if (!entry || typeof entry !== 'object') return false;
-        const record = entry as Record<string, unknown>;
-        const tag = String(record.tag ?? record.versionTag ?? '');
-        return tag === versionTag;
-      }) as Record<string, unknown> | undefined;
-      if (match) {
-        versionId = String(match.id ?? match.versionId ?? '');
-      }
-    }
-  }
-
-  if (!versionId) {
-    throw new Error('Version not found');
-  }
-
-  const adminUrl = apiUrl(`/api/admin/image/versions/${encodeURIComponent(versionId)}`);
-  const adminRes = await fetchWithAuth(adminUrl);
-  console.debug('[ImageModelApi] Fetching admin version details', {
-    slug,
-    versionTag,
-    url: adminUrl,
-    status: adminRes.status,
-  });
-
-  if (!adminRes.ok) {
-    if (adminRes.status === 401 || adminRes.status === 403) {
-      throw new Error('Admin authorization required');
+  if (!res.ok) {
+    if (res.status === 404) {
+      return null;
     }
     throw new Error('Failed to fetch version details');
   }
 
-  const json = await adminRes.json();
-  return mapVersionDetails(json, { id: versionId, tag: versionTag });
+  const json = await res.json();
+  return mapVersionDetails(json, { tag: versionTag });
 }
 
 export async function createImageJob(
