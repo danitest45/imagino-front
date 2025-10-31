@@ -203,14 +203,13 @@ export default function ImageModelPage() {
   }, [slug]);
 
   const defaultVersionTag = details?.defaultVersionTag ?? '';
-  const versionLabel = detailsLoading ? 'Carregando...' : defaultVersionTag || 'default';
 
   useEffect(() => {
     if (!slug) return;
     if (!defaultVersionTag) {
       setVersionDetails(null);
       if (!detailsLoading) {
-        setVersionError('Detalhes indisponíveis para este modelo.');
+        setVersionError('Detalhes indisponíveis');
       }
       setVersionLoading(false);
       return;
@@ -230,7 +229,7 @@ export default function ImageModelPage() {
         if (!active) return;
         if (!data) {
           setVersionDetails(null);
-          setVersionError('Detalhes indisponíveis para este modelo.');
+          setVersionError('Detalhes indisponíveis');
           return;
         }
         setVersionDetails(data);
@@ -569,28 +568,22 @@ export default function ImageModelPage() {
 
     Object.keys(schemaProperties).forEach(key => {
       const value = formValues[key];
-      const defaultValue = versionDetails?.defaults?.[key];
       if (typeof value === 'boolean') {
         params[key] = value;
         return;
       }
       if (value === '' || value === undefined || value === null) {
-        if (defaultValue !== undefined) {
-          params[key] = defaultValue;
-        } else if (requiredFields.has(key)) {
-          params[key] = value;
-        }
         return;
       }
       params[key] = value;
     });
 
     try {
-      const versionTag = defaultVersionTag;
-      if (!versionTag) {
-        throw new Error('Model default version not available');
+      const modelSlug = details?.slug ?? slug;
+      if (!modelSlug) {
+        throw new Error('Model slug not available');
       }
-      const jobId = await createImageJob(slug, versionTag, params);
+      const jobId = await createImageJob(modelSlug, params);
       const newJob: UiJob = {
         id: jobId,
         status: 'loading',
@@ -668,9 +661,9 @@ export default function ImageModelPage() {
     loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
-    <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
+    <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
+      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col lg:h-screen bg-black/40 backdrop-blur-lg animate-fade-in lg:overflow-hidden">
+        <div className="flex h-full flex-col gap-5 md:gap-6">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
             <div className="flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
@@ -686,51 +679,6 @@ export default function ImageModelPage() {
             {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Model version</p>
-              <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                {versionLabel}
-              </span>
-            </div>
-          </div>
-
-          {promptKey && schemaAvailable && !versionLoading ? (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                  {schemaProperties[promptKey]?.title ?? 'Creative brief'}
-                </label>
-                <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
-              </div>
-              <textarea
-                id={`${slug}-${promptKey}`}
-                value={promptValue}
-                onChange={event => updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)}
-                placeholder={
-                  schemaProperties[promptKey]?.description ??
-                  'Describe the scene, subject, style, and lighting you want to see...'
-                }
-                className="h-40 sm:h-48 md:h-72 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-              />
-              <div className="flex flex-wrap gap-2">
-                {promptSuggestions.map(suggestion => (
-                  <button
-                    key={suggestion.title}
-                    type="button"
-                    onClick={() => updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)}
-                    className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                  >
-                    <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                    <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                      {suggestion.prompt}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
-
           {versionLoading && (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
               Carregando campos do modelo...
@@ -739,9 +687,57 @@ export default function ImageModelPage() {
 
           {!versionLoading && schemaAvailable && (
             <>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-white">Configurações principais</p>
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
+                    Essenciais
+                  </span>
+                </div>
+                {promptKey ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                        {schemaProperties[promptKey]?.title ?? 'Creative brief'}
+                      </label>
+                      <span className="text-[11px] text-gray-500">Adicione assunto, estilo e detalhes</span>
+                    </div>
+                    <textarea
+                      id={`${slug}-${promptKey}`}
+                      value={promptValue}
+                      onChange={event => updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)}
+                      placeholder={
+                        schemaProperties[promptKey]?.description ??
+                        'Descreva a cena, o estilo e a iluminação desejada...'
+                      }
+                      className="min-h-[160px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      {promptSuggestions.map(suggestion => (
+                        <button
+                          key={suggestion.title}
+                          type="button"
+                          onClick={() => updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)}
+                          className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
+                        >
+                          <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
+                          <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                            {suggestion.prompt}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-400">
+                    Este modelo não possui campo de prompt configurável.
+                  </p>
+                )}
+
                 {primaryKeys.length > 0 ? (
-                  primaryKeys.map(renderField)
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    {primaryKeys.map(renderField)}
+                  </div>
                 ) : (
                   <p className="text-sm text-gray-400">
                     Todos os parâmetros deste modelo estão nas configurações avançadas.
@@ -762,7 +758,7 @@ export default function ImageModelPage() {
 
           {!versionLoading && !schemaAvailable && (
             <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-              {versionError ?? 'Detalhes indisponíveis para este modelo.'}
+              {versionError ?? 'Detalhes indisponíveis'}
             </div>
           )}
         </div>
