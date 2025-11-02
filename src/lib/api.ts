@@ -335,7 +335,7 @@ export async function resetPassword(
 
 export async function getUserHistory(): Promise<ImageJobApi[]> {
   const res = await fetchWithAuth(
-    apiUrl('/api/image/history'),
+    apiUrl('/api/history'),
   );
   return (await res.json()) as ImageJobApi[];
 }
