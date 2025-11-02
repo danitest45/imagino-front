@@ -56,7 +56,7 @@ export async function createReplicateJob(prompt: string, aspectRatio: string, qu
 export async function getJobStatus(jobId: string) {
   try {
     const res = await fetchWithAuth(
-      apiUrl(`/api/jobs/${jobId}`),
+      apiUrl(`/api/image/jobs/${jobId}`),
     );
     return (await res.json());
   } catch {
@@ -66,7 +66,7 @@ export async function getJobStatus(jobId: string) {
 
 export async function getJobDetails(jobId: string): Promise<JobDetails> {
   const res = await fetchWithAuth(
-    apiUrl(`/api/jobs/details/${jobId}`),
+    apiUrl(`/api/image/jobs/details/${jobId}`),
   );
   const json = await res.json();
   return {
@@ -80,7 +80,7 @@ export async function getJobDetails(jobId: string): Promise<JobDetails> {
 
 export async function getLatestJobs(): Promise<LatestJob[]> {
   const res = await apiFetch(
-    apiUrl('/api/jobs/latest'),
+    apiUrl('/api/image/jobs/latest'),
   );
   const json = (await res.json()) as Array<Record<string, unknown>>;
   return json.map(j => ({
@@ -335,7 +335,7 @@ export async function resetPassword(
 
 export async function getUserHistory(): Promise<ImageJobApi[]> {
   const res = await fetchWithAuth(
-    apiUrl('/api/history'),
+    apiUrl('/api/image/history'),
   );
   return (await res.json()) as ImageJobApi[];
 }
