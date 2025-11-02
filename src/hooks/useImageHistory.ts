@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { getUserHistory } from '../lib/api';
 import type { ImageJobApi } from '../types/image-job';
+import type { Problem } from '../lib/errors';
+import { toast } from '../lib/toast';
 import { useAuth } from '../context/AuthContext';
 
 export function useImageHistory() {
@@ -17,7 +19,14 @@ export function useImageHistory() {
         const hist = await getUserHistory();
         setHistory(hist);
       } catch (e) {
-        console.error(e);
+        const problem = e as Problem | undefined;
+        if (problem?.status === 500) {
+          setHistory([]);
+          const traceId = problem.traceId ? ` (${problem.traceId})` : '';
+          toast(`Não foi possível carregar o histórico${traceId}.`);
+        } else {
+          console.error(e);
+        }
       } finally {
         setLoading(false);
       }

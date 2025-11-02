@@ -380,12 +380,23 @@ export async function updateUser(
   return (await res.json()) as UserDto;
 }
 
+const toArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === 'string' && !!item);
+  }
+  if (typeof value === 'string' && value) {
+    return [value];
+  }
+  return [];
+};
+
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
-  const rawUrl = j.imageUrl ?? j.imageUrls?.[0] ?? null;     // <<<<<< pega singular OU primeira do array
+  const imageUrls = toArray(j.imageUrls ?? j.imageUrl);
+  const rawUrl = imageUrls[0] ?? null;
   return {
     id: j.jobId || j.id,
     status: j.status?.toUpperCase() === 'COMPLETED' ? 'done' : 'loading',
-    url: normalizeUrl(rawUrl),                               // <<<<<< normaliza
+    url: normalizeUrl(rawUrl),
     aspectRatio: j.aspectRatio ?? '1:1',
   };
 }
