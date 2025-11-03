@@ -21,7 +21,13 @@ import type {
 } from '../../../types/image-model';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
-import { ChevronDown, ChevronLeft, ChevronRight, ImageOff, UploadCloud } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  ImageOff,
+  SlidersHorizontal,
+  UploadCloud,
+} from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
@@ -102,37 +108,50 @@ function isReferenceImageField(
   });
 }
 
-function isPrimaryParamField(
+function isResolutionField(
   key: string,
   property: JsonSchemaProperty | undefined,
 ): boolean {
   if (!property) return false;
-  if (isPromptField(key, property)) return false;
-  if (isImageUploadField(key, property)) return true;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
 
-  const normalize = (value: string | undefined) =>
-    (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-  const normalizedKey = normalize(key);
-  const normalizedTitle = normalize(property.title);
-
-  const matchesPrimary = (value: string) => {
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
     if (!value) return false;
-    if (value.includes('width') || value.includes('height')) return true;
-    if (value.includes('resolution') || value.includes('megapixel')) return true;
-    if (value.includes('dimension') || value.includes('size')) return true;
-    if (value.includes('aspectratio') || value.endsWith('aspect')) return true;
-    if (value.includes('outputquality') || value === 'quality' || value.endsWith('quality')) return true;
-    if (value.includes('outputformat') || (value.endsWith('format') && value.includes('output'))) {
-      return true;
-    }
-    if (value.includes('numoutputs') || value.includes('numimages') || value.endsWith('outputs')) {
-      return true;
-    }
+    if (value.includes('resolucao') || value.includes('resolution')) return true;
+    if (value.includes('largura') || value.includes('width')) return true;
+    if (value.includes('altura') || value.includes('height')) return true;
+    if (value.includes('dimensao') || value.includes('dimension')) return true;
+    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
+    if (value.includes('proporcao') || value.includes('proportion')) return true;
+    if (value.includes('megapixel') || value.includes('megapixels')) return true;
+    if (value.endsWith('size')) return true;
     return false;
-  };
+  });
+}
 
-  return matchesPrimary(normalizedKey) || matchesPrimary(normalizedTitle);
+function isOutputFormatField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
+
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
+    if (!value) return false;
+    if (value.includes('outputformat') || value.includes('imageformat')) return true;
+    if (value.includes('formato de saida') || value.includes('formato de saída')) return true;
+    if (value.includes('formato') && (value.includes('saida') || value.includes('saída'))) return true;
+    if (value.includes('filetype') || value.includes('file type')) return true;
+    if (value.includes('output type') || value.includes('tipodearquivo')) return true;
+    if (value.includes('mime') || value.includes('mimetype')) return true;
+    return false;
+  });
 }
 
 export default function ImageModelPage() {
@@ -152,7 +171,7 @@ export default function ImageModelPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [advancedSettingsExpanded, setAdvancedSettingsExpanded] = useState(false);
+  const [advancedModalOpen, setAdvancedModalOpen] = useState(false);
   const [outOfCredits, setOutOfCredits] =
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
@@ -337,7 +356,7 @@ export default function ImageModelPage() {
     [orderedKeys, schemaProperties],
   );
 
-  const otherKeys = useMemo(
+  const nonPromptKeys = useMemo(
     () =>
       orderedKeys.filter(
         key => key !== promptKey && key !== referenceImageKey,
@@ -345,23 +364,39 @@ export default function ImageModelPage() {
     [orderedKeys, promptKey, referenceImageKey],
   );
 
-  const primaryKeys = useMemo(
+  const resolutionKeys = useMemo(
     () =>
-      otherKeys.filter(key =>
-        isPrimaryParamField(key, schemaProperties[key]),
-      ),
-    [otherKeys, schemaProperties],
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        return isResolutionField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
   );
 
-  const advancedKeys = useMemo(
+  const outputFormatKeys = useMemo(
     () =>
-      otherKeys.filter(
-        key => !isPrimaryParamField(key, schemaProperties[key]),
-      ),
-    [otherKeys, schemaProperties],
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        if (isResolutionField(key, property)) return false;
+        return isOutputFormatField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
   );
 
-  const hasAdvancedFields = advancedKeys.length > 0;
+  const essentialKeys = useMemo(
+    () => [...resolutionKeys, ...outputFormatKeys],
+    [resolutionKeys, outputFormatKeys],
+  );
+
+  const modalKeys = useMemo(
+    () =>
+      nonPromptKeys.filter(
+        key => !essentialKeys.includes(key),
+      ),
+    [nonPromptKeys, essentialKeys],
+  );
 
   const referenceImageProperty = referenceImageKey
     ? schemaProperties[referenceImageKey]
@@ -899,6 +934,22 @@ export default function ImageModelPage() {
     }
   }
 
+  useEffect(() => {
+    if (!advancedModalOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setAdvancedModalOpen(false);
+      }
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [advancedModalOpen]);
+
   const isGenerateDisabled =
     loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
@@ -944,8 +995,8 @@ export default function ImageModelPage() {
         )}
 
         {!versionLoading && schemaAvailable && (
-          <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
-            <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-2">
+          <div className="space-y-3">
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-white">Brief criativo</p>
                 <span className="text-[11px] text-gray-500">Descreva o que deseja gerar</span>
@@ -975,52 +1026,50 @@ export default function ImageModelPage() {
               )}
             </section>
 
-            <div className="xl:col-span-1">
-              {renderReferenceSection()}
-            </div>
+            {renderReferenceSection()}
 
-            <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-1">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-white">Ajustes essenciais</p>
-                <span className="text-[11px] text-gray-500">Principais controles</span>
-              </div>
-              {primaryKeys.length > 0 ? (
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {primaryKeys.map(renderField)}
+            {resolutionKeys.length > 0 && (
+              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-white">Resolução</p>
+                  <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
                 </div>
-              ) : (
-                <p className="mt-4 text-sm text-gray-400">
-                  Todos os parâmetros deste modelo estão nas configurações avançadas.
-                </p>
-              )}
-            </section>
+                <div className="mt-4 flex flex-col gap-3">
+                  {resolutionKeys.map(renderField)}
+                </div>
+              </section>
+            )}
 
-            {hasAdvancedFields && (
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-2">
-                <button
-                  type="button"
-                  onClick={() => setAdvancedSettingsExpanded(prev => !prev)}
-                  className="flex w-full items-center justify-between gap-3 text-left"
-                >
-                  <div>
-                    <p className="text-sm font-semibold text-white">Configurações avançadas</p>
-                    <p className="text-xs text-gray-400">Ajuste parâmetros adicionais para refinar o resultado.</p>
+            {outputFormatKeys.length > 0 && (
+              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-white">Saída da imagem</p>
+                  <span className="text-[11px] text-gray-500">Formato do arquivo</span>
+                </div>
+                <div className="mt-4 flex flex-col gap-3">
+                  {outputFormatKeys.map(renderField)}
+                </div>
+              </section>
+            )}
+
+            {modalKeys.length > 0 && (
+              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-white">Mais configurações</p>
+                    <p className="text-xs text-gray-400">
+                      Abra o painel modal para ajustar parâmetros avançados do modelo.
+                    </p>
                   </div>
-                  <span
-                    className={`rounded-full border border-white/10 bg-white/5 p-1 transition ${
-                      advancedSettingsExpanded
-                        ? 'rotate-180 border-fuchsia-400/40 text-fuchsia-200'
-                        : 'text-gray-400'
-                    }`}
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedModalOpen(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
                   >
-                    <ChevronDown className="h-4 w-4" />
-                  </span>
-                </button>
-                {advancedSettingsExpanded && (
-                  <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-                    {advancedKeys.map(renderField)}
-                  </div>
-                )}
+                    <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
+                    Abrir painel ({modalKeys.length})
+                  </button>
+                </div>
               </section>
             )}
           </div>
@@ -1157,6 +1206,46 @@ export default function ImageModelPage() {
               </button>
             </div>
           )}
+        </div>
+      )}
+
+      {advancedModalOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 py-8"
+          onClick={() => setAdvancedModalOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 shadow-2xl"
+            onClick={event => event.stopPropagation()}
+          >
+            <div className="flex flex-col gap-2 border-b border-white/5 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold text-white">Configurações avançadas</h2>
+                <p className="text-xs text-gray-400">
+                  Ajuste os parâmetros que não aparecem na tela principal.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAdvancedModalOpen(false)}
+                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-gray-300 transition hover:border-fuchsia-400/60 hover:text-white"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="max-h-[70vh] space-y-3 overflow-y-auto px-6 py-4">
+              {modalKeys.map(renderField)}
+            </div>
+            <div className="flex justify-end border-t border-white/5 bg-black/40 px-6 py-4">
+              <button
+                type="button"
+                onClick={() => setAdvancedModalOpen(false)}
+                className="rounded-2xl border border-fuchsia-400/40 bg-fuchsia-500/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-fuchsia-400/70 hover:bg-fuchsia-500/30"
+              >
+                Concluir ajustes
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
