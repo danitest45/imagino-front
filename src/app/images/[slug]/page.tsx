@@ -21,7 +21,12 @@ import type {
 } from '../../../types/image-model';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  UploadCloud,
+} from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
@@ -33,24 +38,6 @@ type ModelAwareJob = ImageJobApi & {
   modelSlug?: string;
   provider?: string;
 };
-
-const promptSuggestions = [
-  {
-    title: 'Neon city portrait',
-    prompt:
-      'Cinematic portrait of a cyberpunk explorer lit by neon reflections, ultra-detailed, 85mm photo',
-  },
-  {
-    title: 'Product spotlight',
-    prompt:
-      'Minimalist product render of a smart home speaker on a marble table, dramatic studio lighting',
-  },
-  {
-    title: 'Floating lab concept',
-    prompt:
-      'Concept art of a floating botanical laboratory above the clouds, illustrated in watercolor style',
-  },
-];
 
 function formatLabel(key: string): string {
   return key
@@ -87,36 +74,57 @@ function isImageUploadField(
   return /image/i.test(key);
 }
 
-function isPrimaryParamField(
+function normalizeIdentifier(value: string | undefined): string {
+  return (value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function isResolutionField(
   key: string,
   property: JsonSchemaProperty | undefined,
 ): boolean {
   if (!property) return false;
-  if (isPromptField(key, property)) return false;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
 
-  const normalize = (value: string | undefined) =>
-    (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-  const normalizedKey = normalize(key);
-  const normalizedTitle = normalize(property.title);
-
-  const matchesPrimary = (value: string) => {
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
     if (!value) return false;
-    if (value.includes('width') || value.includes('height')) return true;
-    if (value.includes('resolution') || value.includes('megapixel')) return true;
-    if (value.includes('dimension') || value.includes('size')) return true;
-    if (value.includes('aspectratio') || value.endsWith('aspect')) return true;
-    if (value.includes('outputquality') || value === 'quality' || value.endsWith('quality')) return true;
-    if (value.includes('outputformat') || (value.endsWith('format') && value.includes('output'))) {
-      return true;
-    }
-    if (value.includes('numoutputs') || value.includes('numimages') || value.endsWith('outputs')) {
-      return true;
-    }
+    if (value.includes('resolucao') || value.includes('resolution')) return true;
+    if (value.includes('largura') || value.includes('width')) return true;
+    if (value.includes('altura') || value.includes('height')) return true;
+    if (value.includes('dimensao') || value.includes('dimension')) return true;
+    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
+    if (value.includes('proporcao') || value.includes('proportion')) return true;
+    if (value.endsWith('size')) return true;
     return false;
-  };
+  });
+}
 
-  return matchesPrimary(normalizedKey) || matchesPrimary(normalizedTitle);
+function isOutputFormatField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
+
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
+    if (!value) return false;
+    if (value.includes('outputformat') || value.includes('imageformat')) return true;
+    if (value.includes('formato de saida') || value.includes('formato de saída')) return true;
+    if (value.includes('formato') && (value.includes('saida') || value.includes('saída'))) return true;
+    if (value.includes('filetype') || value.includes('file type')) return true;
+    if (value.includes('output type') || value.includes('tipodearquivo')) return true;
+    if (value.includes('mime') || value.includes('mimetype')) return true;
+    return false;
+  });
 }
 
 export default function ImageModelPage() {
@@ -136,7 +144,7 @@ export default function ImageModelPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
+  const [advancedModalOpen, setAdvancedModalOpen] = useState(false);
   const [outOfCredits, setOutOfCredits] =
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
@@ -146,6 +154,7 @@ export default function ImageModelPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
+  const capabilities = details?.capabilities ?? [];
 
   useEffect(() => {
     if (!history) return;
@@ -252,7 +261,7 @@ export default function ImageModelPage() {
   }, [slug, defaultVersionTag, detailsLoading]);
 
   useEffect(() => {
-    setAdvancedSettingsOpen(false);
+    setAdvancedModalOpen(false);
   }, [slug, defaultVersionTag]);
 
   useEffect(() => {
@@ -312,28 +321,47 @@ export default function ImageModelPage() {
     [orderedKeys, schemaProperties],
   );
 
-  const otherKeys = useMemo(
-    () => orderedKeys.filter(key => key !== promptKey),
+  const nonPromptKeys = useMemo(
+    () =>
+      orderedKeys.filter(
+        key => key !== promptKey,
+      ),
     [orderedKeys, promptKey],
   );
 
-  const primaryKeys = useMemo(
+  const resolutionKeys = useMemo(
     () =>
-      otherKeys.filter(key =>
-        isPrimaryParamField(key, schemaProperties[key]),
-      ),
-    [otherKeys, schemaProperties],
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        return isResolutionField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
   );
 
-  const advancedKeys = useMemo(
+  const outputFormatKeys = useMemo(
     () =>
-      otherKeys.filter(
-        key => !isPrimaryParamField(key, schemaProperties[key]),
-      ),
-    [otherKeys, schemaProperties],
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        if (isResolutionField(key, property)) return false;
+        return isOutputFormatField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
   );
 
-  const hasAdvancedFields = advancedKeys.length > 0;
+  const essentialKeys = useMemo(
+    () => [...resolutionKeys, ...outputFormatKeys],
+    [resolutionKeys, outputFormatKeys],
+  );
+
+  const modalKeys = useMemo(
+    () =>
+      nonPromptKeys.filter(
+        key => !essentialKeys.includes(key),
+      ),
+    [nonPromptKeys, essentialKeys],
+  );
 
   const promptValue = promptKey
     ? (typeof formValues[promptKey] === 'string' ? (formValues[promptKey] as string) : '')
@@ -390,76 +418,153 @@ export default function ImageModelPage() {
     const label = property.title ?? formatLabel(key);
     const required = requiredFields.has(key);
     const description = property.description;
-    const commonLabel = (
-      <label htmlFor={id} className="text-sm font-medium text-gray-200">
-        {label}
-        {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
-      </label>
-    );
+    const wrapperClass =
+      'flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
+    const labelClass =
+      'text-[11px] font-semibold uppercase tracking-[0.32em] text-gray-400';
+    const inputClass =
+      'w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500';
 
     if (property.type === 'boolean') {
       const checked = Boolean(formValues[key]);
       return (
-        <div
-          key={key}
-          className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3"
-        >
-          <div>
-            <p className="text-sm font-medium text-gray-200">
-              {label}
-              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
-            </p>
-            {description && <p className="text-xs text-gray-400 mt-1">{description}</p>}
+        <div key={key} className={wrapperClass}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-sm font-medium text-gray-200">
+                {label}
+                {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+              </span>
+              {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={checked}
+              onClick={() => updateFormValue(key, property, !checked)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
+                checked ? 'bg-fuchsia-500/80' : 'bg-white/15'
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+                  checked ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+              <span className="sr-only">Alternar {label}</span>
+            </button>
           </div>
-          <input
-            id={id}
-            type="checkbox"
-            className="h-5 w-5 cursor-pointer accent-fuchsia-400"
-            checked={checked}
-            onChange={event => updateFormValue(key, property, event.target.checked)}
-          />
         </div>
       );
     }
 
     if (isImageUploadField(key, property)) {
       const fileName = fileNames[key];
+      const preview =
+        typeof formValues[key] === 'string' && formValues[key]
+          ? (formValues[key] as string)
+          : '';
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
-          <input
-            id={id}
-            type="file"
-            accept={property.contentMediaType ?? 'image/*'}
-            className="w-full cursor-pointer rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-            onChange={event => {
-              const file = event.target.files?.[0];
-              if (!file) {
-                updateFormValue(key, property, '');
-                return;
-              }
-              const reader = new FileReader();
-              reader.onload = e => {
-                updateFormValue(key, property, e.target?.result ?? '');
-                setFileNames(prev => ({ ...prev, [key]: file.name }));
-              };
-              reader.readAsDataURL(file);
-            }}
-          />
-          {fileName && <p className="text-xs text-gray-400">{fileName}</p>}
-          {description && <p className="text-xs text-gray-400">{description}</p>}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
+          <label
+            htmlFor={id}
+            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-6 text-center transition ${
+              preview
+                ? 'border-fuchsia-400/60 bg-slate-900/60'
+                : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
+            }`}
+          >
+            {preview ? (
+              <img
+                src={preview}
+                alt={label}
+                className="h-32 w-full rounded-lg object-cover shadow-lg"
+              />
+            ) : (
+              <>
+                <UploadCloud className="h-8 w-8 text-fuchsia-300" />
+                <span className="text-sm font-medium text-white">
+                  Clique para enviar
+                </span>
+                <span className="text-xs text-gray-400">
+                  Arraste e solte ou selecione um arquivo
+                </span>
+              </>
+            )}
+            <input
+              id={id}
+              type="file"
+              accept={property.contentMediaType ?? 'image/*'}
+              className="sr-only"
+              onChange={event => {
+                const file = event.target.files?.[0];
+                if (!file) {
+                  updateFormValue(key, property, '');
+                  setFileNames(prev => {
+                    const next = { ...prev };
+                    delete next[key];
+                    return next;
+                  });
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                  updateFormValue(key, property, e.target?.result ?? '');
+                  setFileNames(prev => ({ ...prev, [key]: file.name }));
+                };
+                reader.readAsDataURL(file);
+              }}
+            />
+          </label>
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
+            {preview && (
+              <button
+                type="button"
+                onClick={() => {
+                  updateFormValue(key, property, '');
+                  setFileNames(prev => {
+                    const next = { ...prev };
+                    delete next[key];
+                    return next;
+                  });
+                }}
+                className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
+              >
+                Remover
+              </button>
+            )}
+          </div>
         </div>
       );
     }
 
     if (property.enum) {
       const value = formValues[key];
+      const firstOption = property.enum?.[0];
+      const selectValue =
+        typeof firstOption === 'boolean'
+          ? (typeof value === 'boolean' ? String(value) : value === '' ? '' : String(value ?? ''))
+          : ((value as string | number | undefined) ?? '');
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <select
             id={id}
-            value={(value as string | number | undefined) ?? ''}
+            value={selectValue}
             onChange={event => {
               const raw = event.target.value;
               const sample = property.enum?.[0];
@@ -471,8 +576,9 @@ export default function ImageModelPage() {
               }
               updateFormValue(key, property, parsed);
             }}
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+            className={`${inputClass} appearance-none pr-10`}
           >
+            {!required && <option value="">Selecione uma opção</option>}
             {property.enum?.map(option => {
               const optionLabel = typeof option === 'string' ? option : String(option);
               const optionValue = typeof option === 'boolean' ? String(option) : option;
@@ -483,7 +589,6 @@ export default function ImageModelPage() {
               );
             })}
           </select>
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
@@ -491,8 +596,14 @@ export default function ImageModelPage() {
     if (property.type === 'number' || property.type === 'integer') {
       const value = formValues[key];
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <input
             id={id}
             type="number"
@@ -509,9 +620,8 @@ export default function ImageModelPage() {
             min={property.minimum}
             max={property.maximum}
             step={property.multipleOf ?? (property.type === 'integer' ? 1 : undefined)}
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+            className={inputClass}
           />
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
@@ -519,36 +629,45 @@ export default function ImageModelPage() {
     if (shouldUseTextarea(key, property)) {
       const value = formValues[key];
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <textarea
             id={id}
             value={typeof value === 'string' ? value : ''}
             onChange={event => updateFormValue(key, property, event.target.value)}
             placeholder={property.description ?? ''}
-            className="h-40 sm:h-48 md:h-60 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+            className={`${inputClass} min-h-[160px] resize-none`}
           />
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
 
     return (
-      <div key={key} className="flex flex-col gap-2">
-        {commonLabel}
+      <div key={key} className={wrapperClass}>
+        <div className="space-y-1">
+          <label htmlFor={id} className={labelClass}>
+            {label}
+            {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+          </label>
+          {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+        </div>
         <input
           id={id}
           type="text"
           value={typeof formValues[key] === 'string' ? (formValues[key] as string) : ''}
           onChange={event => updateFormValue(key, property, event.target.value)}
           placeholder={property.description ?? ''}
-          className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+          className={inputClass}
         />
-        {description && <p className="text-xs text-gray-400">{description}</p>}
       </div>
     );
   }
-
   async function handleGenerate() {
     if (!slug || !defaultVersionTag || !schemaAvailable) return;
     if (missingRequired) {
@@ -657,130 +776,156 @@ export default function ImageModelPage() {
     }
   }
 
+  useEffect(() => {
+    if (!advancedModalOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setAdvancedModalOpen(false);
+      }
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [advancedModalOpen]);
+
   const isGenerateDisabled =
     loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
     <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col lg:h-screen bg-black/40 backdrop-blur-lg animate-fade-in lg:overflow-hidden">
-        <div className="flex h-full flex-col gap-5 md:gap-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
-                imagino.AI studio
-              </span>
-              <span className="text-[11px] text-gray-400">Credits update live</span>
-            </div>
-            <p className="mt-3 text-sm text-gray-200">
-              {detailsLoading
-                ? 'Carregando modelo...'
-                : details?.displayName ?? slug ?? 'Modelo de imagem'}
-            </p>
-            {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
-          </div>
-
-          {versionLoading && (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
-              Carregando campos do modelo...
-            </div>
-          )}
-
-          {!versionLoading && schemaAvailable && (
-            <>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">Configurações principais</p>
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                    Essenciais
-                  </span>
-                </div>
-                {promptKey ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                        {schemaProperties[promptKey]?.title ?? 'Creative brief'}
-                      </label>
-                      <span className="text-[11px] text-gray-500">Adicione assunto, estilo e detalhes</span>
-                    </div>
-                    <textarea
-                      id={`${slug}-${promptKey}`}
-                      value={promptValue}
-                      onChange={event => updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)}
-                      placeholder={
-                        schemaProperties[promptKey]?.description ??
-                        'Descreva a cena, o estilo e a iluminação desejada...'
-                      }
-                      className="min-h-[160px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-                    />
-                    <div className="flex flex-wrap gap-2">
-                      {promptSuggestions.map(suggestion => (
-                        <button
-                          key={suggestion.title}
-                          type="button"
-                          onClick={() => updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)}
-                          className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                        >
-                          <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                          <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                            {suggestion.prompt}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400">
-                    Este modelo não possui campo de prompt configurável.
-                  </p>
-                )}
-
-                {primaryKeys.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {primaryKeys.map(renderField)}
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400">
-                    Todos os parâmetros deste modelo estão nas configurações avançadas.
-                  </p>
-                )}
-              </div>
-              {hasAdvancedFields && (
-                <button
-                  type="button"
-                  onClick={() => setAdvancedSettingsOpen(true)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition duration-200 hover:border-fuchsia-400/50 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-                >
-                  Configurações avançadas
-                </button>
-              )}
-            </>
-          )}
-
-          {!versionLoading && !schemaAvailable && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-              {versionError ?? 'Detalhes indisponíveis'}
-            </div>
+      <div className="w-full lg:max-w-[540px] xl:max-w-[560px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
+        <div className="flex items-center justify-between">
+          <h1 className="text-base font-semibold text-white">
+            {detailsLoading
+              ? 'Carregando modelo...'
+              : details?.displayName ?? slug ?? 'Modelo de imagem'}
+          </h1>
+          {!detailsLoading && defaultVersionTag && (
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
+              {defaultVersionTag}
+            </span>
           )}
         </div>
+        {detailsError && (
+          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+            {detailsError}
+          </div>
+        )}
 
-        <button
-          onClick={handleGenerate}
-          disabled={isGenerateDisabled}
-          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? 'Generating...' : 'Generate with imagino.AI'}
-        </button>
-        <p className="mt-2 text-center text-[11px] text-gray-500">
-          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
-        </p>
+        {versionLoading && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
+            Carregando campos do modelo...
+          </div>
+        )}
+
+        {!versionLoading && schemaAvailable && (
+          <div className="space-y-3">
+            <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+              </div>
+              {promptKey ? (
+                <div className="mt-4 flex flex-col gap-3">
+                  <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                    {schemaProperties[promptKey]?.title ?? 'Prompt'}
+                  </label>
+                  <textarea
+                    id={`${slug}-${promptKey}`}
+                    value={promptValue}
+                    onChange={event =>
+                      updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
+                    }
+                    placeholder={
+                      schemaProperties[promptKey]?.description ??
+                      'Descreva a cena, o estilo e a iluminação desejada...'
+                    }
+                    className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                  />
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-gray-400">
+                  Este modelo não possui campo de prompt configurável.
+                </p>
+              )}
+            </section>
+            {resolutionKeys.length > 0 && (
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-white">Resolução</p>
+                  <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
+                </div>
+                <div className="mt-4 flex flex-col gap-3">
+                  {resolutionKeys.map(renderField)}
+                </div>
+              </section>
+            )}
+
+            {outputFormatKeys.length > 0 && (
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-white">Saída da imagem</p>
+                  <span className="text-[11px] text-gray-500">Formato do arquivo</span>
+                </div>
+                <div className="mt-4 flex flex-col gap-3">
+                  {outputFormatKeys.map(renderField)}
+                </div>
+              </section>
+            )}
+
+            {modalKeys.length > 0 && (
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold text-white">Mais configurações</p>
+                    <p className="text-xs text-gray-400">
+                      Abra o painel modal para ajustar parâmetros avançados do modelo.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedModalOpen(true)}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
+                  >
+                    <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
+                    Abrir painel ({modalKeys.length})
+                  </button>
+                </div>
+              </section>
+            )}
+          </div>
+        )}
+
+        {!versionLoading && !schemaAvailable && (
+          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+            {versionError ?? 'Detalhes indisponíveis'}
+          </div>
+        )}
+
+        <div className="grid w-full max-w-[500px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerateDisabled}
+            className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
+          >
+            {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
+          </button>
+          <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
+            {capabilities.length > 0 && (
+              <span>{capabilities.join(' · ')}</span>
+            )}
+          </div>
+        </div>
 
         {!showCenterOnMobile && doneImages.length > 0 && (
-          <div className="mt-3 lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
+          <div className="lg:hidden">
+            <div className="mb-2 flex items-center justify-between px-1">
+              <h3 className="text-sm text-white">Recent renders</h3>
               {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+            <div className="-mx-1 flex gap-2 overflow-x-auto pb-2 px-1 no-scrollbar">
               {doneImages.slice(0, 30).map(job => (
                 <img
                   key={job.id}
@@ -789,7 +934,7 @@ export default function ImageModelPage() {
                     setSelectedImageUrl(job.url!);
                     setSelectedJobId(job.id);
                   }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
+                  className={`h-20 w-20 flex-none cursor-pointer rounded-md border-2 object-cover transition-all ${
                     selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                   }`}
                   alt=""
@@ -799,7 +944,6 @@ export default function ImageModelPage() {
           </div>
         )}
       </div>
-
       <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
         {centerImageUrl ? (
           <div className="max-w-[512px] w-full">
@@ -818,7 +962,7 @@ export default function ImageModelPage() {
           </div>
         ) : (
           <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
-            Draft your creative brief and press &quot;Generate with imagino.AI&quot; to begin.
+            Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
           </div>
         )}
 
@@ -890,46 +1034,40 @@ export default function ImageModelPage() {
         </div>
       )}
 
-      {advancedSettingsOpen && schemaAvailable && hasAdvancedFields && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
+      {advancedModalOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 px-4 py-8"
+          onClick={() => setAdvancedModalOpen(false)}
+        >
           <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setAdvancedSettingsOpen(false)}
-          />
-          <div className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950/95 p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-white">Configurações avançadas</h2>
-                <p className="mt-1 text-sm text-gray-400">
-                  Personalize parâmetros adicionais do modelo.
+            className="relative w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950/95 shadow-2xl"
+            onClick={event => event.stopPropagation()}
+          >
+            <div className="flex flex-col gap-2 border-b border-white/5 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h2 className="text-base font-semibold text-white">Configurações avançadas</h2>
+                <p className="text-xs text-gray-400">
+                  Ajuste os parâmetros que não aparecem na tela principal.
                 </p>
               </div>
               <button
                 type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-full border border-white/10 bg-white/5 p-1 text-gray-300 transition hover:border-fuchsia-400/40 hover:text-white"
-                aria-label="Fechar configurações avançadas"
+                onClick={() => setAdvancedModalOpen(false)}
+                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-gray-300 transition hover:border-fuchsia-400/60 hover:text-white"
               >
-                <span className="block h-5 w-5 text-xl leading-5">×</span>
+                Fechar
               </button>
             </div>
-            <div className="mt-6 max-h-[60vh] overflow-y-auto pr-1 space-y-4">
-              {advancedKeys.map(renderField)}
+            <div className="max-h-[70vh] space-y-3 overflow-y-auto px-6 py-4">
+              {modalKeys.map(renderField)}
             </div>
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="flex justify-end border-t border-white/5 bg-black/40 px-6 py-4">
               <button
                 type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
+                onClick={() => setAdvancedModalOpen(false)}
+                className="rounded-2xl border border-fuchsia-400/40 bg-fuchsia-500/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-fuchsia-400/70 hover:bg-fuchsia-500/30"
               >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-              >
-                Salvar
+                Concluir ajustes
               </button>
             </div>
           </div>
