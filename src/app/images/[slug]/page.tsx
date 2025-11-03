@@ -826,13 +826,11 @@ export default function ImageModelPage() {
           <div className="space-y-3">
             <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-sm font-semibold text-white">Brief criativo</p>
-                <span className="text-[11px] text-gray-500">Descreva o que deseja gerar</span>
               </div>
               {promptKey ? (
                 <div className="mt-4 flex flex-col gap-3">
                   <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                    {schemaProperties[promptKey]?.title ?? 'Creative brief'}
+                    {schemaProperties[promptKey]?.title ?? 'Prompt'}
                   </label>
                   <textarea
                     id={`${slug}-${promptKey}`}
