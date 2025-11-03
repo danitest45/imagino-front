@@ -126,7 +126,6 @@ function isResolutionField(
     if (value.includes('dimensao') || value.includes('dimension')) return true;
     if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
     if (value.includes('proporcao') || value.includes('proportion')) return true;
-    if (value.includes('megapixel') || value.includes('megapixels')) return true;
     if (value.endsWith('size')) return true;
     return false;
   });
@@ -717,10 +716,10 @@ export default function ImageModelPage() {
 
   function renderReferenceSection() {
     const disabled = !referenceImageKey || !referenceImageProperty;
-    const label = referenceImageProperty?.title ?? 'Imagem de referência';
+    const label = referenceImageProperty?.title ?? 'Image to image';
     const required = referenceImageKey ? requiredFields.has(referenceImageKey) : false;
     const description =
-      referenceImageProperty?.description ?? 'Use uma imagem para guiar o estilo do resultado.';
+      referenceImageProperty?.description ?? 'Faça upload de uma imagem base para transformar o resultado.';
     const inputId = referenceImageKey ? `${slug}-${referenceImageKey}` : 'reference-image-disabled';
     const preview = referenceImageValue;
     const helperText = referenceImageFileName ?? 'PNG, JPG ou WEBP até 10MB';
@@ -758,7 +757,7 @@ export default function ImageModelPage() {
           <div className="mt-4 flex h-44 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-slate-950/40 text-center text-xs text-gray-500">
             <ImageOff className="h-8 w-8 text-gray-500" />
             <p className="max-w-[220px] text-xs text-gray-500">
-              Este modelo não suporta envio de imagem de referência.
+              Este modelo não suporta modo image-to-image.
             </p>
           </div>
         ) : (
@@ -781,7 +780,7 @@ export default function ImageModelPage() {
                 <>
                   <UploadCloud className="h-10 w-10 text-fuchsia-300" />
                   <span className="text-sm font-semibold text-white">
-                    Adicionar referência visual
+                    Adicionar imagem inicial
                   </span>
                   <span className="text-xs text-gray-400">
                     Arraste uma imagem ou clique para selecionar
