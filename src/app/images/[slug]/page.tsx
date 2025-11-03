@@ -797,31 +797,17 @@ export default function ImageModelPage() {
 
   return (
     <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
-      <div className="w-full lg:max-w-[620px] xl:max-w-[700px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div className="space-y-1">
-            <h1 className="text-lg font-semibold text-white">
-              {detailsLoading
-                ? 'Carregando modelo...'
-                : details?.displayName ?? slug ?? 'Modelo de imagem'}
-            </h1>
-            <p className="text-xs text-gray-400">
-              {detailsLoading
-                ? 'Buscando detalhes do modelo'
-                : `Versão padrão · ${defaultVersionTag || 'indisponível'}`}
-            </p>
-          </div>
-          {capabilities.length > 0 && (
-            <div className="flex flex-wrap justify-end gap-2">
-              {capabilities.map(capability => (
-                <span
-                  key={capability}
-                  className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-fuchsia-100"
-                >
-                  {capability}
-                </span>
-              ))}
-            </div>
+      <div className="w-full lg:max-w-[540px] xl:max-w-[560px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
+        <div className="flex items-center justify-between">
+          <h1 className="text-base font-semibold text-white">
+            {detailsLoading
+              ? 'Carregando modelo...'
+              : details?.displayName ?? slug ?? 'Modelo de imagem'}
+          </h1>
+          {!detailsLoading && defaultVersionTag && (
+            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
+              {defaultVersionTag}
+            </span>
           )}
         </div>
         {detailsError && (
@@ -838,7 +824,7 @@ export default function ImageModelPage() {
 
         {!versionLoading && schemaAvailable && (
           <div className="space-y-3">
-            <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-white">Brief criativo</p>
                 <span className="text-[11px] text-gray-500">Descreva o que deseja gerar</span>
@@ -868,7 +854,7 @@ export default function ImageModelPage() {
               )}
             </section>
             {resolutionKeys.length > 0 && (
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-white">Resolução</p>
                   <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
@@ -880,7 +866,7 @@ export default function ImageModelPage() {
             )}
 
             {outputFormatKeys.length > 0 && (
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-semibold text-white">Saída da imagem</p>
                   <span className="text-[11px] text-gray-500">Formato do arquivo</span>
@@ -892,7 +878,7 @@ export default function ImageModelPage() {
             )}
 
             {modalKeys.length > 0 && (
-              <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-white">Mais configurações</p>
@@ -920,10 +906,7 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
-          <p className="order-2 text-center text-[11px] text-gray-500 xl:order-1 xl:text-left">
-            Cada geração consome 1 crédito. Planos superiores liberam limites maiores.
-          </p>
+        <div className="grid w-full max-w-[500px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
           <button
             onClick={handleGenerate}
             disabled={isGenerateDisabled}
@@ -931,6 +914,11 @@ export default function ImageModelPage() {
           >
             {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
           </button>
+          <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
+            {capabilities.length > 0 && (
+              <span>{capabilities.join(' · ')}</span>
+            )}
+          </div>
         </div>
 
         {!showCenterOnMobile && doneImages.length > 0 && (
