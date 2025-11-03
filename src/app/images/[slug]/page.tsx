@@ -24,7 +24,6 @@ import { useImageHistory } from '../../../hooks/useImageHistory';
 import {
   ChevronLeft,
   ChevronRight,
-  ImageOff,
   SlidersHorizontal,
   UploadCloud,
 } from 'lucide-react';
@@ -81,31 +80,6 @@ function normalizeIdentifier(value: string | undefined): string {
     .normalize('NFD')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
-}
-
-function isReferenceImageField(
-  key: string,
-  property: JsonSchemaProperty | undefined,
-): boolean {
-  if (!property) return false;
-  if (!isImageUploadField(key, property)) return false;
-
-  const normalizedKey = normalizeIdentifier(key);
-  const normalizedTitle = normalizeIdentifier(property.title);
-  const normalizedDescription = normalizeIdentifier(property.description);
-
-  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
-  return candidates.some(value => {
-    if (!value) return false;
-    if (value.includes('referencia')) return true;
-    if (value.includes('reference')) return true;
-    if (value.includes('ref image')) return true;
-    if (value.includes('guidance image')) return true;
-    if (value.includes('init image')) return true;
-    if (value.includes('source image')) return true;
-    if (value.includes('control image')) return true;
-    return false;
-  });
 }
 
 function isResolutionField(
@@ -347,20 +321,12 @@ export default function ImageModelPage() {
     [orderedKeys, schemaProperties],
   );
 
-  const referenceImageKey = useMemo(
-    () =>
-      orderedKeys.find(key =>
-        isReferenceImageField(key, schemaProperties[key]),
-      ),
-    [orderedKeys, schemaProperties],
-  );
-
   const nonPromptKeys = useMemo(
     () =>
       orderedKeys.filter(
-        key => key !== promptKey && key !== referenceImageKey,
+        key => key !== promptKey,
       ),
-    [orderedKeys, promptKey, referenceImageKey],
+    [orderedKeys, promptKey],
   );
 
   const resolutionKeys = useMemo(
@@ -396,17 +362,6 @@ export default function ImageModelPage() {
       ),
     [nonPromptKeys, essentialKeys],
   );
-
-  const referenceImageProperty = referenceImageKey
-    ? schemaProperties[referenceImageKey]
-    : undefined;
-  const referenceImageValue =
-    referenceImageKey && typeof formValues[referenceImageKey] === 'string'
-      ? (formValues[referenceImageKey] as string)
-      : '';
-  const referenceImageFileName = referenceImageKey
-    ? fileNames[referenceImageKey]
-    : undefined;
 
   const promptValue = promptKey
     ? (typeof formValues[promptKey] === 'string' ? (formValues[promptKey] as string) : '')
@@ -713,118 +668,6 @@ export default function ImageModelPage() {
       </div>
     );
   }
-
-  function renderReferenceSection() {
-    const disabled = !referenceImageKey || !referenceImageProperty;
-    const label = referenceImageProperty?.title ?? 'Image to image';
-    const required = referenceImageKey ? requiredFields.has(referenceImageKey) : false;
-    const description =
-      referenceImageProperty?.description ?? 'Faça upload de uma imagem base para transformar o resultado.';
-    const inputId = referenceImageKey ? `${slug}-${referenceImageKey}` : 'reference-image-disabled';
-    const preview = referenceImageValue;
-    const helperText = referenceImageFileName ?? 'PNG, JPG ou WEBP até 10MB';
-
-    return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/5">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold text-white">
-              {label}
-              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
-            </p>
-            <p className="text-xs leading-5 text-gray-400">{description}</p>
-          </div>
-          {!disabled && preview && (
-            <button
-              type="button"
-              onClick={() => {
-                if (!referenceImageKey || !referenceImageProperty) return;
-                updateFormValue(referenceImageKey, referenceImageProperty, '');
-                setFileNames(prev => {
-                  const next = { ...prev };
-                  delete next[referenceImageKey];
-                  return next;
-                });
-              }}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-fuchsia-200 transition hover:border-fuchsia-400/50 hover:text-white"
-            >
-              Remover
-            </button>
-          )}
-        </div>
-
-        {disabled ? (
-          <div className="mt-4 flex h-44 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-slate-950/40 text-center text-xs text-gray-500">
-            <ImageOff className="h-8 w-8 text-gray-500" />
-            <p className="max-w-[220px] text-xs text-gray-500">
-              Este modelo não suporta modo image-to-image.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            <label
-              htmlFor={inputId}
-              className={`group relative flex min-h-[150px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-4 py-6 text-center transition ${
-                preview
-                  ? 'border-fuchsia-400/70 bg-slate-900/70'
-                  : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/70 hover:bg-slate-900/60'
-              }`}
-            >
-              {preview ? (
-                <img
-                  src={preview}
-                  alt={label}
-                  className="h-40 w-full rounded-xl object-cover shadow-lg"
-                />
-              ) : (
-                <>
-                  <UploadCloud className="h-10 w-10 text-fuchsia-300" />
-                  <span className="text-sm font-semibold text-white">
-                    Adicionar imagem inicial
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    Arraste uma imagem ou clique para selecionar
-                  </span>
-                </>
-              )}
-            </label>
-            <input
-              id={inputId}
-              type="file"
-              disabled={disabled}
-              accept={referenceImageProperty?.contentMediaType ?? 'image/*'}
-              className="sr-only"
-              onChange={event => {
-                if (!referenceImageKey || !referenceImageProperty) return;
-                const file = event.target.files?.[0];
-                if (!file) {
-                  updateFormValue(referenceImageKey, referenceImageProperty, '');
-                  setFileNames(prev => {
-                    const next = { ...prev };
-                    delete next[referenceImageKey];
-                    return next;
-                  });
-                  return;
-                }
-                const reader = new FileReader();
-                reader.onload = e => {
-                  updateFormValue(
-                    referenceImageKey,
-                    referenceImageProperty,
-                    e.target?.result ?? '',
-                  );
-                  setFileNames(prev => ({ ...prev, [referenceImageKey]: file.name }));
-                };
-                reader.readAsDataURL(file);
-              }}
-            />
-            <p className="text-xs text-gray-400">{helperText}</p>
-          </div>
-        )}
-      </div>
-    );
-  }
-
   async function handleGenerate() {
     if (!slug || !defaultVersionTag || !schemaAvailable) return;
     if (missingRequired) {
@@ -1024,9 +867,6 @@ export default function ImageModelPage() {
                 </p>
               )}
             </section>
-
-            {renderReferenceSection()}
-
             {resolutionKeys.length > 0 && (
               <section className="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
