@@ -21,7 +21,7 @@ import type {
 } from '../../../types/image-model';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ImageOff, UploadCloud } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
@@ -87,12 +87,46 @@ function isImageUploadField(
   return /image/i.test(key);
 }
 
+function normalizeIdentifier(value: string | undefined): string {
+  return (value ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function isReferenceImageField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  if (!isImageUploadField(key, property)) return false;
+
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
+
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
+    if (!value) return false;
+    if (value.includes('referencia')) return true;
+    if (value.includes('reference')) return true;
+    if (value.includes('ref image')) return true;
+    if (value.includes('guidance image')) return true;
+    if (value.includes('init image')) return true;
+    if (value.includes('source image')) return true;
+    if (value.includes('control image')) return true;
+    return false;
+  });
+}
+
 function isPrimaryParamField(
   key: string,
   property: JsonSchemaProperty | undefined,
 ): boolean {
   if (!property) return false;
   if (isPromptField(key, property)) return false;
+  if (isImageUploadField(key, property)) return true;
 
   const normalize = (value: string | undefined) =>
     (value ?? '').toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -136,7 +170,7 @@ export default function ImageModelPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [advancedSettingsOpen, setAdvancedSettingsOpen] = useState(false);
+  const [advancedSettingsExpanded, setAdvancedSettingsExpanded] = useState(false);
   const [outOfCredits, setOutOfCredits] =
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
@@ -252,7 +286,7 @@ export default function ImageModelPage() {
   }, [slug, defaultVersionTag, detailsLoading]);
 
   useEffect(() => {
-    setAdvancedSettingsOpen(false);
+    setAdvancedSettingsExpanded(false);
   }, [slug, defaultVersionTag]);
 
   useEffect(() => {
@@ -312,9 +346,20 @@ export default function ImageModelPage() {
     [orderedKeys, schemaProperties],
   );
 
+  const referenceImageKey = useMemo(
+    () =>
+      orderedKeys.find(key =>
+        isReferenceImageField(key, schemaProperties[key]),
+      ),
+    [orderedKeys, schemaProperties],
+  );
+
   const otherKeys = useMemo(
-    () => orderedKeys.filter(key => key !== promptKey),
-    [orderedKeys, promptKey],
+    () =>
+      orderedKeys.filter(
+        key => key !== promptKey && key !== referenceImageKey,
+      ),
+    [orderedKeys, promptKey, referenceImageKey],
   );
 
   const primaryKeys = useMemo(
@@ -334,6 +379,17 @@ export default function ImageModelPage() {
   );
 
   const hasAdvancedFields = advancedKeys.length > 0;
+
+  const referenceImageProperty = referenceImageKey
+    ? schemaProperties[referenceImageKey]
+    : undefined;
+  const referenceImageValue =
+    referenceImageKey && typeof formValues[referenceImageKey] === 'string'
+      ? (formValues[referenceImageKey] as string)
+      : '';
+  const referenceImageFileName = referenceImageKey
+    ? fileNames[referenceImageKey]
+    : undefined;
 
   const promptValue = promptKey
     ? (typeof formValues[promptKey] === 'string' ? (formValues[promptKey] as string) : '')
@@ -390,76 +446,153 @@ export default function ImageModelPage() {
     const label = property.title ?? formatLabel(key);
     const required = requiredFields.has(key);
     const description = property.description;
-    const commonLabel = (
-      <label htmlFor={id} className="text-sm font-medium text-gray-200">
-        {label}
-        {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
-      </label>
-    );
+    const wrapperClass =
+      'flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
+    const labelClass =
+      'text-[11px] font-semibold uppercase tracking-[0.32em] text-gray-400';
+    const inputClass =
+      'w-full rounded-xl border border-white/10 bg-slate-950/40 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500';
 
     if (property.type === 'boolean') {
       const checked = Boolean(formValues[key]);
       return (
-        <div
-          key={key}
-          className="flex items-start justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3"
-        >
-          <div>
-            <p className="text-sm font-medium text-gray-200">
-              {label}
-              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
-            </p>
-            {description && <p className="text-xs text-gray-400 mt-1">{description}</p>}
+        <div key={key} className={wrapperClass}>
+          <div className="flex items-start justify-between gap-4">
+            <div className="space-y-1">
+              <span className="text-sm font-medium text-gray-200">
+                {label}
+                {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+              </span>
+              {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={checked}
+              onClick={() => updateFormValue(key, property, !checked)}
+              className={`relative inline-flex h-6 w-12 items-center rounded-full transition ${
+                checked ? 'bg-fuchsia-500/80' : 'bg-white/15'
+              }`}
+            >
+              <span
+                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition ${
+                  checked ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+              <span className="sr-only">Alternar {label}</span>
+            </button>
           </div>
-          <input
-            id={id}
-            type="checkbox"
-            className="h-5 w-5 cursor-pointer accent-fuchsia-400"
-            checked={checked}
-            onChange={event => updateFormValue(key, property, event.target.checked)}
-          />
         </div>
       );
     }
 
     if (isImageUploadField(key, property)) {
       const fileName = fileNames[key];
+      const preview =
+        typeof formValues[key] === 'string' && formValues[key]
+          ? (formValues[key] as string)
+          : '';
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
-          <input
-            id={id}
-            type="file"
-            accept={property.contentMediaType ?? 'image/*'}
-            className="w-full cursor-pointer rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-            onChange={event => {
-              const file = event.target.files?.[0];
-              if (!file) {
-                updateFormValue(key, property, '');
-                return;
-              }
-              const reader = new FileReader();
-              reader.onload = e => {
-                updateFormValue(key, property, e.target?.result ?? '');
-                setFileNames(prev => ({ ...prev, [key]: file.name }));
-              };
-              reader.readAsDataURL(file);
-            }}
-          />
-          {fileName && <p className="text-xs text-gray-400">{fileName}</p>}
-          {description && <p className="text-xs text-gray-400">{description}</p>}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
+          <label
+            htmlFor={id}
+            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-6 text-center transition ${
+              preview
+                ? 'border-fuchsia-400/60 bg-slate-900/60'
+                : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
+            }`}
+          >
+            {preview ? (
+              <img
+                src={preview}
+                alt={label}
+                className="h-32 w-full rounded-lg object-cover shadow-lg"
+              />
+            ) : (
+              <>
+                <UploadCloud className="h-8 w-8 text-fuchsia-300" />
+                <span className="text-sm font-medium text-white">
+                  Clique para enviar
+                </span>
+                <span className="text-xs text-gray-400">
+                  Arraste e solte ou selecione um arquivo
+                </span>
+              </>
+            )}
+            <input
+              id={id}
+              type="file"
+              accept={property.contentMediaType ?? 'image/*'}
+              className="sr-only"
+              onChange={event => {
+                const file = event.target.files?.[0];
+                if (!file) {
+                  updateFormValue(key, property, '');
+                  setFileNames(prev => {
+                    const next = { ...prev };
+                    delete next[key];
+                    return next;
+                  });
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                  updateFormValue(key, property, e.target?.result ?? '');
+                  setFileNames(prev => ({ ...prev, [key]: file.name }));
+                };
+                reader.readAsDataURL(file);
+              }}
+            />
+          </label>
+          <div className="flex items-center justify-between text-xs text-gray-400">
+            <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
+            {preview && (
+              <button
+                type="button"
+                onClick={() => {
+                  updateFormValue(key, property, '');
+                  setFileNames(prev => {
+                    const next = { ...prev };
+                    delete next[key];
+                    return next;
+                  });
+                }}
+                className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
+              >
+                Remover
+              </button>
+            )}
+          </div>
         </div>
       );
     }
 
     if (property.enum) {
       const value = formValues[key];
+      const firstOption = property.enum?.[0];
+      const selectValue =
+        typeof firstOption === 'boolean'
+          ? (typeof value === 'boolean' ? String(value) : value === '' ? '' : String(value ?? ''))
+          : ((value as string | number | undefined) ?? '');
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <select
             id={id}
-            value={(value as string | number | undefined) ?? ''}
+            value={selectValue}
             onChange={event => {
               const raw = event.target.value;
               const sample = property.enum?.[0];
@@ -471,8 +604,9 @@ export default function ImageModelPage() {
               }
               updateFormValue(key, property, parsed);
             }}
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+            className={`${inputClass} appearance-none pr-10`}
           >
+            {!required && <option value="">Selecione uma opção</option>}
             {property.enum?.map(option => {
               const optionLabel = typeof option === 'string' ? option : String(option);
               const optionValue = typeof option === 'boolean' ? String(option) : option;
@@ -483,7 +617,6 @@ export default function ImageModelPage() {
               );
             })}
           </select>
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
@@ -491,8 +624,14 @@ export default function ImageModelPage() {
     if (property.type === 'number' || property.type === 'integer') {
       const value = formValues[key];
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <input
             id={id}
             type="number"
@@ -509,9 +648,8 @@ export default function ImageModelPage() {
             min={property.minimum}
             max={property.maximum}
             step={property.multipleOf ?? (property.type === 'integer' ? 1 : undefined)}
-            className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
+            className={inputClass}
           />
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
@@ -519,32 +657,153 @@ export default function ImageModelPage() {
     if (shouldUseTextarea(key, property)) {
       const value = formValues[key];
       return (
-        <div key={key} className="flex flex-col gap-2">
-          {commonLabel}
+        <div key={key} className={wrapperClass}>
+          <div className="space-y-1">
+            <label htmlFor={id} className={labelClass}>
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </label>
+            {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+          </div>
           <textarea
             id={id}
             value={typeof value === 'string' ? value : ''}
             onChange={event => updateFormValue(key, property, event.target.value)}
             placeholder={property.description ?? ''}
-            className="h-40 sm:h-48 md:h-60 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+            className={`${inputClass} min-h-[160px] resize-none`}
           />
-          {description && <p className="text-xs text-gray-400">{description}</p>}
         </div>
       );
     }
 
     return (
-      <div key={key} className="flex flex-col gap-2">
-        {commonLabel}
+      <div key={key} className={wrapperClass}>
+        <div className="space-y-1">
+          <label htmlFor={id} className={labelClass}>
+            {label}
+            {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+          </label>
+          {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
+        </div>
         <input
           id={id}
           type="text"
           value={typeof formValues[key] === 'string' ? (formValues[key] as string) : ''}
           onChange={event => updateFormValue(key, property, event.target.value)}
           placeholder={property.description ?? ''}
-          className="w-full rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+          className={inputClass}
         />
-        {description && <p className="text-xs text-gray-400">{description}</p>}
+      </div>
+    );
+  }
+
+  function renderReferenceSection() {
+    const disabled = !referenceImageKey || !referenceImageProperty;
+    const label = referenceImageProperty?.title ?? 'Imagem de referência';
+    const required = referenceImageKey ? requiredFields.has(referenceImageKey) : false;
+    const description =
+      referenceImageProperty?.description ?? 'Use uma imagem para guiar o estilo do resultado.';
+    const inputId = referenceImageKey ? `${slug}-${referenceImageKey}` : 'reference-image-disabled';
+    const preview = referenceImageValue;
+    const helperText = referenceImageFileName ?? 'PNG, JPG ou WEBP até 10MB';
+
+    return (
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-purple-500/5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-2">
+            <p className="text-sm font-semibold text-white">
+              {label}
+              {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
+            </p>
+            <p className="text-xs leading-5 text-gray-400">{description}</p>
+          </div>
+          {!disabled && preview && (
+            <button
+              type="button"
+              onClick={() => {
+                if (!referenceImageKey || !referenceImageProperty) return;
+                updateFormValue(referenceImageKey, referenceImageProperty, '');
+                setFileNames(prev => {
+                  const next = { ...prev };
+                  delete next[referenceImageKey];
+                  return next;
+                });
+              }}
+              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold text-fuchsia-200 transition hover:border-fuchsia-400/50 hover:text-white"
+            >
+              Remover
+            </button>
+          )}
+        </div>
+
+        {disabled ? (
+          <div className="mt-4 flex h-44 flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/15 bg-slate-950/40 text-center text-xs text-gray-500">
+            <ImageOff className="h-8 w-8 text-gray-500" />
+            <p className="max-w-[220px] text-xs text-gray-500">
+              Este modelo não suporta envio de imagem de referência.
+            </p>
+          </div>
+        ) : (
+          <div className="mt-4 space-y-3">
+            <label
+              htmlFor={inputId}
+              className={`group relative flex min-h-[176px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-4 py-6 text-center transition ${
+                preview
+                  ? 'border-fuchsia-400/70 bg-slate-900/70'
+                  : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/70 hover:bg-slate-900/60'
+              }`}
+            >
+              {preview ? (
+                <img
+                  src={preview}
+                  alt={label}
+                  className="h-40 w-full rounded-xl object-cover shadow-lg"
+                />
+              ) : (
+                <>
+                  <UploadCloud className="h-10 w-10 text-fuchsia-300" />
+                  <span className="text-sm font-semibold text-white">
+                    Adicionar referência visual
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Arraste uma imagem ou clique para selecionar
+                  </span>
+                </>
+              )}
+            </label>
+            <input
+              id={inputId}
+              type="file"
+              disabled={disabled}
+              accept={referenceImageProperty?.contentMediaType ?? 'image/*'}
+              className="sr-only"
+              onChange={event => {
+                if (!referenceImageKey || !referenceImageProperty) return;
+                const file = event.target.files?.[0];
+                if (!file) {
+                  updateFormValue(referenceImageKey, referenceImageProperty, '');
+                  setFileNames(prev => {
+                    const next = { ...prev };
+                    delete next[referenceImageKey];
+                    return next;
+                  });
+                  return;
+                }
+                const reader = new FileReader();
+                reader.onload = e => {
+                  updateFormValue(
+                    referenceImageKey,
+                    referenceImageProperty,
+                    e.target?.result ?? '',
+                  );
+                  setFileNames(prev => ({ ...prev, [referenceImageKey]: file.name }));
+                };
+                reader.readAsDataURL(file);
+              }}
+            />
+            <p className="text-xs text-gray-400">{helperText}</p>
+          </div>
+        )}
       </div>
     );
   }
@@ -686,12 +945,12 @@ export default function ImageModelPage() {
           )}
 
           {!versionLoading && schemaAvailable && (
-            <>
+            <div className="space-y-5">
               <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-5">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">Configurações principais</p>
+                  <p className="text-sm font-semibold text-white">Brief criativo</p>
                   <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                    Essenciais
+                    Descrição
                   </span>
                 </div>
                 {promptKey ? (
@@ -733,7 +992,17 @@ export default function ImageModelPage() {
                     Este modelo não possui campo de prompt configurável.
                   </p>
                 )}
+              </div>
 
+              {renderReferenceSection()}
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-white">Ajustes essenciais</p>
+                  <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
+                    Principais controles
+                  </span>
+                </div>
                 {primaryKeys.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {primaryKeys.map(renderField)}
@@ -744,16 +1013,38 @@ export default function ImageModelPage() {
                   </p>
                 )}
               </div>
+
               {hasAdvancedFields && (
-                <button
-                  type="button"
-                  onClick={() => setAdvancedSettingsOpen(true)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition duration-200 hover:border-fuchsia-400/50 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-                >
-                  Configurações avançadas
-                </button>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <button
+                    type="button"
+                    onClick={() => setAdvancedSettingsExpanded(prev => !prev)}
+                    className="flex w-full items-center justify-between gap-3 text-left"
+                  >
+                    <div>
+                      <p className="text-sm font-semibold text-white">Configurações avançadas</p>
+                      <p className="text-xs text-gray-400">
+                        Ajuste parâmetros adicionais para refinar o resultado.
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full border border-white/10 bg-white/5 p-1 transition ${
+                        advancedSettingsExpanded
+                          ? 'rotate-180 border-fuchsia-400/40 text-fuchsia-200'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      <ChevronDown className="h-4 w-4" />
+                    </span>
+                  </button>
+                  {advancedSettingsExpanded && (
+                    <div className="mt-4 grid grid-cols-1 gap-4">
+                      {advancedKeys.map(renderField)}
+                    </div>
+                  )}
+                </div>
               )}
-            </>
+            </div>
           )}
 
           {!versionLoading && !schemaAvailable && (
@@ -887,52 +1178,6 @@ export default function ImageModelPage() {
               </button>
             </div>
           )}
-        </div>
-      )}
-
-      {advancedSettingsOpen && schemaAvailable && hasAdvancedFields && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6">
-          <div
-            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-            onClick={() => setAdvancedSettingsOpen(false)}
-          />
-          <div className="relative z-10 w-full max-w-2xl rounded-3xl border border-white/10 bg-slate-950/95 p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-white">Configurações avançadas</h2>
-                <p className="mt-1 text-sm text-gray-400">
-                  Personalize parâmetros adicionais do modelo.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-full border border-white/10 bg-white/5 p-1 text-gray-300 transition hover:border-fuchsia-400/40 hover:text-white"
-                aria-label="Fechar configurações avançadas"
-              >
-                <span className="block h-5 w-5 text-xl leading-5">×</span>
-              </button>
-            </div>
-            <div className="mt-6 max-h-[60vh] overflow-y-auto pr-1 space-y-4">
-              {advancedKeys.map(renderField)}
-            </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                onClick={() => setAdvancedSettingsOpen(false)}
-                className="rounded-xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
-              >
-                Salvar
-              </button>
-            </div>
-          </div>
         </div>
       )}
 
