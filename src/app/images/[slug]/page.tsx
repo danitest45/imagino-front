@@ -921,157 +921,162 @@ export default function ImageModelPage() {
 
   return (
     <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col lg:h-screen bg-black/40 backdrop-blur-lg animate-fade-in lg:overflow-hidden">
-        <div className="flex h-full flex-col gap-5 md:gap-6">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
+      <div className="w-full lg:max-w-[620px] xl:max-w-[700px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-4 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
+        <header className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-fuchsia-100">
                 imagino.AI studio
               </span>
-              <span className="text-[11px] text-gray-400">Credits update live</span>
+              <h1 className="mt-1 text-base font-semibold text-white">
+                {detailsLoading
+                  ? 'Carregando modelo...'
+                  : details?.displayName ?? slug ?? 'Modelo de imagem'}
+              </h1>
             </div>
-            <p className="mt-3 text-sm text-gray-200">
-              {detailsLoading
-                ? 'Carregando modelo...'
-                : details?.displayName ?? slug ?? 'Modelo de imagem'}
-            </p>
-            {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
+            <div className="flex items-center gap-2 text-[11px] text-gray-400">
+              <span className="hidden sm:inline">Atualização de créditos em tempo real</span>
+              <span className="sm:hidden">Créditos em tempo real</span>
+            </div>
           </div>
+          {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
+        </header>
 
-          {versionLoading && (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
-              Carregando campos do modelo...
-            </div>
-          )}
+        {versionLoading && (
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
+            Carregando campos do modelo...
+          </div>
+        )}
 
-          {!versionLoading && schemaAvailable && (
-            <div className="space-y-5">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">Brief criativo</p>
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                    Descrição
-                  </span>
-                </div>
-                {promptKey ? (
-                  <div className="flex flex-col gap-3">
-                    <div className="flex items-center justify-between">
-                      <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                        {schemaProperties[promptKey]?.title ?? 'Creative brief'}
-                      </label>
-                      <span className="text-[11px] text-gray-500">Adicione assunto, estilo e detalhes</span>
-                    </div>
-                    <textarea
-                      id={`${slug}-${promptKey}`}
-                      value={promptValue}
-                      onChange={event => updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)}
-                      placeholder={
-                        schemaProperties[promptKey]?.description ??
-                        'Descreva a cena, o estilo e a iluminação desejada...'
-                      }
-                      className="min-h-[160px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-                    />
-                    <div className="flex flex-wrap gap-2">
-                      {promptSuggestions.map(suggestion => (
-                        <button
-                          key={suggestion.title}
-                          type="button"
-                          onClick={() => updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)}
-                          className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                        >
-                          <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                          <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                            {suggestion.prompt}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-gray-400">
-                    Este modelo não possui campo de prompt configurável.
-                  </p>
-                )}
+        {!versionLoading && schemaAvailable && (
+          <div className="grid gap-4 xl:grid-cols-2">
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-white">Brief criativo</p>
+                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">Descrição</span>
               </div>
-
-              {renderReferenceSection()}
-
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-white">Ajustes essenciais</p>
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">
-                    Principais controles
-                  </span>
-                </div>
-                {primaryKeys.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    {primaryKeys.map(renderField)}
+              {promptKey ? (
+                <div className="mt-4 flex flex-col gap-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                      {schemaProperties[promptKey]?.title ?? 'Creative brief'}
+                    </label>
+                    <span className="text-[11px] text-gray-500">Adicione assunto, estilo e detalhes</span>
                   </div>
-                ) : (
-                  <p className="text-sm text-gray-400">
-                    Todos os parâmetros deste modelo estão nas configurações avançadas.
-                  </p>
-                )}
-              </div>
-
-              {hasAdvancedFields && (
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <button
-                    type="button"
-                    onClick={() => setAdvancedSettingsExpanded(prev => !prev)}
-                    className="flex w-full items-center justify-between gap-3 text-left"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-white">Configurações avançadas</p>
-                      <p className="text-xs text-gray-400">
-                        Ajuste parâmetros adicionais para refinar o resultado.
-                      </p>
-                    </div>
-                    <span
-                      className={`rounded-full border border-white/10 bg-white/5 p-1 transition ${
-                        advancedSettingsExpanded
-                          ? 'rotate-180 border-fuchsia-400/40 text-fuchsia-200'
-                          : 'text-gray-400'
-                      }`}
-                    >
-                      <ChevronDown className="h-4 w-4" />
-                    </span>
-                  </button>
-                  {advancedSettingsExpanded && (
-                    <div className="mt-4 grid grid-cols-1 gap-4">
-                      {advancedKeys.map(renderField)}
-                    </div>
-                  )}
+                  <textarea
+                    id={`${slug}-${promptKey}`}
+                    value={promptValue}
+                    onChange={event =>
+                      updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
+                    }
+                    placeholder={
+                      schemaProperties[promptKey]?.description ??
+                      'Descreva a cena, o estilo e a iluminação desejada...'
+                    }
+                    className="min-h-[140px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    {promptSuggestions.map(suggestion => (
+                      <button
+                        key={suggestion.title}
+                        type="button"
+                        onClick={() =>
+                          updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)
+                        }
+                        className="group min-w-[150px] flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
+                      >
+                        <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
+                        <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                          {suggestion.prompt}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              ) : (
+                <p className="mt-4 text-sm text-gray-400">
+                  Este modelo não possui campo de prompt configurável.
+                </p>
               )}
-            </div>
-          )}
+            </section>
 
-          {!versionLoading && !schemaAvailable && (
-            <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-              {versionError ?? 'Detalhes indisponíveis'}
+            <div className="xl:col-span-1">
+              {renderReferenceSection()}
             </div>
-          )}
+
+            <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-semibold text-white">Ajustes essenciais</p>
+                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">Principais controles</span>
+              </div>
+              {primaryKeys.length > 0 ? (
+                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {primaryKeys.map(renderField)}
+                </div>
+              ) : (
+                <p className="mt-4 text-sm text-gray-400">
+                  Todos os parâmetros deste modelo estão nas configurações avançadas.
+                </p>
+              )}
+            </section>
+
+            {hasAdvancedFields && (
+              <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-2">
+                <button
+                  type="button"
+                  onClick={() => setAdvancedSettingsExpanded(prev => !prev)}
+                  className="flex w-full items-center justify-between gap-3 text-left"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-white">Configurações avançadas</p>
+                    <p className="text-xs text-gray-400">Ajuste parâmetros adicionais para refinar o resultado.</p>
+                  </div>
+                  <span
+                    className={`rounded-full border border-white/10 bg-white/5 p-1 transition ${
+                      advancedSettingsExpanded
+                        ? 'rotate-180 border-fuchsia-400/40 text-fuchsia-200'
+                        : 'text-gray-400'
+                    }`}
+                  >
+                    <ChevronDown className="h-4 w-4" />
+                  </span>
+                </button>
+                {advancedSettingsExpanded && (
+                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                    {advancedKeys.map(renderField)}
+                  </div>
+                )}
+              </section>
+            )}
+          </div>
+        )}
+
+        {!versionLoading && !schemaAvailable && (
+          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+            {versionError ?? 'Detalhes indisponíveis'}
+          </div>
+        )}
+
+        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
+          <p className="order-2 text-center text-[11px] text-gray-500 xl:order-1 xl:text-left">
+            Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+          </p>
+          <button
+            onClick={handleGenerate}
+            disabled={isGenerateDisabled}
+            className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
+          >
+            {loading ? 'Generating...' : 'Generate with imagino.AI'}
+          </button>
         </div>
 
-        <button
-          onClick={handleGenerate}
-          disabled={isGenerateDisabled}
-          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? 'Generating...' : 'Generate with imagino.AI'}
-        </button>
-        <p className="mt-2 text-center text-[11px] text-gray-500">
-          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
-        </p>
-
         {!showCenterOnMobile && doneImages.length > 0 && (
-          <div className="mt-3 lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
+          <div className="lg:hidden">
+            <div className="mb-2 flex items-center justify-between px-1">
+              <h3 className="text-sm text-white">Recent renders</h3>
               {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+            <div className="-mx-1 flex gap-2 overflow-x-auto pb-2 px-1 no-scrollbar">
               {doneImages.slice(0, 30).map(job => (
                 <img
                   key={job.id}
@@ -1080,7 +1085,7 @@ export default function ImageModelPage() {
                     setSelectedImageUrl(job.url!);
                     setSelectedJobId(job.id);
                   }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
+                  className={`h-20 w-20 flex-none cursor-pointer rounded-md border-2 object-cover transition-all ${
                     selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
                   }`}
                   alt=""
@@ -1090,7 +1095,6 @@ export default function ImageModelPage() {
           </div>
         )}
       </div>
-
       <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
         {centerImageUrl ? (
           <div className="max-w-[512px] w-full">
