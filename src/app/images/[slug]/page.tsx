@@ -288,7 +288,7 @@ export default function ImageModelPage() {
   }, [slug, defaultVersionTag, detailsLoading]);
 
   useEffect(() => {
-    setAdvancedSettingsExpanded(false);
+    setAdvancedModalOpen(false);
   }, [slug, defaultVersionTag]);
 
   useEffect(() => {
