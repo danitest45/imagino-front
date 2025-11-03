@@ -34,24 +34,6 @@ type ModelAwareJob = ImageJobApi & {
   provider?: string;
 };
 
-const promptSuggestions = [
-  {
-    title: 'Neon city portrait',
-    prompt:
-      'Cinematic portrait of a cyberpunk explorer lit by neon reflections, ultra-detailed, 85mm photo',
-  },
-  {
-    title: 'Product spotlight',
-    prompt:
-      'Minimalist product render of a smart home speaker on a marble table, dramatic studio lighting',
-  },
-  {
-    title: 'Floating lab concept',
-    prompt:
-      'Concept art of a floating botanical laboratory above the clouds, illustrated in watercolor style',
-  },
-];
-
 function formatLabel(key: string): string {
   return key
     .replace(/[_-]+/g, ' ')
@@ -180,6 +162,7 @@ export default function ImageModelPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
+  const capabilities = details?.capabilities ?? [];
 
   useEffect(() => {
     if (!history) return;
@@ -708,7 +691,7 @@ export default function ImageModelPage() {
     const helperText = referenceImageFileName ?? 'PNG, JPG ou WEBP até 10MB';
 
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-purple-500/5">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/5">
         <div className="flex items-start justify-between gap-4">
           <div className="space-y-2">
             <p className="text-sm font-semibold text-white">
@@ -747,7 +730,7 @@ export default function ImageModelPage() {
           <div className="mt-4 space-y-3">
             <label
               htmlFor={inputId}
-              className={`group relative flex min-h-[176px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-4 py-6 text-center transition ${
+              className={`group relative flex min-h-[150px] cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed px-4 py-6 text-center transition ${
                 preview
                   ? 'border-fuchsia-400/70 bg-slate-900/70'
                   : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/70 hover:bg-slate-900/60'
@@ -921,26 +904,38 @@ export default function ImageModelPage() {
 
   return (
     <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
-      <div className="w-full lg:max-w-[620px] xl:max-w-[700px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-4 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
-        <header className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-fuchsia-100">
-                imagino.AI studio
-              </span>
-              <h1 className="mt-1 text-base font-semibold text-white">
-                {detailsLoading
-                  ? 'Carregando modelo...'
-                  : details?.displayName ?? slug ?? 'Modelo de imagem'}
-              </h1>
-            </div>
-            <div className="flex items-center gap-2 text-[11px] text-gray-400">
-              <span className="hidden sm:inline">Atualização de créditos em tempo real</span>
-              <span className="sm:hidden">Créditos em tempo real</span>
-            </div>
+      <div className="w-full lg:max-w-[620px] xl:max-w-[700px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="text-lg font-semibold text-white">
+              {detailsLoading
+                ? 'Carregando modelo...'
+                : details?.displayName ?? slug ?? 'Modelo de imagem'}
+            </h1>
+            <p className="text-xs text-gray-400">
+              {detailsLoading
+                ? 'Buscando detalhes do modelo'
+                : `Versão padrão · ${defaultVersionTag || 'indisponível'}`}
+            </p>
           </div>
-          {detailsError && <p className="mt-2 text-xs text-rose-300">{detailsError}</p>}
-        </header>
+          {capabilities.length > 0 && (
+            <div className="flex flex-wrap justify-end gap-2">
+              {capabilities.map(capability => (
+                <span
+                  key={capability}
+                  className="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-fuchsia-100"
+                >
+                  {capability}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        {detailsError && (
+          <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+            {detailsError}
+          </div>
+        )}
 
         {versionLoading && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
@@ -949,20 +944,17 @@ export default function ImageModelPage() {
         )}
 
         {!versionLoading && schemaAvailable && (
-          <div className="grid gap-4 xl:grid-cols-2">
+          <div className="grid gap-3 xl:grid-cols-2 xl:items-start">
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-2">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-white">Brief criativo</p>
-                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">Descrição</span>
+                <span className="text-[11px] text-gray-500">Descreva o que deseja gerar</span>
               </div>
               {promptKey ? (
                 <div className="mt-4 flex flex-col gap-3">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                      {schemaProperties[promptKey]?.title ?? 'Creative brief'}
-                    </label>
-                    <span className="text-[11px] text-gray-500">Adicione assunto, estilo e detalhes</span>
-                  </div>
+                  <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                    {schemaProperties[promptKey]?.title ?? 'Creative brief'}
+                  </label>
                   <textarea
                     id={`${slug}-${promptKey}`}
                     value={promptValue}
@@ -973,25 +965,8 @@ export default function ImageModelPage() {
                       schemaProperties[promptKey]?.description ??
                       'Descreva a cena, o estilo e a iluminação desejada...'
                     }
-                    className="min-h-[140px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                    className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
                   />
-                  <div className="flex flex-wrap gap-2">
-                    {promptSuggestions.map(suggestion => (
-                      <button
-                        key={suggestion.title}
-                        type="button"
-                        onClick={() =>
-                          updateFormValue(promptKey, schemaProperties[promptKey], suggestion.prompt)
-                        }
-                        className="group min-w-[150px] flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                      >
-                        <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                        <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                          {suggestion.prompt}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
                 </div>
               ) : (
                 <p className="mt-4 text-sm text-gray-400">
@@ -1007,10 +982,10 @@ export default function ImageModelPage() {
             <section className="rounded-2xl border border-white/10 bg-white/5 p-4 xl:col-span-1">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold text-white">Ajustes essenciais</p>
-                <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">Principais controles</span>
+                <span className="text-[11px] text-gray-500">Principais controles</span>
               </div>
               {primaryKeys.length > 0 ? (
-                <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {primaryKeys.map(renderField)}
                 </div>
               ) : (
@@ -1042,7 +1017,7 @@ export default function ImageModelPage() {
                   </span>
                 </button>
                 {advancedSettingsExpanded && (
-                  <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
                     {advancedKeys.map(renderField)}
                   </div>
                 )}
@@ -1059,14 +1034,14 @@ export default function ImageModelPage() {
 
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
           <p className="order-2 text-center text-[11px] text-gray-500 xl:order-1 xl:text-left">
-            Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+            Cada geração consome 1 crédito. Planos superiores liberam limites maiores.
           </p>
           <button
             onClick={handleGenerate}
             disabled={isGenerateDisabled}
             className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
           >
-            {loading ? 'Generating...' : 'Generate with imagino.AI'}
+            {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
           </button>
         </div>
 
@@ -1113,7 +1088,7 @@ export default function ImageModelPage() {
           </div>
         ) : (
           <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
-            Draft your creative brief and press &quot;Generate with imagino.AI&quot; to begin.
+            Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
           </div>
         )}
 
