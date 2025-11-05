@@ -20,6 +20,7 @@ type Props = {
 export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: Props) {
   const { token } = useAuth();
   const [details, setDetails] = useState<JobDetails | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     if (!isOpen || !jobId || !token) {
@@ -57,12 +58,14 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
     }
   }, [details]);
   const imageUrl = details?.imageUrl ?? fallbackUrl;
+  useEffect(() => {
+    setImageLoaded(false);
+  }, [imageUrl]);
   if (!isOpen) return null;
-  if (!imageUrl) return null;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/80 px-4 py-12 sm:items-center sm:py-16 backdrop-blur"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 px-4 py-10 sm:py-16 backdrop-blur"
       onClick={onClose}
     >
       <div
@@ -79,7 +82,28 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
 
         <div className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black p-4 sm:p-8">
           <div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
-          <img src={imageUrl} alt="Generated image" className="relative max-h-full max-w-full rounded-[22px] object-contain shadow-2xl" />
+          {imageUrl ? (
+            <>
+              {!imageLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+                </div>
+              )}
+              <img
+                src={imageUrl}
+                alt="Generated image"
+                onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(true)}
+                className={`relative max-h-full max-w-full rounded-[22px] object-contain shadow-2xl transition-opacity duration-300 ${
+                  imageLoaded ? 'opacity-100' : 'opacity-0'
+                }`}
+              />
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+            </div>
+          )}
         </div>
 
         <aside className="flex w-full flex-col gap-5 border-t border-white/5 bg-black/40 p-6 text-sm text-gray-200 md:w-96 md:border-l md:border-t-0 md:bg-black/30">
