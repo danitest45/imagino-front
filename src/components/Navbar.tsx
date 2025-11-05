@@ -8,7 +8,7 @@ import { getUserById, getUserId, getCredits } from '../lib/api';
 import type { UserDto } from '../types/user';
 
 const navLinks = [
-  { href: '/images/replicate', label: 'Images' },
+  { href: '/images', label: 'Images' },
   { href: '/voices', label: 'Voices' },
   { href: '/videos', label: 'Videos' },
   { href: '/pricing', label: 'Pricing' },
