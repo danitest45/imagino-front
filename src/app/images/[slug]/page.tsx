@@ -155,6 +155,8 @@ export default function ImageModelPage() {
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
   const capabilities = details?.capabilities ?? [];
+  const showDetailsSkeleton = detailsLoading;
+  const showVersionSkeleton = detailsLoading || versionLoading;
 
   useEffect(() => {
     if (!history) return;
@@ -798,16 +800,22 @@ export default function ImageModelPage() {
   return (
     <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
       <div className="w-full lg:max-w-[540px] xl:max-w-[560px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
-        <div className="flex items-center justify-between">
-          <h1 className="text-base font-semibold text-white">
-            {detailsLoading
-              ? 'Carregando modelo...'
-              : details?.displayName ?? slug ?? 'Modelo de imagem'}
-          </h1>
-          {!detailsLoading && defaultVersionTag && (
-            <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
-              {defaultVersionTag}
-            </span>
+        <div className="flex items-center justify-between gap-3">
+          {showDetailsSkeleton ? (
+            <div className="h-6 w-40 rounded-lg bg-white/10 animate-pulse" />
+          ) : (
+            <h1 className="text-base font-semibold text-white">
+              {details?.displayName ?? slug ?? 'Modelo de imagem'}
+            </h1>
+          )}
+          {showDetailsSkeleton ? (
+            <div className="hidden h-3 w-16 rounded-full bg-white/10 animate-pulse sm:block" />
+          ) : (
+            defaultVersionTag && (
+              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
+                {defaultVersionTag}
+              </span>
+            )
           )}
         </div>
         {detailsError && (
@@ -816,13 +824,18 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        {versionLoading && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-gray-400">
-            Carregando campos do modelo...
+        {showVersionSkeleton && (
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <div
+                key={`schema-skeleton-${index}`}
+                className="h-32 w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/[0.08] animate-pulse"
+              />
+            ))}
           </div>
         )}
 
-        {!versionLoading && schemaAvailable && (
+        {!showVersionSkeleton && schemaAvailable && (
           <div className="space-y-3">
             <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -898,7 +911,7 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        {!versionLoading && !schemaAvailable && (
+        {!showVersionSkeleton && !schemaAvailable && (
           <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
             {versionError ?? 'Detalhes indisponíveis'}
           </div>
