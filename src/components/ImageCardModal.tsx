@@ -21,6 +21,8 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
   const { token } = useAuth();
   const [details, setDetails] = useState<JobDetails | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
+  const fallbackNormalized = useMemo(() => fallbackUrl?.trim() || null, [fallbackUrl]);
 
   useEffect(() => {
     if (!isOpen || !jobId || !token) {
@@ -57,10 +59,18 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
       return '';
     }
   }, [details]);
-  const imageUrl = details?.imageUrl ?? fallbackUrl;
+  const preferredImageUrl = useMemo(() => {
+    const normalized = details?.imageUrl?.trim();
+    if (normalized) {
+      return normalized;
+    }
+    return fallbackNormalized;
+  }, [details?.imageUrl, fallbackNormalized]);
+
   useEffect(() => {
+    setActiveImageUrl(preferredImageUrl);
     setImageLoaded(false);
-  }, [imageUrl]);
+  }, [preferredImageUrl]);
   if (!isOpen) return null;
 
   return (
@@ -82,7 +92,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
 
         <div className="relative flex flex-1 items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black p-4 sm:p-8">
           <div className="absolute inset-4 rounded-[28px] border border-white/5" aria-hidden />
-          {imageUrl ? (
+          {activeImageUrl ? (
             <>
               {!imageLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -90,18 +100,26 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
                 </div>
               )}
               <img
-                src={imageUrl}
+                key={activeImageUrl}
+                src={activeImageUrl}
                 alt="Generated image"
                 onLoad={() => setImageLoaded(true)}
-                onError={() => setImageLoaded(true)}
+                onError={() => {
+                  if (activeImageUrl !== fallbackNormalized && fallbackNormalized) {
+                    setActiveImageUrl(fallbackNormalized);
+                    return;
+                  }
+                  setImageLoaded(true);
+                }}
                 className={`relative max-h-full max-w-full rounded-[22px] object-contain shadow-2xl transition-opacity duration-300 ${
                   imageLoaded ? 'opacity-100' : 'opacity-0'
                 }`}
               />
             </>
           ) : (
-            <div className="flex h-full w-full items-center justify-center">
+            <div className="flex h-full w-full flex-col items-center justify-center gap-3 text-center text-sm text-white/70">
               <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
+              <p>Carregando a imagem…</p>
             </div>
           )}
         </div>
