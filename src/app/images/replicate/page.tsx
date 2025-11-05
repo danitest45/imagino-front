@@ -196,8 +196,8 @@ export default function ReplicatePage() {
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
       {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
+      <div className="w-full lg:w-[440px] flex-shrink-0 p-3 sm:p-4 md:p-5 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in lg:max-h-[calc(100vh-48px)] lg:overflow-hidden">
+        <div className="flex flex-1 flex-col gap-4 md:gap-5 overflow-y-auto pr-1">
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
             <div className="flex items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
@@ -210,34 +210,43 @@ export default function ReplicatePage() {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
-                Creative brief
-              </label>
-              <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
-            </div>
-            <textarea
-              id="prompt"
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              placeholder="Describe the scene, subject, style, and lighting you want to see..."
-              className="h-40 sm:h-48 md:h-72 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-            />
-            <div className="flex flex-wrap gap-2">
-              {promptSuggestions.map(suggestion => (
-                <button
-                  key={suggestion.title}
-                  type="button"
-                  onClick={() => setPrompt(suggestion.prompt)}
-                  className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                >
-                  <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                  <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                    {suggestion.prompt}
-                  </span>
-                </button>
-              ))}
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:gap-5 md:items-start">
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
+                    Creative brief
+                  </label>
+                  <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
+                </div>
+                <textarea
+                  id="prompt"
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  placeholder="Describe the scene, subject, style, and lighting you want to see..."
+                  className="h-32 sm:h-36 md:h-48 lg:h-40 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                />
+              </div>
+              <div className="mt-4 md:mt-0 flex flex-col gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+                  Quick ideas
+                </span>
+                <div className="grid grid-cols-1 gap-2">
+                  {promptSuggestions.map(suggestion => (
+                    <button
+                      key={suggestion.title}
+                      type="button"
+                      onClick={() => setPrompt(suggestion.prompt)}
+                      className="group rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-left transition hover:border-fuchsia-400/50 hover:bg-white/10"
+                    >
+                      <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
+                      <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                        {suggestion.prompt}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -289,16 +298,18 @@ export default function ReplicatePage() {
             </div>
           </div>
         </div>
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !token}
-          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? 'Generating...' : 'Generate with imagino.AI'}
-        </button>
-        <p className="mt-2 text-center text-[11px] text-gray-500">
-          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
-        </p>
+        <div className="mt-4 md:mt-5">
+          <button
+            onClick={handleGenerate}
+            disabled={loading || !token}
+            className="w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {loading ? 'Generating...' : 'Generate with imagino.AI'}
+          </button>
+          <p className="mt-2 text-center text-[11px] text-gray-500">
+            Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+          </p>
+        </div>
 
         {/* Mobile history directly under controls when center is hidden */}
         {!showCenterOnMobile && doneImages.length > 0 && (
