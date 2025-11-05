@@ -194,53 +194,51 @@ export default function ReplicatePage() {
   const showCenterOnMobile = !!centerImageUrl || loading;
 
   return (
-    <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
+    <div className="flex min-h-screen flex-1 flex-col overflow-hidden lg:flex-row lg:items-stretch animate-fade-in">
       {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[440px] flex-shrink-0 p-3 sm:p-4 md:p-5 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in lg:max-h-[calc(100vh-48px)] lg:overflow-hidden">
-        <div className="flex flex-1 flex-col gap-4 md:gap-5 overflow-y-auto pr-1">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
+      <div className="w-full lg:w-[396px] xl:w-[420px] flex-shrink-0 p-3 sm:p-4 md:p-5 flex flex-col h-auto lg:h-screen bg-black/40 backdrop-blur-lg animate-fade-in lg:overflow-hidden">
+        <div className="flex flex-1 flex-col gap-3 md:gap-4 overflow-y-auto pr-1 lg:pr-2 pb-3">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-3 shadow-inner shadow-purple-500/10">
+            <div className="flex items-center justify-between gap-2">
+              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.28em] text-fuchsia-100">
                 imagino.AI studio
               </span>
-              <span className="text-[11px] text-gray-400">Credits update live</span>
+              <span className="text-[10px] text-gray-400">Live credits</span>
             </div>
-            <p className="mt-3 text-sm text-gray-200">
-              Use the creative brief below to guide lighting, composition, and brand voice before generating.
+            <p className="mt-2 text-xs text-gray-300">
+              Shape your brief and fine-tune the controls here so the generate button stays within reach.
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] md:gap-5 md:items-start">
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
-                    Creative brief
-                  </label>
-                  <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
-                </div>
-                <textarea
-                  id="prompt"
-                  value={prompt}
-                  onChange={e => setPrompt(e.target.value)}
-                  placeholder="Describe the scene, subject, style, and lighting you want to see..."
-                  className="h-32 sm:h-36 md:h-48 lg:h-40 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-                />
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 md:p-5">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
+                  Creative brief
+                </label>
+                <span className="text-[10px] text-gray-500">Subject · mood · camera</span>
               </div>
-              <div className="mt-4 md:mt-0 flex flex-col gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400">
+              <textarea
+                id="prompt"
+                value={prompt}
+                onChange={e => setPrompt(e.target.value)}
+                placeholder="Describe the scene, subject, style, and lighting you want to see..."
+                className="min-h-[108px] sm:min-h-[120px] md:min-h-[132px] lg:min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+              />
+              <div>
+                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-400">
                   Quick ideas
                 </span>
-                <div className="grid grid-cols-1 gap-2">
+                <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {promptSuggestions.map(suggestion => (
                     <button
                       key={suggestion.title}
                       type="button"
                       onClick={() => setPrompt(suggestion.prompt)}
-                      className="group rounded-xl border border-white/10 bg-black/30 px-3 py-3 text-left transition hover:border-fuchsia-400/50 hover:bg-white/10"
+                      className="group rounded-xl border border-white/10 bg-black/30 px-3 py-2 text-left transition hover:border-fuchsia-400/50 hover:bg-white/10"
                     >
                       <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                      <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                      <span className="mt-1 block text-[10px] leading-snug text-gray-400 group-hover:text-gray-200">
                         {suggestion.prompt}
                       </span>
                     </button>
@@ -250,55 +248,56 @@ export default function ReplicatePage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Aspect ratio</p>
-              <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">{selectedAspectRatio}</span>
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-white">Aspect ratio</p>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-gray-500">{selectedAspectRatio}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {aspectRatioOptions.map(option => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setSelectedAspectRatio(option.value)}
+                    className={`rounded-xl border px-3 py-2 text-left text-xs transition ${
+                      selectedAspectRatio === option.value
+                        ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/20 text-white'
+                        : 'border-white/10 bg-black/30 text-gray-300 hover:border-white/20 hover:text-white'
+                    }`}
+                  >
+                    <span className="block text-sm font-semibold">{option.label}</span>
+                    <span className="mt-1 block text-[10px] leading-snug text-gray-400">
+                      {option.helper}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {aspectRatioOptions.map(option => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setSelectedAspectRatio(option.value)}
-                  className={`rounded-xl border px-3 py-3 text-left text-xs transition ${
-                    selectedAspectRatio === option.value
-                      ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/20 text-white'
-                      : 'border-white/10 bg-black/30 text-gray-300 hover:border-white/20 hover:text-white'
-                  }`}
-                >
-                  <span className="block text-sm font-semibold">{option.label}</span>
-                  <span className="mt-1 block text-[11px] text-gray-400">
-                    {option.helper}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Quality priority</p>
-              <span className="text-xs text-gray-400">Level {quality}</span>
-            </div>
-            <p className="text-[11px] text-gray-500">
-              Move right for more detail, or left for faster previews and explorations.
-            </p>
-            <input
-              type="range"
-              min={1}
-              max={5}
-              value={quality}
-              onChange={e => setQuality(Number(e.target.value))}
-              className="w-full accent-fuchsia-400"
-            />
-            <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
-              <span>Faster previews</span>
-              <span>Highest fidelity</span>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-white">Quality priority</p>
+                <span className="text-[11px] text-gray-400">Level {quality}</span>
+              </div>
+              <p className="text-[10px] text-gray-500">
+                Balance render speed and fidelity before you hit generate.
+              </p>
+              <input
+                type="range"
+                min={1}
+                max={5}
+                value={quality}
+                onChange={e => setQuality(Number(e.target.value))}
+                className="w-full accent-fuchsia-400"
+              />
+              <div className="flex justify-between text-[10px] text-gray-400">
+                <span>Faster</span>
+                <span>More detail</span>
+              </div>
             </div>
           </div>
         </div>
-        <div className="mt-4 md:mt-5">
+        <div className="mt-3 md:mt-4">
           <button
             onClick={handleGenerate}
             disabled={loading || !token}
@@ -306,8 +305,8 @@ export default function ReplicatePage() {
           >
             {loading ? 'Generating...' : 'Generate with imagino.AI'}
           </button>
-          <p className="mt-2 text-center text-[11px] text-gray-500">
-            Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+          <p className="mt-1 text-center text-[10px] text-gray-500">
+            Each render uses 1 credit. Upgrade to pro plans for higher limits and premium models.
           </p>
         </div>
 
