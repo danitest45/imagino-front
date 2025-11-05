@@ -19,7 +19,7 @@ export default function ImagesIndexPage() {
           targetSlug = models[0].slug;
         }
       } catch (error) {
-        console.error('Failed to resolve default image model', error);
+        console.warn('Failed to resolve default image model', error);
       }
 
       if (!cancelled) {
