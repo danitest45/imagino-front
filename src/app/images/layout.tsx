@@ -1,5 +1,5 @@
 import Sidebar from './Sidebar';
-import Link from 'next/link';
+import MobileModelNav from './MobileModelNav';
 
 
 export default function ImagesLayout({
@@ -15,19 +15,12 @@ export default function ImagesLayout({
       </div>
 
       {/* Mobile top nav */}
-      <div className="lg:hidden fixed top-16 inset-x-0 z-30 border-b border-white/10 bg-black/60 backdrop-blur-xl">
-        <nav className="flex items-center gap-3 px-4 py-3 overflow-x-auto">
-          <Link
-            href="/images/replicate"
-            className="inline-flex items-center gap-2 rounded-2xl border border-fuchsia-400/40 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30"
-          >
-            Replicate Studio
-          </Link>
-        </nav>
+      <div className="lg:hidden fixed top-16 inset-x-0 z-30 border-b border-white/10 bg-black/70 backdrop-blur-xl">
+        <MobileModelNav />
       </div>
 
       {/* Spacer to avoid overlap with fixed mobile nav */}
-      <div className="lg:hidden h-10" />
+      <div className="lg:hidden h-20" />
 
       <main className="flex-1 p-0">{children}</main>
     </div>

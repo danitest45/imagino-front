@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { getPublicImageModels } from '../../lib/api';
 import type { PublicImageModelSummary } from '../../types/image-model';
 
-const fallbackModels: PublicImageModelSummary[] = [
+export const fallbackModels: PublicImageModelSummary[] = [
   {
     slug: 'replicate',
     displayName: 'Replicate Studio',
