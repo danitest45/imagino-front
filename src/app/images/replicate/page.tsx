@@ -13,7 +13,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
 import { normalizeUrl } from '../../../lib/api';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
@@ -191,146 +191,147 @@ export default function ReplicatePage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const showCenterOnMobile = !!centerImageUrl || loading;
-
-  return (
-    <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
-      {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-            <div className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
-                imagino.AI studio
-              </span>
-              <span className="text-[11px] text-gray-400">Credits update live</span>
-            </div>
-            <p className="mt-3 text-sm text-gray-200">
-              Use the creative brief below to guide lighting, composition, and brand voice before generating.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between">
-              <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
-                Creative brief
-              </label>
-              <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
-            </div>
-            <textarea
-              id="prompt"
-              value={prompt}
-              onChange={e => setPrompt(e.target.value)}
-              placeholder="Describe the scene, subject, style, and lighting you want to see..."
-              className="h-40 sm:h-48 md:h-72 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-            />
-            <div className="flex flex-wrap gap-2">
-              {promptSuggestions.map(suggestion => (
-                <button
-                  key={suggestion.title}
-                  type="button"
-                  onClick={() => setPrompt(suggestion.prompt)}
-                  className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
-                >
-                  <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
-                  <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
-                    {suggestion.prompt}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Aspect ratio</p>
-              <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">{selectedAspectRatio}</span>
-            </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-              {aspectRatioOptions.map(option => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setSelectedAspectRatio(option.value)}
-                  className={`rounded-xl border px-3 py-3 text-left text-xs transition ${
-                    selectedAspectRatio === option.value
-                      ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/20 text-white'
-                      : 'border-white/10 bg-black/30 text-gray-300 hover:border-white/20 hover:text-white'
-                  }`}
-                >
-                  <span className="block text-sm font-semibold">{option.label}</span>
-                  <span className="mt-1 block text-[11px] text-gray-400">
-                    {option.helper}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-white">Quality priority</p>
-              <span className="text-xs text-gray-400">Level {quality}</span>
-            </div>
-            <p className="text-[11px] text-gray-500">
-              Move right for more detail, or left for faster previews and explorations.
-            </p>
-            <input
-              type="range"
-              min={1}
-              max={5}
-              value={quality}
-              onChange={e => setQuality(Number(e.target.value))}
-              className="w-full accent-fuchsia-400"
-            />
-            <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
-              <span>Faster previews</span>
-              <span>Highest fidelity</span>
-            </div>
-          </div>
+  const renderPromptComposer = (variant: 'mobile' | 'desktop') => (
+    <section
+      className={`rounded-3xl border border-white/10 bg-black/40 shadow-lg shadow-purple-500/10 backdrop-blur ${
+        variant === 'desktop' ? 'p-5 space-y-5' : 'p-4 space-y-4'
+      }`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.35em] text-fuchsia-200">
+            Creative brief
+          </p>
+          <p className={`text-sm text-gray-300 ${variant === 'desktop' ? 'max-w-xs' : 'max-w-full'}`}>
+            Add subject, mood, lighting, and brand cues for a production-ready render.
+          </p>
         </div>
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !token}
-          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? 'Generating...' : 'Generate with imagino.AI'}
-        </button>
-        <p className="mt-2 text-center text-[11px] text-gray-500">
-          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
-        </p>
-
-        {/* Mobile history directly under controls when center is hidden */}
-        {!showCenterOnMobile && doneImages.length > 0 && (
-          <div className="mt-3 lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
-            </div>
-          </div>
-        )}
+        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-gray-400">
+          Live credits
+        </span>
       </div>
+      <div className="space-y-3">
+        <label htmlFor={`prompt-${variant}`} className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400">
+          Prompt
+        </label>
+        <textarea
+          id={`prompt-${variant}`}
+          value={prompt}
+          onChange={e => setPrompt(e.target.value)}
+          placeholder="Describe the scene, subject, style, and lighting you want to see..."
+          className={`min-h-[160px] w-full resize-none rounded-2xl border border-white/10 bg-slate-950/70 p-4 text-sm text-white shadow-inner shadow-purple-500/10 transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500 ${
+            variant === 'desktop' ? 'md:min-h-[260px]' : ''
+          }`}
+        />
+        <div className="flex flex-wrap gap-2">
+          {promptSuggestions.map(suggestion => (
+            <button
+              key={suggestion.title}
+              type="button"
+              onClick={() => setPrompt(suggestion.prompt)}
+              className="group min-w-[160px] flex-1 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
+            >
+              <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
+              <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
+                {suggestion.prompt}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 
-      {/* Center panel: selected image or generation state */}
-      <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
+  const renderAspectRatioSelector = (variant: 'mobile' | 'desktop') => (
+    <section
+      className={`rounded-3xl border border-white/10 bg-black/35 shadow-lg shadow-purple-500/10 backdrop-blur ${
+        variant === 'desktop' ? 'p-5 space-y-4' : 'p-4 space-y-3'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-sm font-semibold text-white">Aspect ratio</p>
+        <span className="text-[11px] uppercase tracking-[0.3em] text-gray-500">{selectedAspectRatio}</span>
+      </div>
+      <div className={`${variant === 'desktop' ? 'grid grid-cols-3 gap-3' : 'grid grid-cols-1 gap-2 sm:grid-cols-3'}`}>
+        {aspectRatioOptions.map(option => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => setSelectedAspectRatio(option.value)}
+            className={`rounded-2xl border px-4 py-3 text-left text-xs transition ${
+              selectedAspectRatio === option.value
+                ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/20 text-white shadow-inner shadow-purple-500/20'
+                : 'border-white/10 bg-black/30 text-gray-300 hover:border-white/20 hover:text-white'
+            }`}
+          >
+            <span className="block text-sm font-semibold">{option.label}</span>
+            <span className="mt-1 block text-[11px] text-gray-400">{option.helper}</span>
+          </button>
+        ))}
+      </div>
+    </section>
+  );
+
+  const renderQualitySelector = (variant: 'mobile' | 'desktop') => (
+    <section
+      className={`rounded-3xl border border-white/10 bg-black/35 shadow-lg shadow-purple-500/10 backdrop-blur ${
+        variant === 'desktop' ? 'p-5 space-y-4' : 'p-4 space-y-3'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm font-semibold text-white">Quality priority</p>
+          <p className="text-[11px] text-gray-500">Move right for more detail; left for faster previews.</p>
+        </div>
+        <span className="text-xs text-gray-400">Level {quality}</span>
+      </div>
+      <input
+        type="range"
+        min={1}
+        max={5}
+        value={quality}
+        onChange={e => setQuality(Number(e.target.value))}
+        className="w-full accent-fuchsia-400"
+        aria-label="Quality priority"
+      />
+      <div className="flex justify-between text-[10px] text-gray-500">
+        <span>Faster previews</span>
+        <span>Highest fidelity</span>
+      </div>
+    </section>
+  );
+
+  const renderGenerateButton = (variant: 'mobile' | 'desktop') => (
+    <div className={`${variant === 'mobile' ? 'space-y-2' : 'space-y-3'}`}>
+      <button
+        onClick={handleGenerate}
+        disabled={loading || !token}
+        className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {loading ? 'Generating…' : 'Generate with imagino.AI'}
+      </button>
+      <p className="text-center text-[11px] text-gray-500">
+        Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+      </p>
+    </div>
+  );
+
+  const renderPreviewPanel = (variant: 'mobile' | 'desktop') => (
+    <section
+      className={`rounded-3xl border border-white/10 bg-black/35 shadow-lg shadow-purple-500/10 backdrop-blur ${
+        variant === 'desktop' ? 'flex flex-1 flex-col p-6' : 'p-4 space-y-4'
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-200">Preview</p>
+          <p className="text-sm text-gray-300">Tap the image to view details and download options.</p>
+        </div>
+        {loading && <span className="text-[11px] text-fuchsia-200 animate-pulse">Generating…</span>}
+      </div>
+      <div className={`mt-4 w-full ${variant === 'desktop' ? 'flex-1' : ''}`}>
         {centerImageUrl ? (
-          <div className="max-w-[512px] w-full">
+          <div className={`${variant === 'desktop' ? 'mx-auto max-w-[512px]' : 'max-w-full'} w-full`}>
             <ImageCard
               src={centerImageUrl}
               jobId={selectedJobId ?? undefined}
@@ -341,108 +342,153 @@ export default function ReplicatePage() {
             />
           </div>
         ) : loading ? (
-          <div className="max-w-[512px] w-full">
+          <div className={`${variant === 'desktop' ? 'mx-auto max-w-[512px]' : 'max-w-full'} w-full`}>
             <ImageCard loading={true} onClick={() => {}} />
           </div>
         ) : (
-          <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
-            Draft your creative brief and press &quot;Generate with imagino.AI&quot; to begin.
-          </div>
-        )}
-
-        {/* Mobile history carousel (when center is shown) */}
-        {doneImages.length > 0 && showCenterOnMobile && (
-          <div className="mt-4 w-full lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && (
-                <div className="text-xs text-gray-400">{doneImages.length} renders</div>
-              )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
-            </div>
+          <div
+            className={`flex items-center justify-center rounded-2xl border border-dashed border-white/15 bg-black/20 px-4 text-center text-sm text-gray-400 ${
+              variant === 'desktop' ? 'h-full min-h-[320px]' : 'min-h-[180px] py-10'
+            }`}
+          >
+            Draft your creative brief and press “Generate” to see your image here.
           </div>
         )}
       </div>
+    </section>
+  );
 
-      {/* Removed separate mobile history block to avoid layout gap; it's now inside the left panel */}
+  const renderMobileHistory = () => {
+    if (doneImages.length === 0) return null;
 
-      {/* Right panel: history */}
-      {doneImages.length > 0 && (
-        <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
-          <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
-            {paginatedImages.map(job => (
-              <img
-                key={job.id}
-                src={job.url!}
-                onClick={() => {
-                  setSelectedImageUrl(job.url!);
-                  setSelectedJobId(job.id);
-                }}
-                className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 lg:w-24 lg:h-24 transition-all transform hover:scale-105 ${
-                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                } hover:border-purple-400`}
-                alt=""
-              />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-4 mt-2 text-white">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="disabled:opacity-50 p-1"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="disabled:opacity-50 p-1"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
+    return (
+      <section className="rounded-3xl border border-white/10 bg-black/35 p-4 shadow-lg shadow-purple-500/10 backdrop-blur">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white">Recent renders</h3>
+          <span className="text-[11px] text-gray-500">{doneImages.length} saved</span>
         </div>
-      )}
+        <div className="-mx-1 mt-3 flex gap-3 overflow-x-auto pb-2 pl-1 pr-1 no-scrollbar">
+          {doneImages.slice(0, 24).map(job => (
+            <button
+              key={job.id}
+              type="button"
+              onClick={() => {
+                setSelectedImageUrl(job.url!);
+                setSelectedJobId(job.id);
+              }}
+              className={`relative flex h-20 w-20 flex-none items-center justify-center overflow-hidden rounded-xl border-2 transition-all ${
+                selectedImageUrl === job.url ? 'border-fuchsia-400 shadow-md shadow-fuchsia-500/30' : 'border-transparent'
+              }`}
+            >
+              <img src={job.url!} alt="Generated thumbnail" className="h-full w-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </section>
+    );
+  };
 
-  {/* Modal to enlarge image */}
-  <ImageCardModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    jobId={selectedJobId}
-  />
-  <OutOfCreditsDialog
-    open={outOfCredits !== null}
-    current={outOfCredits?.current}
-    needed={outOfCredits?.needed}
-    onClose={() => setOutOfCredits(null)}
-  />
-  <UpgradePlanDialog
-    open={upgradeDialog}
-    onClose={() => setUpgradeDialog(false)}
-  />
-  <ResendVerificationDialog
-    open={emailModal}
-    email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
-    onClose={() => setEmailModal(false)}
-  />
-</div>
+  const renderDesktopHistory = () => {
+    if (doneImages.length === 0) return null;
+
+    return (
+      <aside className="flex w-72 flex-shrink-0 flex-col gap-4 rounded-3xl border border-white/10 bg-black/30 p-5 shadow-inner shadow-purple-500/5 backdrop-blur">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-white">Recent renders</h3>
+          <span className="text-xs text-gray-500">{doneImages.length}</span>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {paginatedImages.map(job => (
+            <button
+              key={job.id}
+              type="button"
+              onClick={() => {
+                setSelectedImageUrl(job.url!);
+                setSelectedJobId(job.id);
+              }}
+              className={`relative overflow-hidden rounded-xl border-2 transition-all hover:-translate-y-0.5 hover:border-fuchsia-400/70 ${
+                selectedImageUrl === job.url ? 'border-fuchsia-500 shadow-lg shadow-fuchsia-500/30' : 'border-transparent'
+              }`}
+            >
+              <img src={job.url!} alt="Generated thumbnail" className="h-20 w-full object-cover" />
+            </button>
+          ))}
+        </div>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-4 text-white">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="rounded-full border border-white/10 p-2 text-white transition disabled:opacity-40"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="rounded-full border border-white/10 p-2 text-white transition disabled:opacity-40"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        )}
+      </aside>
+    );
+  };
+
+  return (
+    <div className="flex h-full flex-1 flex-col gap-0 lg:flex-row lg:items-stretch animate-fade-in">
+      {/* Mobile layout */}
+      <div className="flex flex-col gap-6 px-4 pb-24 pt-6 lg:hidden">
+        <header className="space-y-3">
+          <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-fuchsia-200">
+            <Sparkles className="h-4 w-4" />
+            <span>imagino.AI studio</span>
+          </div>
+          <h1 className="text-2xl font-semibold text-white">Craft production-ready visuals on the go.</h1>
+          <p className="text-sm text-gray-400">
+            Compose prompts, fine-tune settings, and review your render history without leaving your phone.
+          </p>
+        </header>
+
+        {renderPromptComposer('mobile')}
+        <div className="space-y-4">
+          {renderAspectRatioSelector('mobile')}
+          {renderQualitySelector('mobile')}
+        </div>
+        {renderGenerateButton('mobile')}
+        {renderPreviewPanel('mobile')}
+        {renderMobileHistory()}
+      </div>
+
+      {/* Desktop layout */}
+      <div className="hidden h-full flex-1 gap-6 px-6 pb-16 pt-4 lg:flex">
+        <div className="flex w-[440px] flex-shrink-0 flex-col gap-6">
+          {renderPromptComposer('desktop')}
+          {renderAspectRatioSelector('desktop')}
+          {renderQualitySelector('desktop')}
+          {renderGenerateButton('desktop')}
+        </div>
+        <div className="flex min-h-[calc(100vh-180px)] flex-1 flex-col gap-6">
+          {renderPreviewPanel('desktop')}
+        </div>
+        {renderDesktopHistory()}
+      </div>
+
+      {/* Global modals */}
+      <ImageCardModal isOpen={modalOpen} onClose={() => setModalOpen(false)} jobId={selectedJobId} />
+      <OutOfCreditsDialog
+        open={outOfCredits !== null}
+        current={outOfCredits?.current}
+        needed={outOfCredits?.needed}
+        onClose={() => setOutOfCredits(null)}
+      />
+      <UpgradePlanDialog open={upgradeDialog} onClose={() => setUpgradeDialog(false)} />
+      <ResendVerificationDialog
+        open={emailModal}
+        email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
+        onClose={() => setEmailModal(false)}
+      />
+    </div>
   );
 }
