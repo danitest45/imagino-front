@@ -191,22 +191,22 @@ export default function ReplicatePage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const showCenterOnMobile = !!centerImageUrl || loading;
-
   return (
-    <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
-      {/* Left panel: prompt and controls */}
-      <div className="w-full lg:w-[480px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col h-auto lg:h-full bg-black/40 backdrop-blur-lg animate-fade-in">
-        <div className="flex flex-col gap-5 md:gap-6 lg:flex-1">
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-inner shadow-purple-500/10">
-            <div className="flex items-center justify-between gap-3">
+    <main className="relative flex min-h-screen w-full flex-col overflow-hidden bg-slate-950 text-white lg:flex-row">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-gradient-to-b from-fuchsia-500/20 via-purple-700/10 to-transparent blur-3xl" />
+
+      {/* Controls */}
+      <section className="order-2 flex w-full flex-col gap-6 border-t border-white/5 bg-slate-950/60 px-4 pb-28 pt-6 backdrop-blur lg:order-1 lg:h-screen lg:max-w-[420px] lg:border-t-0 lg:border-r lg:border-white/5 lg:bg-black/30 lg:px-8 lg:py-12">
+        <div className="flex flex-col gap-6">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-5 shadow-inner shadow-purple-500/10">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <span className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-fuchsia-100">
                 imagino.AI studio
               </span>
               <span className="text-[11px] text-gray-400">Credits update live</span>
             </div>
-            <p className="mt-3 text-sm text-gray-200">
-              Use the creative brief below to guide lighting, composition, and brand voice before generating.
+            <p className="mt-4 text-sm text-gray-200">
+              Guide lighting, composition, and tone before you render. Prompts are saved in your history automatically.
             </p>
           </div>
 
@@ -215,14 +215,14 @@ export default function ReplicatePage() {
               <label htmlFor="prompt" className="text-sm font-medium text-gray-200">
                 Creative brief
               </label>
-              <span className="text-[11px] text-gray-500">Add subject, mood &amp; camera details</span>
+              <span className="text-[11px] text-gray-500">Include subject, mood &amp; camera details</span>
             </div>
             <textarea
               id="prompt"
               value={prompt}
               onChange={e => setPrompt(e.target.value)}
               placeholder="Describe the scene, subject, style, and lighting you want to see..."
-              className="h-40 sm:h-48 md:h-72 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+              className="h-40 resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500 sm:h-48 md:h-72"
             />
             <div className="flex flex-wrap gap-2">
               {promptSuggestions.map(suggestion => (
@@ -230,7 +230,7 @@ export default function ReplicatePage() {
                   key={suggestion.title}
                   type="button"
                   onClick={() => setPrompt(suggestion.prompt)}
-                  className="group flex-1 min-w-[160px] rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
+                  className="group min-w-[160px] flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left text-xs text-gray-200 transition hover:border-fuchsia-400/40 hover:bg-white/10"
                 >
                   <span className="block text-xs font-semibold text-white">{suggestion.title}</span>
                   <span className="mt-1 block text-[11px] text-gray-400 group-hover:text-gray-200">
@@ -241,12 +241,12 @@ export default function ReplicatePage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-4">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white">Aspect ratio</p>
               <span className="text-[11px] uppercase tracking-[0.25em] text-gray-500">{selectedAspectRatio}</span>
             </div>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
               {aspectRatioOptions.map(option => (
                 <button
                   key={option.value}
@@ -259,20 +259,18 @@ export default function ReplicatePage() {
                   }`}
                 >
                   <span className="block text-sm font-semibold">{option.label}</span>
-                  <span className="mt-1 block text-[11px] text-gray-400">
-                    {option.helper}
-                  </span>
+                  <span className="mt-1 block text-[11px] text-gray-400">{option.helper}</span>
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3">
+          <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold text-white">Quality priority</p>
               <span className="text-xs text-gray-400">Level {quality}</span>
             </div>
-            <p className="text-[11px] text-gray-500">
+            <p className="mt-2 text-[11px] text-gray-500">
               Move right for more detail, or left for faster previews and explorations.
             </p>
             <input
@@ -281,168 +279,165 @@ export default function ReplicatePage() {
               max={5}
               value={quality}
               onChange={e => setQuality(Number(e.target.value))}
-              className="w-full accent-fuchsia-400"
+              className="mt-3 w-full accent-fuchsia-400"
             />
-            <div className="flex justify-between text-[10px] sm:text-xs text-gray-400">
+            <div className="mt-2 flex justify-between text-[10px] text-gray-400 sm:text-xs">
               <span>Faster previews</span>
               <span>Highest fidelity</span>
             </div>
           </div>
         </div>
-        <button
-          onClick={handleGenerate}
-          disabled={loading || !token}
-          className="mt-4 md:mt-6 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 md:px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-        >
-          {loading ? 'Generating...' : 'Generate with imagino.AI'}
-        </button>
-        <p className="mt-2 text-center text-[11px] text-gray-500">
-          Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
-        </p>
 
-        {/* Mobile history directly under controls when center is hidden */}
-        {!showCenterOnMobile && doneImages.length > 0 && (
-          <div className="mt-3 lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
+        <div className="mt-auto">
+          <div className="sticky bottom-0 left-0 right-0 -mx-4 bg-slate-950/95 px-4 pb-6 pt-4 backdrop-blur lg:static lg:mx-0 lg:bg-transparent lg:p-0">
+            <button
+              onClick={handleGenerate}
+              disabled={loading || !token}
+              className="w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? 'Generating…' : 'Generate with imagino.AI'}
+            </button>
+            <p className="mt-2 text-center text-[11px] text-gray-500">
+              Each render uses 1 credit. Upgrade plans unlock higher limits and premium models.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Viewer */}
+      <section className="order-1 flex flex-1 flex-col px-4 pb-24 pt-6 sm:px-6 lg:order-2 lg:px-10 lg:py-12">
+        <div className="mx-auto w-full max-w-2xl flex-1">
+          <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.3em] text-gray-500">
+            <span>Live render preview</span>
+            {selectedImageUrl && <span>#{selectedJobId?.slice(0, 8)}</span>}
+          </div>
+
+          <div className="mt-4 overflow-hidden rounded-3xl border border-white/10 bg-black/40 p-4 shadow-2xl shadow-purple-500/20 sm:p-6">
+            {centerImageUrl ? (
+              <ImageCard
+                src={centerImageUrl}
+                jobId={selectedJobId ?? undefined}
+                loading={false}
+                onClick={() => {
+                  setModalOpen(true);
+                }}
+              />
+            ) : loading ? (
+              <ImageCard loading={true} onClick={() => {}} />
+            ) : (
+              <div className="flex min-h-[280px] flex-col items-center justify-center gap-3 text-center text-sm text-gray-400 sm:min-h-[360px]">
+                <div className="rounded-full border border-dashed border-white/20 px-4 py-1 text-[11px] uppercase tracking-[0.3em]">
+                  Waiting for first render
+                </div>
+                <p className="max-w-sm text-balance text-xs text-gray-400 sm:text-sm">
+                  Draft your creative brief, adjust generation settings, and press “Generate with imagino.AI” to see your image appear here in real time.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {doneImages.length > 0 && (
+          <div className="mx-auto mt-10 w-full max-w-2xl">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-white">Recent renders</h3>
+                <p className="text-[11px] text-gray-500">Tap an image to focus or open details.</p>
+              </div>
+              <span className="text-[11px] text-gray-500">{doneImages.length} total</span>
             </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-3">
               {doneImages.slice(0, 30).map(job => (
-                <img
+                <button
                   key={job.id}
-                  src={job.url!}
+                  type="button"
                   onClick={() => {
                     setSelectedImageUrl(job.url!);
                     setSelectedJobId(job.id);
                   }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
+                  className={`group relative h-24 w-24 flex-none overflow-hidden rounded-2xl border transition-all duration-200 sm:h-28 sm:w-28 ${
+                    selectedImageUrl === job.url
+                      ? 'border-fuchsia-400 shadow-lg shadow-fuchsia-500/30'
+                      : 'border-white/10 hover:border-fuchsia-300/60'
                   }`}
-                  alt=""
-                />
+                >
+                  <img src={job.url!} alt="" className="h-full w-full object-cover" />
+                  <span className="absolute inset-x-2 bottom-2 hidden rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-white group-hover:flex">
+                    Select
+                  </span>
+                </button>
               ))}
             </div>
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Center panel: selected image or generation state */}
-      <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
-        {centerImageUrl ? (
-          <div className="max-w-[512px] w-full">
-            <ImageCard
-              src={centerImageUrl}
-              jobId={selectedJobId ?? undefined}
-              loading={false}
-              onClick={() => {
-                setModalOpen(true);
-              }}
-            />
-          </div>
-        ) : loading ? (
-          <div className="max-w-[512px] w-full">
-            <ImageCard loading={true} onClick={() => {}} />
-          </div>
-        ) : (
-          <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
-            Draft your creative brief and press &quot;Generate with imagino.AI&quot; to begin.
-          </div>
-        )}
-
-        {/* Mobile history carousel (when center is shown) */}
-        {doneImages.length > 0 && showCenterOnMobile && (
-          <div className="mt-4 w-full lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && (
-                <div className="text-xs text-gray-400">{doneImages.length} renders</div>
-              )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Removed separate mobile history block to avoid layout gap; it's now inside the left panel */}
-
-      {/* Right panel: history */}
+      {/* Desktop history */}
       {doneImages.length > 0 && (
-        <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
-          <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
+        <aside className="order-3 hidden w-full max-w-[280px] flex-col border-l border-white/5 bg-black/20 px-5 py-10 backdrop-blur lg:flex xl:max-w-sm">
+          <div className="flex items-baseline justify-between">
+            <h3 className="text-sm font-semibold text-white">History</h3>
+            <span className="text-[11px] text-gray-500">Page {currentPage}</span>
+          </div>
+          <p className="mt-1 text-[11px] text-gray-500">Choose a render to preview or download.</p>
+          <div className="mt-5 grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto pr-1">
             {paginatedImages.map(job => (
-              <img
+              <button
                 key={job.id}
-                src={job.url!}
+                type="button"
                 onClick={() => {
                   setSelectedImageUrl(job.url!);
                   setSelectedJobId(job.id);
                 }}
-                className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 lg:w-24 lg:h-24 transition-all transform hover:scale-105 ${
-                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                } hover:border-purple-400`}
-                alt=""
-              />
+                className={`group relative overflow-hidden rounded-2xl border transition-all duration-200 ${
+                  selectedImageUrl === job.url
+                    ? 'border-fuchsia-400 shadow-lg shadow-fuchsia-500/20'
+                    : 'border-white/10 hover:border-fuchsia-300/60'
+                }`}
+              >
+                <img src={job.url!} alt="" className="h-full w-full object-cover" />
+                <span className="absolute inset-x-2 bottom-2 hidden rounded-full bg-black/60 px-2 py-1 text-[10px] uppercase tracking-[0.2em] text-white group-hover:flex">
+                  Focus
+                </span>
+              </button>
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="flex justify-center gap-4 mt-2 text-white">
+            <div className="mt-6 flex items-center justify-center gap-3">
               <button
                 onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                 disabled={currentPage === 1}
-                className="disabled:opacity-50 p-1"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Previous page"
               >
                 <ChevronLeft size={16} />
               </button>
               <button
                 onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="disabled:opacity-50 p-1"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-white transition hover:border-fuchsia-400 disabled:cursor-not-allowed disabled:opacity-50"
+                aria-label="Next page"
               >
                 <ChevronRight size={16} />
               </button>
             </div>
           )}
-        </div>
+        </aside>
       )}
 
-  {/* Modal to enlarge image */}
-  <ImageCardModal
-    isOpen={modalOpen}
-    onClose={() => setModalOpen(false)}
-    jobId={selectedJobId}
-  />
-  <OutOfCreditsDialog
-    open={outOfCredits !== null}
-    current={outOfCredits?.current}
-    needed={outOfCredits?.needed}
-    onClose={() => setOutOfCredits(null)}
-  />
-  <UpgradePlanDialog
-    open={upgradeDialog}
-    onClose={() => setUpgradeDialog(false)}
-  />
-  <ResendVerificationDialog
-    open={emailModal}
-    email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
-    onClose={() => setEmailModal(false)}
-  />
-</div>
+      <ImageCardModal isOpen={modalOpen} onClose={() => setModalOpen(false)} jobId={selectedJobId} />
+      <OutOfCreditsDialog
+        open={outOfCredits !== null}
+        current={outOfCredits?.current}
+        needed={outOfCredits?.needed}
+        onClose={() => setOutOfCredits(null)}
+      />
+      <UpgradePlanDialog open={upgradeDialog} onClose={() => setUpgradeDialog(false)} />
+      <ResendVerificationDialog
+        open={emailModal}
+        email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
+        onClose={() => setEmailModal(false)}
+      />
+    </main>
   );
 }
