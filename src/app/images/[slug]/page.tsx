@@ -824,8 +824,8 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-[minmax(440px,520px)_minmax(0,1fr)_280px] xl:items-start">
-          <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-[minmax(440px,520px)_minmax(0,1fr)_280px] xl:items-start xl:gap-4">
+          <div className="flex flex-col gap-3 lg:gap-4">
             {showVersionSkeleton && (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, index) => (
@@ -936,16 +936,12 @@ export default function ImageModelPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur">
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Imagem atual</h3>
-                  <p className="text-xs text-gray-400">Visualize o resultado mais recente</p>
-                </div>
+          <div className="flex flex-col gap-3 lg:gap-4">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+              <div className="flex justify-end">
                 {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
               </div>
-              <div className="mt-4 flex w-full justify-center">
+              <div className="mt-2 flex w-full justify-center sm:mt-3">
                 {centerImageUrl ? (
                   <div className="w-full max-w-[560px]">
                     <ImageCard
@@ -970,15 +966,11 @@ export default function ImageModelPage() {
             </section>
           </div>
 
-          <div className="flex flex-col gap-4 lg:col-span-2 xl:col-span-1">
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-4 backdrop-blur">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <div>
-                  <h3 className="text-sm font-semibold text-white">Histórico de imagens</h3>
-                  <p className="text-xs text-gray-400">Selecione um render para visualizá-lo</p>
-                </div>
+          <div className="flex flex-col gap-3 lg:col-span-2 lg:gap-4 xl:col-span-1">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+              <div className="flex items-center justify-end gap-2 text-white">
                 {totalPages > 1 && (
-                  <div className="flex items-center gap-2 text-white">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
                       disabled={currentPage === 1}
@@ -1001,11 +993,11 @@ export default function ImageModelPage() {
               </div>
 
               {doneImages.length === 0 ? (
-                <p className="mt-4 text-sm text-gray-400">
+                <p className="mt-3 text-sm text-gray-400 sm:mt-4">
                   As imagens geradas aparecerão aqui assim que ficarem prontas.
                 </p>
               ) : (
-                <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
+                <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
                   {paginatedImages.map(job => (
                     <button
                       key={job.id}
