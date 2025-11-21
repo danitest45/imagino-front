@@ -390,7 +390,6 @@ export default function ImageModelPage() {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
-  const showCenterOnMobile = !!centerImageUrl || loading;
 
   function updateFormValue(
     key: string,
@@ -798,9 +797,9 @@ export default function ImageModelPage() {
     loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
-    <div className="flex min-h-screen flex-1 flex-col lg:flex-row lg:items-stretch animate-fade-in">
-      <div className="w-full lg:max-w-[540px] xl:max-w-[560px] flex-shrink-0 p-3 sm:p-4 md:p-6 flex flex-col gap-3 bg-black/40 backdrop-blur-lg animate-fade-in lg:h-screen lg:overflow-hidden">
-        <div className="flex items-center justify-between gap-3">
+    <div className="flex min-h-screen w-full justify-center animate-fade-in">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-6 lg:pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           {showDetailsSkeleton ? (
             <div className="h-6 w-40 rounded-lg bg-white/10 animate-pulse" />
           ) : (
@@ -818,234 +817,210 @@ export default function ImageModelPage() {
             )
           )}
         </div>
+
         {detailsError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
             {detailsError}
           </div>
         )}
 
-        {showVersionSkeleton && (
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <div
-                key={`schema-skeleton-${index}`}
-                className="h-32 w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/[0.08] animate-pulse"
-              />
-            ))}
-          </div>
-        )}
-
-        {!showVersionSkeleton && schemaAvailable && (
-          <div className="space-y-3">
-            <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-              </div>
-              {promptKey ? (
-                <div className="mt-4 flex flex-col gap-3">
-                  <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                    {schemaProperties[promptKey]?.title ?? 'Prompt'}
-                  </label>
-                  <textarea
-                    id={`${slug}-${promptKey}`}
-                    value={promptValue}
-                    onChange={event =>
-                      updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
-                    }
-                    placeholder={
-                      schemaProperties[promptKey]?.description ??
-                      'Descreva a cena, o estilo e a iluminação desejada...'
-                    }
-                    className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-[minmax(440px,520px)_minmax(0,1fr)_280px] xl:items-start xl:gap-4">
+          <div className="flex flex-col gap-3 lg:gap-4">
+            {showVersionSkeleton && (
+              <div className="space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`schema-skeleton-${index}`}
+                    className="h-32 w-full max-w-[520px] rounded-2xl border border-white/10 bg-white/[0.08] animate-pulse"
                   />
-                </div>
-              ) : (
-                <p className="mt-4 text-sm text-gray-400">
-                  Este modelo não possui campo de prompt configurável.
+                ))}
+              </div>
+            )}
+
+            {!showVersionSkeleton && schemaAvailable && (
+              <div className="space-y-3">
+                <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-sm font-semibold text-white">Briefing criativo</p>
+                    <span className="text-[11px] text-gray-500">Diga o que deseja gerar</span>
+                  </div>
+                  {promptKey ? (
+                    <div className="mt-4 flex flex-col gap-3">
+                      <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                        {schemaProperties[promptKey]?.title ?? 'Prompt'}
+                      </label>
+                      <textarea
+                        id={`${slug}-${promptKey}`}
+                        value={promptValue}
+                        onChange={event =>
+                          updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
+                        }
+                        placeholder={
+                          schemaProperties[promptKey]?.description ??
+                          'Descreva a cena, o estilo e a iluminação desejada...'
+                        }
+                        className="min-h-[140px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                      />
+                    </div>
+                  ) : (
+                    <p className="mt-4 text-sm text-gray-400">
+                      Este modelo não possui campo de prompt configurável.
+                    </p>
+                  )}
+                </section>
+
+                {resolutionKeys.length > 0 && (
+                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Resolução</p>
+                      <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
+                    </div>
+                    <div className="mt-4 flex flex-col gap-3">
+                      {resolutionKeys.map(renderField)}
+                    </div>
+                  </section>
+                )}
+
+                {outputFormatKeys.length > 0 && (
+                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Saída da imagem</p>
+                      <span className="text-[11px] text-gray-500">Formato do arquivo</span>
+                    </div>
+                    <div className="mt-4 flex flex-col gap-3">
+                      {outputFormatKeys.map(renderField)}
+                    </div>
+                  </section>
+                )}
+
+                {modalKeys.length > 0 && (
+                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div className="space-y-1">
+                        <p className="text-sm font-semibold text-white">Mais configurações</p>
+                        <p className="text-xs text-gray-400">
+                          Abra o painel modal para ajustar parâmetros avançados do modelo.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAdvancedModalOpen(true)}
+                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
+                      >
+                        <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
+                        Abrir painel ({modalKeys.length})
+                      </button>
+                    </div>
+                  </section>
+                )}
+              </div>
+            )}
+
+            {!showVersionSkeleton && !schemaAvailable && (
+              <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+                {versionError ?? 'Detalhes indisponíveis'}
+              </div>
+            )}
+
+            <div className="grid w-full max-w-[640px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
+              <button
+                onClick={handleGenerate}
+                disabled={isGenerateDisabled}
+                className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
+              >
+                {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
+              </button>
+              <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
+                {capabilities.length > 0 && <span>{capabilities.join(' · ')}</span>}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-3 lg:gap-4">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+              <div className="flex justify-end">
+                {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
+              </div>
+              <div className="mt-2 flex w-full justify-center sm:mt-3">
+                {centerImageUrl ? (
+                  <div className="w-full max-w-[560px]">
+                    <ImageCard
+                      src={centerImageUrl}
+                      jobId={selectedJobId ?? undefined}
+                      loading={false}
+                      onClick={() => {
+                        setModalOpen(true);
+                      }}
+                    />
+                  </div>
+                ) : loading ? (
+                  <div className="w-full max-w-[560px]">
+                    <ImageCard loading={true} onClick={() => {}} />
+                  </div>
+                ) : (
+                  <div className="w-full max-w-[560px] rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
+                    Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
+                  </div>
+                )}
+              </div>
+            </section>
+          </div>
+
+          <div className="flex flex-col gap-3 lg:col-span-2 lg:gap-4 xl:col-span-1">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+              <div className="flex items-center justify-end gap-2 text-white">
+                {totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
+                    >
+                      <ChevronLeft size={14} />
+                    </button>
+                    <span className="text-[11px] text-gray-300">
+                      {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
+                    >
+                      <ChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {doneImages.length === 0 ? (
+                <p className="mt-3 text-sm text-gray-400 sm:mt-4">
+                  As imagens geradas aparecerão aqui assim que ficarem prontas.
                 </p>
+              ) : (
+                <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
+                  {paginatedImages.map(job => (
+                    <button
+                      key={job.id}
+                      onClick={() => {
+                        setSelectedImageUrl(job.url!);
+                        setSelectedJobId(job.id);
+                      }}
+                      className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
+                        selectedImageUrl === job.url ? 'border-purple-500' : 'border-white/10'
+                      }`}
+                    >
+                      <img
+                        src={job.url!}
+                        className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+                        alt=""
+                      />
+                    </button>
+                  ))}
+                </div>
               )}
             </section>
-            {resolutionKeys.length > 0 && (
-              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-white">Resolução</p>
-                  <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
-                </div>
-                <div className="mt-4 flex flex-col gap-3">
-                  {resolutionKeys.map(renderField)}
-                </div>
-              </section>
-            )}
-
-            {outputFormatKeys.length > 0 && (
-              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="text-sm font-semibold text-white">Saída da imagem</p>
-                  <span className="text-[11px] text-gray-500">Formato do arquivo</span>
-                </div>
-                <div className="mt-4 flex flex-col gap-3">
-                  {outputFormatKeys.map(renderField)}
-                </div>
-              </section>
-            )}
-
-            {modalKeys.length > 0 && (
-              <section className="w-full max-w-[500px] rounded-2xl border border-white/10 bg-white/5 p-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold text-white">Mais configurações</p>
-                    <p className="text-xs text-gray-400">
-                      Abra o painel modal para ajustar parâmetros avançados do modelo.
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setAdvancedModalOpen(true)}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
-                  >
-                    <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
-                    Abrir painel ({modalKeys.length})
-                  </button>
-                </div>
-              </section>
-            )}
-          </div>
-        )}
-
-        {!showVersionSkeleton && !schemaAvailable && (
-          <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-            {versionError ?? 'Detalhes indisponíveis'}
-          </div>
-        )}
-
-        <div className="grid w-full max-w-[500px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
-          <button
-            onClick={handleGenerate}
-            disabled={isGenerateDisabled}
-            className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
-          >
-            {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
-          </button>
-          <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
-            {capabilities.length > 0 && (
-              <span>{capabilities.join(' · ')}</span>
-            )}
           </div>
         </div>
-
-        {!showCenterOnMobile && doneImages.length > 0 && (
-          <div className="lg:hidden">
-            <div className="mb-2 flex items-center justify-between px-1">
-              <h3 className="text-sm text-white">Recent renders</h3>
-              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
-            </div>
-            <div className="-mx-1 flex gap-2 overflow-x-auto pb-2 px-1 no-scrollbar">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`h-20 w-20 flex-none cursor-pointer rounded-md border-2 object-cover transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
-        {centerImageUrl ? (
-          <div className="max-w-[512px] w-full">
-            <ImageCard
-              src={centerImageUrl}
-              jobId={selectedJobId ?? undefined}
-              loading={false}
-              onClick={() => {
-                setModalOpen(true);
-              }}
-            />
-          </div>
-        ) : loading ? (
-          <div className="max-w-[512px] w-full">
-            <ImageCard loading={true} onClick={() => {}} />
-          </div>
-        ) : (
-          <div className="hidden lg:block px-4 text-center text-sm text-gray-500">
-            Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
-          </div>
-        )}
-
-        {doneImages.length > 0 && showCenterOnMobile && (
-          <div className="mt-4 w-full lg:hidden">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && (
-                <div className="text-xs text-gray-400">{doneImages.length} renders</div>
-              )}
-            </div>
-            <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {doneImages.length > 0 && (
-        <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
-          <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
-          <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
-            {paginatedImages.map(job => (
-              <img
-                key={job.id}
-                src={job.url!}
-                onClick={() => {
-                  setSelectedImageUrl(job.url!);
-                  setSelectedJobId(job.id);
-                }}
-                className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 lg:w-24 lg:h-24 transition-all transform hover:scale-105 ${
-                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                } hover:border-purple-400`}
-                alt=""
-              />
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center gap-4 mt-2 text-white">
-              <button
-                onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                disabled={currentPage === 1}
-                className="disabled:opacity-50 p-1"
-              >
-                <ChevronLeft size={16} />
-              </button>
-              <button
-                onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="disabled:opacity-50 p-1"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       {advancedModalOpen && (
         <div
@@ -1107,6 +1082,7 @@ export default function ImageModelPage() {
         email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
         onClose={() => setEmailModal(false)}
       />
+      </div>
     </div>
   );
 }
