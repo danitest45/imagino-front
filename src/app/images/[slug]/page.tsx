@@ -936,7 +936,7 @@ export default function ImageModelPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 lg:gap-4">
+          <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex justify-end">
                 {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
@@ -965,7 +965,7 @@ export default function ImageModelPage() {
               </div>
             </section>
 
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4 xl:sticky xl:top-4">
               <div className="flex items-center justify-end gap-2 text-white">
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
