@@ -824,8 +824,8 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-[minmax(440px,520px)_minmax(0,1fr)_280px] xl:items-start xl:gap-4">
-          <div className="flex flex-col gap-3 lg:gap-4">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(360px,440px)_minmax(0,1fr)] xl:items-start xl:gap-5">
+          <div className="flex flex-col gap-3 lg:max-w-[460px] lg:gap-4">
             {showVersionSkeleton && (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, index) => (
@@ -838,14 +838,14 @@ export default function ImageModelPage() {
             )}
 
             {!showVersionSkeleton && schemaAvailable && (
-              <div className="space-y-3">
-                <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-2">
+                <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-white">Briefing criativo</p>
                     <span className="text-[11px] text-gray-500">Diga o que deseja gerar</span>
                   </div>
                   {promptKey ? (
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3 sm:gap-4">
                       <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
                         {schemaProperties[promptKey]?.title ?? 'Prompt'}
                       </label>
@@ -859,7 +859,7 @@ export default function ImageModelPage() {
                           schemaProperties[promptKey]?.description ??
                           'Descreva a cena, o estilo e a iluminação desejada...'
                         }
-                        className="min-h-[140px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                        className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
                       />
                     </div>
                   ) : (
@@ -870,31 +870,31 @@ export default function ImageModelPage() {
                 </section>
 
                 {resolutionKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-white">Resolução</p>
                       <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
                     </div>
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3">
                       {resolutionKeys.map(renderField)}
                     </div>
                   </section>
                 )}
 
                 {outputFormatKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-white">Saída da imagem</p>
                       <span className="text-[11px] text-gray-500">Formato do arquivo</span>
                     </div>
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3">
                       {outputFormatKeys.map(renderField)}
                     </div>
                   </section>
                 )}
 
                 {modalKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-sm font-semibold text-white">Mais configurações</p>
@@ -922,7 +922,7 @@ export default function ImageModelPage() {
               </div>
             )}
 
-            <div className="grid w-full max-w-[640px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
+            <div className="grid w-full max-w-full gap-3 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
               <button
                 onClick={handleGenerate}
                 disabled={isGenerateDisabled}
@@ -943,7 +943,7 @@ export default function ImageModelPage() {
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
                 {centerImageUrl ? (
-                  <div className="w-full max-w-[560px]">
+                  <div className="w-full max-w-full">
                     <ImageCard
                       src={centerImageUrl}
                       jobId={selectedJobId ?? undefined}
@@ -954,19 +954,17 @@ export default function ImageModelPage() {
                     />
                   </div>
                 ) : loading ? (
-                  <div className="w-full max-w-[560px]">
+                  <div className="w-full max-w-full">
                     <ImageCard loading={true} onClick={() => {}} />
                   </div>
                 ) : (
-                  <div className="w-full max-w-[560px] rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
+                  <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
                     Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
                   </div>
                 )}
               </div>
             </section>
-          </div>
 
-          <div className="flex flex-col gap-3 lg:col-span-2 lg:gap-4 xl:col-span-1">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex items-center justify-end gap-2 text-white">
                 {totalPages > 1 && (
