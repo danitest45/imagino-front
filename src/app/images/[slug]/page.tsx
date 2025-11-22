@@ -87,6 +87,7 @@ function isResolutionField(
   property: JsonSchemaProperty | undefined,
 ): boolean {
   if (!property) return false;
+  if (isAspectRatioField(key, property)) return false;
   const normalizedKey = normalizeIdentifier(key);
   const normalizedTitle = normalizeIdentifier(property.title);
   const normalizedDescription = normalizeIdentifier(property.description);
@@ -98,9 +99,27 @@ function isResolutionField(
     if (value.includes('largura') || value.includes('width')) return true;
     if (value.includes('altura') || value.includes('height')) return true;
     if (value.includes('dimensao') || value.includes('dimension')) return true;
-    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
     if (value.includes('proporcao') || value.includes('proportion')) return true;
     if (value.endsWith('size')) return true;
+    return false;
+  });
+}
+
+function isAspectRatioField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
+
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
+    if (!value) return false;
+    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
+    if (value.includes('proporcao') || value.includes('proporção')) return true;
+    if (value.includes('ratio') && value.includes('aspect')) return true;
     return false;
   });
 }
@@ -341,6 +360,16 @@ export default function ImageModelPage() {
     [nonPromptKeys, schemaProperties],
   );
 
+  const imageUploadKeys = useMemo(
+    () =>
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        return isImageUploadField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
+  );
+
   const outputFormatKeys = useMemo(
     () =>
       nonPromptKeys.filter(key => {
@@ -353,8 +382,8 @@ export default function ImageModelPage() {
   );
 
   const essentialKeys = useMemo(
-    () => [...resolutionKeys, ...outputFormatKeys],
-    [resolutionKeys, outputFormatKeys],
+    () => [...resolutionKeys, ...outputFormatKeys, ...imageUploadKeys],
+    [resolutionKeys, outputFormatKeys, imageUploadKeys],
   );
 
   const modalKeys = useMemo(
@@ -419,8 +448,10 @@ export default function ImageModelPage() {
     const label = property.title ?? formatLabel(key);
     const required = requiredFields.has(key);
     const description = property.description;
-    const wrapperClass =
-      'flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
+    const baseWrapperClass =
+      'flex w-full max-w-full flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40 sm:flex-row sm:items-stretch sm:gap-4';
+    const uploadWrapperClass =
+      'flex w-full max-w-full flex-row flex-wrap items-start gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40 sm:flex-nowrap sm:items-stretch sm:gap-4';
     const labelClass =
       'text-[11px] font-semibold uppercase tracking-[0.32em] text-gray-400';
     const inputClass =
@@ -429,7 +460,7 @@ export default function ImageModelPage() {
     if (property.type === 'boolean') {
       const checked = Boolean(formValues[key]);
       return (
-        <div key={key} className={wrapperClass}>
+        <div key={key} className={baseWrapperClass}>
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-1">
               <span className="text-sm font-medium text-gray-200">
@@ -466,82 +497,84 @@ export default function ImageModelPage() {
           ? (formValues[key] as string)
           : '';
       return (
-        <div key={key} className={wrapperClass}>
-          <div className="space-y-1">
+        <div key={key} className={uploadWrapperClass}>
+          <div className="w-full space-y-1 sm:w-2/5">
             <label htmlFor={id} className={labelClass}>
               {label}
               {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
             </label>
             {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
           </div>
-          <label
-            htmlFor={id}
-            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-6 text-center transition ${
-              preview
-                ? 'border-fuchsia-400/60 bg-slate-900/60'
-                : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
-            }`}
-          >
-            {preview ? (
-              <img
-                src={preview}
-                alt={label}
-                className="h-32 w-full rounded-lg object-cover shadow-lg"
-              />
-            ) : (
-              <>
-                <UploadCloud className="h-8 w-8 text-fuchsia-300" />
-                <span className="text-sm font-medium text-white">
-                  Clique para enviar
-                </span>
-                <span className="text-xs text-gray-400">
-                  Arraste e solte ou selecione um arquivo
-                </span>
-              </>
-            )}
-            <input
-              id={id}
-              type="file"
-              accept={property.contentMediaType ?? 'image/*'}
-              className="sr-only"
-              onChange={event => {
-                const file = event.target.files?.[0];
-                if (!file) {
-                  updateFormValue(key, property, '');
-                  setFileNames(prev => {
-                    const next = { ...prev };
-                    delete next[key];
-                    return next;
-                  });
-                  return;
-                }
-                const reader = new FileReader();
-                reader.onload = e => {
-                  updateFormValue(key, property, e.target?.result ?? '');
-                  setFileNames(prev => ({ ...prev, [key]: file.name }));
-                };
-                reader.readAsDataURL(file);
-              }}
-            />
-          </label>
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
-            {preview && (
-              <button
-                type="button"
-                onClick={() => {
-                  updateFormValue(key, property, '');
-                  setFileNames(prev => {
-                    const next = { ...prev };
-                    delete next[key];
-                    return next;
-                  });
+          <div className="w-full space-y-2 sm:w-3/5">
+            <label
+              htmlFor={id}
+              className={`group relative flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-3 text-center transition ${
+                preview
+                  ? 'border-fuchsia-400/60 bg-slate-900/60'
+                  : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
+              }`}
+            >
+              {preview ? (
+                <img
+                  src={preview}
+                  alt={label}
+                  className="h-20 w-full rounded-lg object-cover shadow-lg"
+                />
+              ) : (
+                <>
+                  <UploadCloud className="h-8 w-8 text-fuchsia-300" />
+                  <span className="text-sm font-medium text-white">
+                    Clique para enviar
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Arraste e solte ou selecione um arquivo
+                  </span>
+                </>
+              )}
+              <input
+                id={id}
+                type="file"
+                accept={property.contentMediaType ?? 'image/*'}
+                className="sr-only"
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (!file) {
+                    updateFormValue(key, property, '');
+                    setFileNames(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = e => {
+                    updateFormValue(key, property, e.target?.result ?? '');
+                    setFileNames(prev => ({ ...prev, [key]: file.name }));
+                  };
+                  reader.readAsDataURL(file);
                 }}
-                className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
-              >
-                Remover
-              </button>
-            )}
+              />
+            </label>
+            <div className="flex items-center justify-between text-xs text-gray-400">
+              <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
+              {preview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateFormValue(key, property, '');
+                    setFileNames(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
+                  }}
+                  className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
           </div>
         </div>
       );
@@ -555,7 +588,7 @@ export default function ImageModelPage() {
           ? (typeof value === 'boolean' ? String(value) : value === '' ? '' : String(value ?? ''))
           : ((value as string | number | undefined) ?? '');
       return (
-        <div key={key} className={wrapperClass}>
+        <div key={key} className={baseWrapperClass}>
           <div className="space-y-1">
             <label htmlFor={id} className={labelClass}>
               {label}
@@ -597,7 +630,7 @@ export default function ImageModelPage() {
     if (property.type === 'number' || property.type === 'integer') {
       const value = formValues[key];
       return (
-        <div key={key} className={wrapperClass}>
+        <div key={key} className={baseWrapperClass}>
           <div className="space-y-1">
             <label htmlFor={id} className={labelClass}>
               {label}
@@ -630,7 +663,7 @@ export default function ImageModelPage() {
     if (shouldUseTextarea(key, property)) {
       const value = formValues[key];
       return (
-        <div key={key} className={wrapperClass}>
+        <div key={key} className={baseWrapperClass}>
           <div className="space-y-1">
             <label htmlFor={id} className={labelClass}>
               {label}
@@ -650,7 +683,7 @@ export default function ImageModelPage() {
     }
 
     return (
-      <div key={key} className={wrapperClass}>
+      <div key={key} className={baseWrapperClass}>
         <div className="space-y-1">
           <label htmlFor={id} className={labelClass}>
             {label}
@@ -798,33 +831,14 @@ export default function ImageModelPage() {
 
   return (
     <div className="flex min-h-screen w-full justify-center animate-fade-in">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-6 lg:pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {showDetailsSkeleton ? (
-            <div className="h-6 w-40 rounded-lg bg-white/10 animate-pulse" />
-          ) : (
-            <h1 className="text-base font-semibold text-white">
-              {details?.displayName ?? slug ?? 'Modelo de imagem'}
-            </h1>
-          )}
-          {showDetailsSkeleton ? (
-            <div className="hidden h-3 w-16 rounded-full bg-white/10 animate-pulse sm:block" />
-          ) : (
-            defaultVersionTag && (
-              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
-                {defaultVersionTag}
-              </span>
-            )
-          )}
-        </div>
-
+      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
         {detailsError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
             {detailsError}
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-[minmax(440px,520px)_minmax(0,1fr)_280px] xl:items-start xl:gap-4">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)] xl:items-start xl:gap-6">
           <div className="flex flex-col gap-3 lg:gap-4">
             {showVersionSkeleton && (
               <div className="space-y-3">
@@ -838,14 +852,14 @@ export default function ImageModelPage() {
             )}
 
             {!showVersionSkeleton && schemaAvailable && (
-              <div className="space-y-3">
-                <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="space-y-2">
+                <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className="text-sm font-semibold text-white">Briefing criativo</p>
                     <span className="text-[11px] text-gray-500">Diga o que deseja gerar</span>
                   </div>
                   {promptKey ? (
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3 sm:gap-4">
                       <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
                         {schemaProperties[promptKey]?.title ?? 'Prompt'}
                       </label>
@@ -859,7 +873,7 @@ export default function ImageModelPage() {
                           schemaProperties[promptKey]?.description ??
                           'Descreva a cena, o estilo e a iluminação desejada...'
                         }
-                        className="min-h-[140px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                        className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
                       />
                     </div>
                   ) : (
@@ -869,32 +883,44 @@ export default function ImageModelPage() {
                   )}
                 </section>
 
+                {imageUploadKeys.length > 0 && (
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Referência visual</p>
+                      <span className="text-[11px] text-gray-500">Envie imagens-guia</span>
+                    </div>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-1 lg:grid-cols-2">
+                      {imageUploadKeys.map(renderField)}
+                    </div>
+                  </section>
+                )}
+
                 {resolutionKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-white">Resolução</p>
                       <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
                     </div>
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3">
                       {resolutionKeys.map(renderField)}
                     </div>
                   </section>
                 )}
 
                 {outputFormatKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="text-sm font-semibold text-white">Saída da imagem</p>
                       <span className="text-[11px] text-gray-500">Formato do arquivo</span>
                     </div>
-                    <div className="mt-4 flex flex-col gap-3">
+                    <div className="mt-3 flex flex-col gap-3">
                       {outputFormatKeys.map(renderField)}
                     </div>
                   </section>
                 )}
 
                 {modalKeys.length > 0 && (
-                  <section className="w-full max-w-[640px] rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
                         <p className="text-sm font-semibold text-white">Mais configurações</p>
@@ -922,7 +948,7 @@ export default function ImageModelPage() {
               </div>
             )}
 
-            <div className="grid w-full max-w-[640px] gap-3 xl:grid-cols-[minmax(0,1fr)_220px] xl:items-center">
+            <div className="grid w-full max-w-full gap-3 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
               <button
                 onClick={handleGenerate}
                 disabled={isGenerateDisabled}
@@ -936,14 +962,14 @@ export default function ImageModelPage() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 lg:gap-4">
+          <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex justify-end">
                 {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
                 {centerImageUrl ? (
-                  <div className="w-full max-w-[560px]">
+                  <div className="w-full max-w-full">
                     <ImageCard
                       src={centerImageUrl}
                       jobId={selectedJobId ?? undefined}
@@ -954,20 +980,18 @@ export default function ImageModelPage() {
                     />
                   </div>
                 ) : loading ? (
-                  <div className="w-full max-w-[560px]">
+                  <div className="w-full max-w-full">
                     <ImageCard loading={true} onClick={() => {}} />
                   </div>
                 ) : (
-                  <div className="w-full max-w-[560px] rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
+                  <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
                     Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
                   </div>
                 )}
               </div>
             </section>
-          </div>
 
-          <div className="flex flex-col gap-3 lg:col-span-2 lg:gap-4 xl:col-span-1">
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4 xl:sticky xl:top-4">
               <div className="flex items-center justify-end gap-2 text-white">
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
