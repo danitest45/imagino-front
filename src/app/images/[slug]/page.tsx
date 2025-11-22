@@ -360,6 +360,16 @@ export default function ImageModelPage() {
     [nonPromptKeys, schemaProperties],
   );
 
+  const uploadKeys = useMemo(
+    () =>
+      nonPromptKeys.filter(key => {
+        const property = schemaProperties[key];
+        if (!property) return false;
+        return isImageUploadField(key, property);
+      }),
+    [nonPromptKeys, schemaProperties],
+  );
+
   const outputFormatKeys = useMemo(
     () =>
       nonPromptKeys.filter(key => {
@@ -372,8 +382,8 @@ export default function ImageModelPage() {
   );
 
   const essentialKeys = useMemo(
-    () => [...resolutionKeys, ...outputFormatKeys],
-    [resolutionKeys, outputFormatKeys],
+    () => [...uploadKeys, ...resolutionKeys, ...outputFormatKeys],
+    [uploadKeys, resolutionKeys, outputFormatKeys],
   );
 
   const modalKeys = useMemo(
@@ -868,6 +878,18 @@ export default function ImageModelPage() {
                     </p>
                   )}
                 </section>
+
+                {uploadKeys.length > 0 && (
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Referência visual</p>
+                      <span className="text-[11px] text-gray-500">Envie uma imagem base</span>
+                    </div>
+                    <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      {uploadKeys.map(renderField)}
+                    </div>
+                  </section>
+                )}
 
                 {resolutionKeys.length > 0 && (
                   <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
