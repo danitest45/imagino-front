@@ -449,7 +449,7 @@ export default function ImageModelPage() {
     const required = requiredFields.has(key);
     const description = property.description;
     const wrapperClass =
-      'flex w-full max-w-[420px] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
+      'flex w-full max-w-full flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40 sm:flex-row sm:items-stretch sm:gap-4';
     const labelClass =
       'text-[11px] font-semibold uppercase tracking-[0.32em] text-gray-400';
     const inputClass =
@@ -496,81 +496,83 @@ export default function ImageModelPage() {
           : '';
       return (
         <div key={key} className={wrapperClass}>
-          <div className="space-y-1">
+          <div className="w-full space-y-1 sm:w-2/5">
             <label htmlFor={id} className={labelClass}>
               {label}
               {required && <span className="ml-1 text-xs text-fuchsia-300">*</span>}
             </label>
             {description && <p className="text-xs leading-5 text-gray-400">{description}</p>}
           </div>
-          <label
-            htmlFor={id}
-            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-5 text-center transition ${
-              preview
-                ? 'border-fuchsia-400/60 bg-slate-900/60'
-                : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
-            }`}
-          >
-            {preview ? (
-              <img
-                src={preview}
-                alt={label}
-                className="h-28 w-full rounded-lg object-cover shadow-lg"
-              />
-            ) : (
-              <>
-                <UploadCloud className="h-8 w-8 text-fuchsia-300" />
-                <span className="text-sm font-medium text-white">
-                  Clique para enviar
-                </span>
-                <span className="text-xs text-gray-400">
-                  Arraste e solte ou selecione um arquivo
-                </span>
-              </>
-            )}
-            <input
-              id={id}
-              type="file"
-              accept={property.contentMediaType ?? 'image/*'}
-              className="sr-only"
-              onChange={event => {
-                const file = event.target.files?.[0];
-                if (!file) {
-                  updateFormValue(key, property, '');
-                  setFileNames(prev => {
-                    const next = { ...prev };
-                    delete next[key];
-                    return next;
-                  });
-                  return;
-                }
-                const reader = new FileReader();
-                reader.onload = e => {
-                  updateFormValue(key, property, e.target?.result ?? '');
-                  setFileNames(prev => ({ ...prev, [key]: file.name }));
-                };
-                reader.readAsDataURL(file);
-              }}
-            />
-          </label>
-          <div className="flex items-center justify-between text-xs text-gray-400">
-            <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
-            {preview && (
-              <button
-                type="button"
-                onClick={() => {
-                  updateFormValue(key, property, '');
-                  setFileNames(prev => {
-                    const next = { ...prev };
-                    delete next[key];
-                    return next;
-                  });
+          <div className="w-full space-y-2 sm:w-3/5">
+            <label
+              htmlFor={id}
+              className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-4 text-center transition ${
+                preview
+                  ? 'border-fuchsia-400/60 bg-slate-900/60'
+                  : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
+              }`}
+            >
+              {preview ? (
+                <img
+                  src={preview}
+                  alt={label}
+                  className="h-24 w-full rounded-lg object-cover shadow-lg"
+                />
+              ) : (
+                <>
+                  <UploadCloud className="h-8 w-8 text-fuchsia-300" />
+                  <span className="text-sm font-medium text-white">
+                    Clique para enviar
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Arraste e solte ou selecione um arquivo
+                  </span>
+                </>
+              )}
+              <input
+                id={id}
+                type="file"
+                accept={property.contentMediaType ?? 'image/*'}
+                className="sr-only"
+                onChange={event => {
+                  const file = event.target.files?.[0];
+                  if (!file) {
+                    updateFormValue(key, property, '');
+                    setFileNames(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
+                    return;
+                  }
+                  const reader = new FileReader();
+                  reader.onload = e => {
+                    updateFormValue(key, property, e.target?.result ?? '');
+                    setFileNames(prev => ({ ...prev, [key]: file.name }));
+                  };
+                  reader.readAsDataURL(file);
                 }}
-                className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
-              >
-                Remover
-              </button>
-            )}
+              />
+            </label>
+            <div className="flex items-center justify-between text-xs text-gray-400">
+              <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
+              {preview && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    updateFormValue(key, property, '');
+                    setFileNames(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
+                  }}
+                  className="font-medium text-fuchsia-300 transition hover:text-fuchsia-200"
+                >
+                  Remover
+                </button>
+              )}
+            </div>
           </div>
         </div>
       );
@@ -885,7 +887,7 @@ export default function ImageModelPage() {
                       <p className="text-sm font-semibold text-white">Referência visual</p>
                       <span className="text-[11px] text-gray-500">Envie imagens-guia</span>
                     </div>
-                    <div className="mt-3 grid gap-3 justify-items-center sm:grid-cols-2">
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
                       {imageUploadKeys.map(renderField)}
                     </div>
                   </section>
