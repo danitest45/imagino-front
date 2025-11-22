@@ -87,6 +87,7 @@ function isResolutionField(
   property: JsonSchemaProperty | undefined,
 ): boolean {
   if (!property) return false;
+  if (isAspectRatioField(key, property)) return false;
   const normalizedKey = normalizeIdentifier(key);
   const normalizedTitle = normalizeIdentifier(property.title);
   const normalizedDescription = normalizeIdentifier(property.description);
@@ -98,9 +99,27 @@ function isResolutionField(
     if (value.includes('largura') || value.includes('width')) return true;
     if (value.includes('altura') || value.includes('height')) return true;
     if (value.includes('dimensao') || value.includes('dimension')) return true;
-    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
     if (value.includes('proporcao') || value.includes('proportion')) return true;
     if (value.endsWith('size')) return true;
+    return false;
+  });
+}
+
+function isAspectRatioField(
+  key: string,
+  property: JsonSchemaProperty | undefined,
+): boolean {
+  if (!property) return false;
+  const normalizedKey = normalizeIdentifier(key);
+  const normalizedTitle = normalizeIdentifier(property.title);
+  const normalizedDescription = normalizeIdentifier(property.description);
+
+  const candidates = [normalizedKey, normalizedTitle, normalizedDescription];
+  return candidates.some(value => {
+    if (!value) return false;
+    if (value.includes('aspect ratio') || value.includes('aspectratio')) return true;
+    if (value.includes('proporcao') || value.includes('proporção')) return true;
+    if (value.includes('ratio') && value.includes('aspect')) return true;
     return false;
   });
 }
