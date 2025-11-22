@@ -449,7 +449,7 @@ export default function ImageModelPage() {
     const required = requiredFields.has(key);
     const description = property.description;
     const wrapperClass =
-      'flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
+      'flex w-full max-w-[420px] flex-col gap-3 rounded-2xl border border-white/10 bg-slate-950/70 p-4 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40';
     const labelClass =
       'text-[11px] font-semibold uppercase tracking-[0.32em] text-gray-400';
     const inputClass =
@@ -505,7 +505,7 @@ export default function ImageModelPage() {
           </div>
           <label
             htmlFor={id}
-            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-6 text-center transition ${
+            className={`group relative flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-4 py-5 text-center transition ${
               preview
                 ? 'border-fuchsia-400/60 bg-slate-900/60'
                 : 'border-white/20 bg-slate-950/40 hover:border-fuchsia-400/60 hover:bg-slate-900/60'
@@ -515,7 +515,7 @@ export default function ImageModelPage() {
               <img
                 src={preview}
                 alt={label}
-                className="h-32 w-full rounded-lg object-cover shadow-lg"
+                className="h-28 w-full rounded-lg object-cover shadow-lg"
               />
             ) : (
               <>
@@ -885,7 +885,7 @@ export default function ImageModelPage() {
                       <p className="text-sm font-semibold text-white">Referência visual</p>
                       <span className="text-[11px] text-gray-500">Envie imagens-guia</span>
                     </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <div className="mt-3 grid gap-3 justify-items-center sm:grid-cols-2">
                       {imageUploadKeys.map(renderField)}
                     </div>
                   </section>
