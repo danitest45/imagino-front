@@ -798,7 +798,7 @@ export default function ImageModelPage() {
 
   return (
     <div className="flex min-h-screen w-full justify-center animate-fade-in">
-      <div className="mx-auto flex w-full max-w-[1700px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-6 lg:pt-4">
+      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {showDetailsSkeleton ? (
             <div className="h-6 w-40 rounded-lg bg-white/10 animate-pulse" />
@@ -824,7 +824,7 @@ export default function ImageModelPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(340px,400px)_minmax(0,1fr)] xl:items-start xl:gap-6">
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)] xl:items-start xl:gap-6">
           <div className="flex flex-col gap-3 lg:gap-4">
             {showVersionSkeleton && (
               <div className="space-y-3">
@@ -936,7 +936,7 @@ export default function ImageModelPage() {
             </div>
           </div>
 
-          <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
+          <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex justify-end">
                 {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
