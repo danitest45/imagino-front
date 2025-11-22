@@ -799,25 +799,6 @@ export default function ImageModelPage() {
   return (
     <div className="flex min-h-screen w-full justify-center animate-fade-in">
       <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          {showDetailsSkeleton ? (
-            <div className="h-6 w-40 rounded-lg bg-white/10 animate-pulse" />
-          ) : (
-            <h1 className="text-base font-semibold text-white">
-              {details?.displayName ?? slug ?? 'Modelo de imagem'}
-            </h1>
-          )}
-          {showDetailsSkeleton ? (
-            <div className="hidden h-3 w-16 rounded-full bg-white/10 animate-pulse sm:block" />
-          ) : (
-            defaultVersionTag && (
-              <span className="text-[11px] font-medium uppercase tracking-[0.18em] text-gray-500">
-                {defaultVersionTag}
-              </span>
-            )
-          )}
-        </div>
-
         {detailsError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
             {detailsError}
