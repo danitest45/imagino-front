@@ -370,6 +370,8 @@ export default function ImageModelPage() {
     [nonPromptKeys, schemaProperties],
   );
 
+  const hasMultipleImageUploadFields = imageUploadKeys.length > 1;
+
   const outputFormatKeys = useMemo(
     () =>
       nonPromptKeys.filter(key => {
@@ -889,7 +891,11 @@ export default function ImageModelPage() {
                       <p className="text-sm font-semibold text-white">Referência visual</p>
                       <span className="text-[11px] text-gray-500">Envie imagens-guia</span>
                     </div>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-1 lg:grid-cols-2">
+                    <div
+                      className={`mt-3 grid grid-cols-1 gap-3 ${
+                        hasMultipleImageUploadFields ? 'lg:grid-cols-2' : ''
+                      }`}
+                    >
                       {imageUploadKeys.map(renderField)}
                     </div>
                   </section>
