@@ -176,7 +176,6 @@ export default function ImageModelPage() {
   const capabilities = details?.capabilities ?? [];
   const showDetailsSkeleton = detailsLoading;
   const showVersionSkeleton = detailsLoading || versionLoading;
-  const hasMultipleImageUploadFields = imageUploadKeys.length > 1;
 
   useEffect(() => {
     if (!history) return;
@@ -370,6 +369,8 @@ export default function ImageModelPage() {
       }),
     [nonPromptKeys, schemaProperties],
   );
+
+  const hasMultipleImageUploadFields = imageUploadKeys.length > 1;
 
   const outputFormatKeys = useMemo(
     () =>
