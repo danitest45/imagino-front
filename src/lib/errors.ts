@@ -76,6 +76,11 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
         kind: 'toast',
         message: 'Confirme seu e-mail.',
       };
+    case 'INVALID_CREDENTIALS':
+      return {
+        kind: 'toast',
+        message: 'E-mail ou senha inválidos.',
+      };
     default:
       return {
         kind: 'toast',
