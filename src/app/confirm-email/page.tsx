@@ -1,8 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, MailCheck, RefreshCw } from 'lucide-react';
+
+import { Problem, mapProblemToUI } from '../../lib/errors';
 import { resendVerification } from '../../lib/api';
 import { toast } from '../../lib/toast';
-import { Problem, mapProblemToUI } from '../../lib/errors';
 
 export default function ConfirmEmailSentPage() {
   const [email, setEmail] = useState('');
@@ -30,17 +33,92 @@ export default function ConfirmEmailSentPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
-      <div className="bg-gray-800/80 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md text-center">
-        <h1 className="text-2xl font-bold text-white mb-4">Confirme seu e-mail</h1>
-        <p className="text-gray-300 mb-6">Enviamos um link para {email || 'seu e-mail'}.</p>
-        <button
-          onClick={handleResend}
-          disabled={loading}
-          className="w-full py-2 rounded-md bg-purple-600 text-white font-semibold transition-all hover:bg-purple-700 disabled:opacity-50"
-        >
-          {loading ? 'Enviando...' : 'Reenviar verificação'}
-        </button>
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-16">
+      <div
+        className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,_rgba(15,23,42,0.92),_rgba(15,15,26,0.95))]"
+        aria-hidden
+      />
+
+      <div className="w-full max-w-3xl overflow-hidden rounded-3xl border border-white/10 bg-slate-950/70 shadow-2xl backdrop-blur-xl">
+        <div className="grid items-stretch gap-0 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="relative hidden min-h-full flex-col justify-between bg-gradient-to-br from-fuchsia-600/30 via-purple-600/20 to-cyan-500/20 p-10 lg:flex">
+            <div className="space-y-4">
+              <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-100">
+                Verificação pendente
+              </span>
+              <h1 className="text-3xl font-semibold text-white">Confirme seu acesso imagino.AI</h1>
+              <p className="text-sm text-slate-100/80">
+                Enviamos um link seguro para {email || 'seu e-mail'}. Clique no botão dentro da mensagem para ativar seu estúdio e começar a criar fluxos visuais inteligentes.
+              </p>
+            </div>
+            <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-100/80">
+              <div className="flex items-center gap-3">
+                <MailCheck className="h-5 w-5 text-emerald-300" />
+                <p>Cheque também a pasta de spam ou promoções caso não encontre o e-mail.</p>
+              </div>
+              <div className="flex items-center gap-3 text-slate-100/70">
+                <RefreshCw className="h-5 w-5 text-cyan-300" />
+                <p>Precisa de outro link? Você pode reenviar e continuar o cadastro sem perder o progresso.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-center space-y-6 p-8 sm:p-10">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500/30 via-purple-500/30 to-cyan-400/30 text-fuchsia-100">
+              <MailCheck className="h-6 w-6" />
+            </div>
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Verifique seu e-mail</h2>
+              <p className="text-sm text-gray-400">
+                Enviamos um link para <span className="font-semibold text-white">{email || 'seu e-mail'}</span>. Abra a mensagem e clique em <strong>Confirmar acesso</strong> para desbloquear sua conta.
+              </p>
+            </div>
+
+            <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-100/80">
+              <p className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold">1</span>
+                Abra seu e-mail e encontre a mensagem do imagino.AI.
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-fuchsia-500/20 text-fuchsia-200 text-xs font-semibold">2</span>
+                Clique no botão de confirmação para ativar sua conta.
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200 text-xs font-semibold">3</span>
+                Volte para o login e acesse com suas credenciais.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={handleResend}
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 animate-spin" /> Enviando...
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="h-4 w-4" /> Reenviar verificação
+                  </>
+                )}
+              </button>
+              <Link
+                href="/login"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-white/30 hover:bg-white/5"
+              >
+                <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
+                Voltar para o login
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

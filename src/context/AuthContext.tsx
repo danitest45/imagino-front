@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
-import { useRouter } from 'next/navigation';
 import { setAccessToken, getAccessToken, refreshAccessToken, logoutRequest } from '../lib/auth';
 
 interface AuthContextType {
@@ -19,7 +18,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(getAccessToken());
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   // Attempts to refresh the token when the app loads
   useEffect(() => {
@@ -29,14 +27,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (refreshed) {
           setToken(getAccessToken());
           setIsAuthenticated(true);
-        } else {
-          router.push('/login');
         }
       }
       setLoading(false);
     }
     init();
-  }, [router]);
+  }, []);
 
   const login = (newToken: string) => {
     setAccessToken(newToken);
