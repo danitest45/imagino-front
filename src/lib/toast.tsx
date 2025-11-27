@@ -37,7 +37,9 @@ export function Toaster() {
     };
 
     listeners.add(handleToast);
-    return () => listeners.delete(handleToast);
+    return () => {
+      listeners.delete(handleToast);
+    };
   }, []);
 
   const tone = {
