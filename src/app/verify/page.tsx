@@ -14,7 +14,6 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [loadingResend, setLoadingResend] = useState(false);
-  const [countdown, setCountdown] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +21,6 @@ export default function VerifyEmailPage() {
       try {
         await verifyEmail(token);
         setStatus('success');
-        setCountdown(6);
       } catch (err) {
         const problem = err as Problem;
         const action = mapProblemToUI(problem);
@@ -32,24 +30,6 @@ export default function VerifyEmailPage() {
     }
     run();
   }, [token]);
-
-  useEffect(() => {
-    if (status !== 'success') return;
-
-    const interval = setInterval(() => {
-      setCountdown(prev => {
-        if (prev === null) return null;
-        if (prev <= 1) {
-          clearInterval(interval);
-          router.push('/login');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [status, router]);
 
   async function handleResend() {
     if (!email) return;
@@ -145,23 +125,6 @@ export default function VerifyEmailPage() {
               </div>
 
               <div className="space-y-4">
-                {countdown !== null && (
-                  <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 p-4 text-left text-sm text-slate-100/80">
-                    <p className="flex items-center justify-between font-medium text-white">
-                      Redirecionando para o login
-                      <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-semibold text-emerald-100">{countdown}s</span>
-                    </p>
-                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                      <div
-                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-purple-500 to-cyan-400 transition-all duration-500"
-                        style={{ width: `${Math.max(0, ((countdown ?? 0) / 6) * 100)}%` }}
-                        aria-hidden
-                      />
-                    </div>
-                    <p className="text-xs text-slate-200/70">Mantenha esta janela aberta. Vamos levar você para a tela de login assim que o tempo acabar.</p>
-                  </div>
-                )}
-
                 <div className="space-y-3">
                   <button
                     onClick={() => router.push('/login')}
