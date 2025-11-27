@@ -14,6 +14,7 @@ export default function VerifyEmailPage() {
   const [message, setMessage] = useState('');
   const [email, setEmail] = useState('');
   const [loadingResend, setLoadingResend] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function VerifyEmailPage() {
       try {
         await verifyEmail(token);
         setStatus('success');
+        setCountdown(6);
       } catch (err) {
         const problem = err as Problem;
         const action = mapProblemToUI(problem);
@@ -30,6 +32,24 @@ export default function VerifyEmailPage() {
     }
     run();
   }, [token]);
+
+  useEffect(() => {
+    if (status !== 'success') return;
+
+    const interval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          clearInterval(interval);
+          router.push('/login');
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [status, router]);
 
   async function handleResend() {
     if (!email) return;
@@ -124,20 +144,39 @@ export default function VerifyEmailPage() {
                 </p>
               </div>
 
-              <div className="space-y-3">
-                <button
-                  onClick={() => router.push('/login')}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
-                >
-                  Acessar login
-                </button>
-                <button
-                  onClick={() => router.back()}
-                  className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-white/30 hover:bg-white/5"
-                >
-                  <Undo2 className="h-4 w-4 transition group-hover:-translate-x-0.5" />
-                  Voltar
-                </button>
+              <div className="space-y-4">
+                {countdown !== null && (
+                  <div className="space-y-2 rounded-2xl border border-white/10 bg-black/30 p-4 text-left text-sm text-slate-100/80">
+                    <p className="flex items-center justify-between font-medium text-white">
+                      Redirecionando para o login
+                      <span className="rounded-full bg-white/10 px-2 py-1 text-xs font-semibold text-emerald-100">{countdown}s</span>
+                    </p>
+                    <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 via-purple-500 to-cyan-400 transition-all duration-500"
+                        style={{ width: `${Math.max(0, ((countdown ?? 0) / 6) * 100)}%` }}
+                        aria-hidden
+                      />
+                    </div>
+                    <p className="text-xs text-slate-200/70">Mantenha esta janela aberta. Vamos levar você para a tela de login assim que o tempo acabar.</p>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => router.push('/login')}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
+                  >
+                    Acessar login
+                  </button>
+                  <button
+                    onClick={() => router.back()}
+                    className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-white/30 hover:bg-white/5"
+                  >
+                    <Undo2 className="h-4 w-4 transition group-hover:-translate-x-0.5" />
+                    Voltar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
