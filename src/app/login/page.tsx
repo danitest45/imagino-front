@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '../../lib/api';
 import { AuthContext } from '../../context/AuthContext';
-import { CheckCircle2, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../lib/errors';
 import { toast } from '../../lib/toast';
 import ResendVerificationDialog from '../../components/ResendVerificationDialog';
@@ -15,12 +15,16 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
   const auth = useContext(AuthContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!auth) return;
+    setLoading(true);
+    setError('');
     try {
       if (typeof window !== 'undefined') {
         localStorage.setItem('userEmail', email);
@@ -34,8 +38,11 @@ export default function LoginPage() {
         setEmailModal(true);
       } else {
         const action = mapProblemToUI(problem);
-        toast(action.message);
+        setError(action.message);
+        toast(action.message, 'error');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,21 +105,27 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="flex flex-col justify-center space-y-6 p-8 sm:p-10">
-              <div>
-                <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">Sign in to imagino.AI</h2>
-                <p className="mt-2 text-center text-sm text-gray-400">
+          <div className="flex flex-col justify-center space-y-6 p-8 sm:p-10">
+            <div>
+              <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">Sign in to imagino.AI</h2>
+              <p className="mt-2 text-center text-sm text-gray-400">
                   Don&apos;t have an account?{' '}
                   <Link href="/register" className="font-medium text-fuchsia-300 hover:text-fuchsia-200">
                     Create one in seconds
                   </Link>
-                </p>
-              </div>
+              </p>
+            </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <label htmlFor="email" className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                    Email
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-center text-sm text-red-200">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                  Email
                   </label>
                   <div className="relative">
                     <Mail
@@ -173,13 +186,15 @@ export default function LoginPage() {
                   </Link>
                 </div>
 
-                <button
-                  type="submit"
-                  className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
-                >
-                  Sign in
-                </button>
-              </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </form>
 
               <div className="relative">
                 <div className="absolute inset-0 flex items-center" aria-hidden>

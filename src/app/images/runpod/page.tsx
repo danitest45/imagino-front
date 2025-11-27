@@ -6,6 +6,7 @@ import ImageCardModal from '../../../components/ImageCardModal';
 import { useImageJobs } from '../../../hooks/useImageJobs';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
 import { Problem } from '../../../lib/errors';
+import { toast } from '../../../lib/toast';
 export default function Home() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalJobId, setModalJobId] = useState<string | null>(null);
@@ -56,7 +57,7 @@ const handleSubmit = async () => {
               className="w-full px-4 py-3 pr-12 rounded-xl bg-gray-800 text-white placeholder-gray-500 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
             <button
-              onClick={() => alert('Advanced settings coming soon')}
+              onClick={() => toast('Advanced settings coming soon', 'info')}
               className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-white"
               title="More settings coming soon"
             >

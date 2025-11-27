@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle2, Eye, EyeOff, Lock, Mail } from 'lucide-react';
+import { CheckCircle2, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { registerUser } from '../../lib/api';
 import { Problem, mapProblemToUI } from '../../lib/errors';
 import { toast } from '../../lib/toast';
@@ -13,6 +13,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const highlights = useMemo(
@@ -27,6 +28,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
     try {
       await registerUser(email, password);
       if (typeof window !== 'undefined') {
@@ -38,8 +40,10 @@ export default function RegisterPage() {
       const action = mapProblemToUI(problem);
       setError(action.message);
       if (action.kind === 'toast') {
-        toast(action.message);
+        toast(action.message, 'error');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,9 +164,11 @@ export default function RegisterPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
+                disabled={loading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Create account
+                {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+                {loading ? 'Creating account...' : 'Create account'}
               </button>
             </form>
 
