@@ -17,21 +17,24 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setToken] = useState<string | null>(getAccessToken());
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
-  const [loading, setLoading] = useState(true);
 
   // Attempts to refresh the token when the app loads
   useEffect(() => {
+    let canceled = false;
     async function init() {
       if (!getAccessToken()) {
         const refreshed = await refreshAccessToken();
-        if (refreshed) {
+        if (refreshed && !canceled) {
           setToken(getAccessToken());
           setIsAuthenticated(true);
         }
       }
-      setLoading(false);
     }
     init();
+
+    return () => {
+      canceled = true;
+    };
   }, []);
 
   const login = (newToken: string) => {
@@ -48,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }
