@@ -61,7 +61,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
-      {children}
+      {loading ? (
+        <>
+          {/* Optionally render a skeleton while auth refresh is in flight */}
+          {children}
+        </>
+      ) : (
+        children
+      )}
     </AuthContext.Provider>
   );
 }
