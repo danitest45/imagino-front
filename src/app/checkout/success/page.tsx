@@ -1,11 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getBillingMe, type BillingMe } from '../../../lib/billing';
 
 export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <CheckoutSuccessContent />
+    </Suspense>
+  );
+}
+
+function CheckoutSuccessContent() {
   const params = useSearchParams();
   const _sessionId = params.get('session_id');
   const [info, setInfo] = useState<BillingMe | null>(null);
@@ -40,6 +48,14 @@ export default function CheckoutSuccessPage() {
       <Link href="/profile" className="text-purple-400 hover:underline">
         Ir para o perfil
       </Link>
+    </div>
+  );
+}
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen mt-24 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
+      <p className="text-lg">Carregando...</p>
     </div>
   );
 }

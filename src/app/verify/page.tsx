@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { CheckCircle2, ShieldCheck, Undo2 } from 'lucide-react';
 
@@ -8,6 +8,14 @@ import { Problem, mapProblemToUI } from '../../lib/errors';
 import { toast } from '../../lib/toast';
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={<VerifyLoading />}>
+      <VerifyEmailPageContent />
+    </Suspense>
+  );
+}
+
+function VerifyEmailPageContent() {
   const search = useSearchParams();
   const token = search.get('token') || '';
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -168,6 +176,22 @@ export default function VerifyEmailPage() {
           {loadingResend ? 'Enviando...' : 'Reenviar'}
         </button>
       </div>
+    </div>
+  );
+}
+
+function VerifyLoading() {
+  return (
+    <div className="relative flex min-h-screen items-center justify-center px-4 py-16 text-white">
+      <div
+        className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]"
+        aria-hidden
+      />
+      <div
+        className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,_rgba(15,23,42,0.92),_rgba(15,15,26,0.95))]"
+        aria-hidden
+      />
+      Verificando...
     </div>
   );
 }
