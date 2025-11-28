@@ -24,10 +24,23 @@ export default function Navbar() {
   const profileRef = useRef<HTMLDivElement | null>(null);
   const [user, setUser] = useState<UserDto | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
+  const [copiedEmail, setCopiedEmail] = useState(false);
 
   const token = auth?.token ?? null;
   const isAuthenticated = auth?.isAuthenticated ?? false;
   const logout = auth?.logout ?? (async () => {});
+
+  const supportEmail = 'support@imaginoai-app.com';
+
+  const copySupportEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(supportEmail);
+      setCopiedEmail(true);
+      setTimeout(() => setCopiedEmail(false), 1800);
+    } catch (err) {
+      console.error('Unable to copy support email', err);
+    }
+  };
 
   useEffect(() => {
     async function load() {
@@ -146,15 +159,27 @@ export default function Navbar() {
             <div
               id="beta-tooltip"
               role="status"
-              className="pointer-events-none absolute left-1/2 top-full z-50 mt-2 w-80 -translate-x-1/2 rounded-2xl border border-white/10 bg-gray-950/95 px-4 py-3 text-xs text-gray-100 opacity-0 shadow-lg shadow-purple-500/20 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
+              className="pointer-events-auto absolute left-1/2 top-full z-50 mt-2 w-80 -translate-x-1/2 rounded-2xl border border-white/10 bg-gray-950/95 px-4 py-3 text-xs text-gray-100 opacity-0 shadow-lg shadow-purple-500/20 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100"
             >
               <p className="text-sm font-semibold text-white">imagino.AI test release</p>
               <p className="mt-1 text-gray-300">
                 The product is in beta testing. Features may change as improvements roll out. Send suggestions or bug reports to{' '}
-                <a href="mailto:support@imaginoai-app.com" className="font-semibold text-fuchsia-200 hover:text-fuchsia-100">
-                  support@imaginoai-app.com
+                <a
+                  href={`mailto:${supportEmail}`}
+                  className="inline-flex items-center gap-2 font-semibold text-fuchsia-200 hover:text-fuchsia-100"
+                >
+                  {supportEmail}
+                  <span className="rounded-full bg-white/10 px-2 py-1 text-[11px] font-medium text-white/80">Open email</span>
                 </a>
-                .
+              .
+              <button
+                type="button"
+                onClick={copySupportEmail}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 font-medium text-white transition hover:border-fuchsia-400/60 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-500"
+              >
+                <Mail className="h-4 w-4 text-fuchsia-200" aria-hidden />
+                {copiedEmail ? 'Email copied' : 'Copy support email'}
+              </button>
               </p>
             </div>
           </div>
@@ -247,10 +272,22 @@ export default function Navbar() {
             </p>
             <p className="mt-2 text-gray-300">
               We are in beta testing. Features may change while improvements are shipping. Share feedback or bugs at{' '}
-              <a href="mailto:support@imaginoai-app.com" className="font-semibold text-fuchsia-200 hover:text-fuchsia-100">
-                support@imaginoai-app.com
+              <a
+                href={`mailto:${supportEmail}`}
+                className="inline-flex items-center gap-2 font-semibold text-fuchsia-200 hover:text-fuchsia-100"
+              >
+                {supportEmail}
+                <span className="rounded-full bg-white/10 px-2 py-1 text-[11px] font-medium text-white/80">Open email</span>
               </a>
               .
+              <button
+                type="button"
+                onClick={copySupportEmail}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-3 py-2 font-medium text-white transition hover:border-fuchsia-400/60 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-500"
+              >
+                <Mail className="h-4 w-4 text-fuchsia-200" aria-hidden />
+                {copiedEmail ? 'Email copied' : 'Copy support email'}
+              </button>
             </p>
           </div>
           {navLinks.map(link => {
