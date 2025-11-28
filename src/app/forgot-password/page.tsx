@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
     try {
       await forgotPassword(email);
       setSent(true);
-      toast('Se o e-mail existir, enviaremos um link.');
+      toast('If the email exists, we\'ll send a reset link.');
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
@@ -152,17 +152,17 @@ export default function ForgotPasswordPage() {
                   className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
-                  Enviar link de recuperação
+                  Send reset link
                 </button>
               </form>
             )}
 
             <p className="text-center text-xs text-gray-500">
-              Precisa de ajuda adicional? Visite nossa{' '}
+              Need extra help? Visit our{' '}
               <Link href="/support" className="text-fuchsia-300 hover:text-fuchsia-200">
-                central de suporte
+                support center
               </Link>{' '}
-              ou fale com o administrador da sua equipe.
+              or talk to your team administrator.
             </p>
           </div>
         </div>

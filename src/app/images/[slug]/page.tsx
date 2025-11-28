@@ -219,7 +219,7 @@ export default function ImageModelPage() {
       .catch(error => {
         if (!active) return;
         console.error('Failed to load model details', error);
-        setDetailsError('Não foi possível carregar este modelo.');
+        setDetailsError('We couldn\'t load this model.');
       })
       .finally(() => {
         if (active) {
@@ -239,7 +239,7 @@ export default function ImageModelPage() {
     if (!defaultVersionTag) {
       setVersionDetails(null);
       if (!detailsLoading) {
-        setVersionError('Detalhes indisponíveis');
+        setVersionError('Details unavailable');
       }
       setVersionLoading(false);
       return;
@@ -259,7 +259,7 @@ export default function ImageModelPage() {
         if (!active) return;
         if (!data) {
           setVersionDetails(null);
-          setVersionError('Detalhes indisponíveis');
+          setVersionError('Details unavailable');
           return;
         }
         setVersionDetails(data);
@@ -268,7 +268,7 @@ export default function ImageModelPage() {
         if (!active) return;
         console.error('Failed to load version details', error);
         setVersionDetails(null);
-        setVersionError('Detalhes do modelo não disponíveis.');
+        setVersionError('Model details unavailable.');
       })
       .finally(() => {
         if (active) {
@@ -485,7 +485,7 @@ export default function ImageModelPage() {
                   checked ? 'translate-x-6' : 'translate-x-1'
                 }`}
               />
-              <span className="sr-only">Alternar {label}</span>
+              <span className="sr-only">Toggle {label}</span>
             </button>
           </div>
         </div>
@@ -559,7 +559,7 @@ export default function ImageModelPage() {
               />
             </label>
             <div className="flex items-center justify-between text-xs text-gray-400">
-              <span>{fileName ?? 'PNG, JPG ou WEBP até 10MB'}</span>
+              <span>{fileName ?? 'PNG, JPG or WEBP up to 10MB'}</span>
               {preview && (
                 <button
                   type="button"
@@ -614,7 +614,7 @@ export default function ImageModelPage() {
             }}
             className={`${inputClass} appearance-none pr-10`}
           >
-            {!required && <option value="">Selecione uma opção</option>}
+            {!required && <option value="">Select an option</option>}
             {property.enum?.map(option => {
               const optionLabel = typeof option === 'string' ? option : String(option);
               const optionValue = typeof option === 'boolean' ? String(option) : option;
@@ -707,7 +707,7 @@ export default function ImageModelPage() {
   async function handleGenerate() {
     if (!slug || !defaultVersionTag || !schemaAvailable) return;
     if (missingRequired) {
-      toast('Preencha os campos obrigatórios antes de gerar.');
+      toast('Please complete the required fields before generating.');
       return;
     }
     if (!token) {
@@ -806,7 +806,7 @@ export default function ImageModelPage() {
         toast(action.message);
         router.push(action.cta);
       } else {
-        toast('Não foi possível iniciar a geração de imagens.');
+      toast('We could not start the image generation.');
       }
       setLoading(false);
     }
@@ -857,8 +857,8 @@ export default function ImageModelPage() {
               <div className="space-y-2">
                 <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-white">Briefing criativo</p>
-                    <span className="text-[11px] text-gray-500">Diga o que deseja gerar</span>
+                    <p className="text-sm font-semibold text-white">Creative brief</p>
+                    <span className="text-[11px] text-gray-500">Tell us what you want to generate</span>
                   </div>
                   {promptKey ? (
                     <div className="mt-3 flex flex-col gap-3 sm:gap-4">
@@ -873,14 +873,14 @@ export default function ImageModelPage() {
                         }
                         placeholder={
                           schemaProperties[promptKey]?.description ??
-                          'Descreva a cena, o estilo e a iluminação desejada...'
+                          'Describe the scene, style, and lighting you want...'
                         }
                         className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
                       />
                     </div>
                   ) : (
                     <p className="mt-4 text-sm text-gray-400">
-                      Este modelo não possui campo de prompt configurável.
+                      This model does not have a configurable prompt field.
                     </p>
                   )}
                 </section>
@@ -888,8 +888,8 @@ export default function ImageModelPage() {
                 {imageUploadKeys.length > 0 && (
                   <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Referência visual</p>
-                      <span className="text-[11px] text-gray-500">Envie imagens-guia</span>
+                      <p className="text-sm font-semibold text-white">Visual reference</p>
+                      <span className="text-[11px] text-gray-500">Upload guide images</span>
                     </div>
                     <div
                       className={`mt-3 grid grid-cols-1 gap-3 ${
@@ -904,8 +904,8 @@ export default function ImageModelPage() {
                 {resolutionKeys.length > 0 && (
                   <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Resolução</p>
-                      <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
+                      <p className="text-sm font-semibold text-white">Resolution</p>
+                      <span className="text-[11px] text-gray-500">Dimensions and aspect ratio</span>
                     </div>
                     <div className="mt-3 flex flex-col gap-3">
                       {resolutionKeys.map(renderField)}
@@ -916,8 +916,8 @@ export default function ImageModelPage() {
                 {outputFormatKeys.length > 0 && (
                   <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Saída da imagem</p>
-                      <span className="text-[11px] text-gray-500">Formato do arquivo</span>
+                      <p className="text-sm font-semibold text-white">Image output</p>
+                      <span className="text-[11px] text-gray-500">File format</span>
                     </div>
                     <div className="mt-3 flex flex-col gap-3">
                       {outputFormatKeys.map(renderField)}
@@ -929,9 +929,9 @@ export default function ImageModelPage() {
                   <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <div className="space-y-1">
-                        <p className="text-sm font-semibold text-white">Mais configurações</p>
+                        <p className="text-sm font-semibold text-white">More settings</p>
                         <p className="text-xs text-gray-400">
-                          Abra o painel modal para ajustar parâmetros avançados do modelo.
+                          Open the modal panel to adjust advanced model parameters.
                         </p>
                       </div>
                       <button
@@ -940,7 +940,7 @@ export default function ImageModelPage() {
                         className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
                       >
                         <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
-                        Abrir painel ({modalKeys.length})
+                        Open panel ({modalKeys.length})
                       </button>
                     </div>
                   </section>
@@ -950,7 +950,7 @@ export default function ImageModelPage() {
 
             {!showVersionSkeleton && !schemaAvailable && (
               <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-                {versionError ?? 'Detalhes indisponíveis'}
+                {versionError ?? 'Details unavailable'}
               </div>
             )}
 
@@ -960,7 +960,7 @@ export default function ImageModelPage() {
                 disabled={isGenerateDisabled}
                 className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
               >
-                {loading ? 'Gerando...' : 'Gerar com imagino.AI'}
+                {loading ? 'Generating...' : 'Generate with imagino.AI'}
               </button>
               <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
                 {capabilities.length > 0 && <span>{capabilities.join(' · ')}</span>}
@@ -971,7 +971,7 @@ export default function ImageModelPage() {
           <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex justify-end">
-                {loading && <span className="text-[11px] text-fuchsia-200">Gerando...</span>}
+                {loading && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
                 {centerImageUrl ? (
@@ -991,7 +991,7 @@ export default function ImageModelPage() {
                   </div>
                 ) : (
                   <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
-                    Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
+                    Write your creative brief and click &quot;Generate with imagino.AI&quot; to get started.
                   </div>
                 )}
               </div>
@@ -1024,7 +1024,7 @@ export default function ImageModelPage() {
 
               {doneImages.length === 0 ? (
                 <p className="mt-3 text-sm text-gray-400 sm:mt-4">
-                  As imagens geradas aparecerão aqui assim que ficarem prontas.
+                  Generated images will appear here as soon as they are ready.
                 </p>
               ) : (
                 <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
@@ -1063,9 +1063,9 @@ export default function ImageModelPage() {
           >
             <div className="flex flex-col gap-2 border-b border-white/5 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="space-y-1">
-                <h2 className="text-base font-semibold text-white">Configurações avançadas</h2>
+                <h2 className="text-base font-semibold text-white">Advanced settings</h2>
                 <p className="text-xs text-gray-400">
-                  Ajuste os parâmetros que não aparecem na tela principal.
+                  Adjust parameters that are hidden from the main screen.
                 </p>
               </div>
               <button
@@ -1073,7 +1073,7 @@ export default function ImageModelPage() {
                 onClick={() => setAdvancedModalOpen(false)}
                 className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-gray-300 transition hover:border-fuchsia-400/60 hover:text-white"
               >
-                Fechar
+                Close
               </button>
             </div>
             <div className="max-h-[70vh] space-y-3 overflow-y-auto px-6 py-4">
@@ -1085,7 +1085,7 @@ export default function ImageModelPage() {
                 onClick={() => setAdvancedModalOpen(false)}
                 className="rounded-2xl border border-fuchsia-400/40 bg-fuchsia-500/20 px-4 py-2 text-sm font-semibold text-white transition hover:border-fuchsia-400/70 hover:bg-fuchsia-500/30"
               >
-                Concluir ajustes
+                Finish adjustments
               </button>
             </div>
           </div>

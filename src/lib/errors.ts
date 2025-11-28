@@ -22,21 +22,21 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
       const needed = meta.needed ?? 0;
       return {
         kind: 'modal',
-        message: `Você não tem créditos suficientes (${current}/${needed})`,
+        message: `You do not have enough credits (${current}/${needed})`,
         cta: '/pricing',
       };
     }
     case 'FORBIDDEN_FEATURE':
       return {
         kind: 'modal',
-        message: 'Este recurso requer um plano superior',
+        message: 'This feature requires a higher-tier plan',
         cta: '/pricing',
       };
     case 'VALIDATION_FAILED': {
       const fields = Array.isArray(meta.fields) ? meta.fields.join(', ') : '';
       return {
         kind: 'toast',
-        message: fields ? `Campos inválidos: ${fields}` : 'Dados inválidos',
+        message: fields ? `Invalid fields: ${fields}` : 'Invalid data',
       };
     }
     case 'RATE_LIMITED': {
@@ -45,48 +45,48 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
       return {
         kind: 'toast',
         message: seconds
-          ? `Você excedeu o limite; tente novamente em ${seconds}s`
-          : 'Você excedeu o limite; tente novamente mais tarde',
+          ? `Rate limit exceeded; try again in ${seconds}s`
+          : 'Rate limit exceeded; try again later',
       };
     }
     case 'STRIPE_ERROR':
       return {
         kind: 'toast',
-        message: problem.detail || 'Erro ao processar pagamento',
+        message: problem.detail || 'Error processing payment',
       };
     case 'TOKEN_INVALID':
-      return { kind: 'toast', message: 'Link inválido.' };
+      return { kind: 'toast', message: 'Invalid link.' };
     case 'TOKEN_EXPIRED':
       return {
         kind: 'toast',
-        message: 'Link expirado. Clique em Reenviar.',
+        message: 'Link expired. Click Resend.',
       };
     case 'TOKEN_CONSUMED':
       return {
         kind: 'toast',
-        message: 'Este link já foi usado.',
+        message: 'This link has already been used.',
       };
     case 'WEAK_PASSWORD':
       return {
         kind: 'toast',
-        message: 'Senha fraca. Use 8+ caracteres com número e símbolo.',
+        message: 'Weak password. Use 8+ characters with a number and symbol.',
       };
     case 'EMAIL_NOT_VERIFIED':
       return {
         kind: 'toast',
-        message: 'Confirme seu e-mail.',
+        message: 'Please verify your email.',
       };
     case 'INVALID_CREDENTIALS':
       return {
         kind: 'toast',
-        message: 'E-mail ou senha inválidos.',
+        message: 'Invalid email or password.',
       };
     default:
       return {
         kind: 'toast',
         message: problem.traceId
-          ? `Erro inesperado (${problem.traceId})`
-          : 'Erro inesperado',
-      };
-  }
+          ? `Unexpected error (${problem.traceId})`
+          : 'Unexpected error',
+  };
+}
 }

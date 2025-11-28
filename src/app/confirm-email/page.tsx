@@ -23,7 +23,7 @@ export default function ConfirmEmailSentPage() {
     setLoading(true);
     try {
       await resendVerification(email);
-      toast('Link reenviado.');
+      toast('Link resent.');
     } catch (err) {
       const action = mapProblemToUI(err as Problem);
       toast(action.message);
@@ -48,21 +48,21 @@ export default function ConfirmEmailSentPage() {
           <div className="relative hidden min-h-full flex-col justify-between bg-gradient-to-br from-fuchsia-600/30 via-purple-600/20 to-cyan-500/20 p-10 lg:flex">
             <div className="space-y-4">
               <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-100">
-                Verificação pendente
+                Verification pending
               </span>
-              <h1 className="text-3xl font-semibold text-white">Confirme seu acesso imagino.AI</h1>
+              <h1 className="text-3xl font-semibold text-white">Confirm your imagino.AI access</h1>
               <p className="text-sm text-slate-100/80">
-                Enviamos um link seguro para {email || 'seu e-mail'}. Clique no botão dentro da mensagem para ativar seu estúdio e começar a criar fluxos visuais inteligentes.
+                We sent a secure link to {email || 'your email'}. Click the button inside the message to activate your studio and start creating smart visual flows.
               </p>
             </div>
             <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-100/80">
               <div className="flex items-center gap-3">
                 <MailCheck className="h-5 w-5 text-emerald-300" />
-                <p>Cheque também a pasta de spam ou promoções caso não encontre o e-mail.</p>
+                <p>Check your spam or promotions folder if you can&apos;t find the email.</p>
               </div>
               <div className="flex items-center gap-3 text-slate-100/70">
                 <RefreshCw className="h-5 w-5 text-cyan-300" />
-                <p>Precisa de outro link? Você pode reenviar e continuar o cadastro sem perder o progresso.</p>
+                <p>Need another link? You can resend and keep your signup progress intact.</p>
               </div>
             </div>
           </div>
@@ -72,24 +72,24 @@ export default function ConfirmEmailSentPage() {
               <MailCheck className="h-6 w-6" />
             </div>
             <div className="space-y-2 text-center">
-              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Verifique seu e-mail</h2>
+              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Check your email</h2>
               <p className="text-sm text-gray-400">
-                Enviamos um link para <span className="font-semibold text-white">{email || 'seu e-mail'}</span>. Abra a mensagem e clique em <strong>Confirmar acesso</strong> para desbloquear sua conta.
+                We sent a link to <span className="font-semibold text-white">{email || 'your email'}</span>. Open the message and click <strong>Confirm access</strong> to unlock your account.
               </p>
             </div>
 
             <div className="space-y-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-100/80">
               <p className="flex items-center gap-2">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold">1</span>
-                Abra seu e-mail e encontre a mensagem do imagino.AI.
+                Open your inbox and find the message from imagino.AI.
               </p>
               <p className="flex items-center gap-2">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-fuchsia-500/20 text-fuchsia-200 text-xs font-semibold">2</span>
-                Clique no botão de confirmação para ativar sua conta.
+                Click the confirmation button to activate your account.
               </p>
               <p className="flex items-center gap-2">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200 text-xs font-semibold">3</span>
-                Volte para o login e acesse com suas credenciais.
+                Return to login and sign in with your credentials.
               </p>
             </div>
 
@@ -101,11 +101,11 @@ export default function ConfirmEmailSentPage() {
               >
                 {loading ? (
                   <>
-                    <RefreshCw className="h-4 w-4 animate-spin" /> Enviando...
+                    <RefreshCw className="h-4 w-4 animate-spin" /> Sending...
                   </>
                 ) : (
                   <>
-                    <RefreshCw className="h-4 w-4" /> Reenviar verificação
+                    <RefreshCw className="h-4 w-4" /> Resend verification
                   </>
                 )}
               </button>
@@ -114,7 +114,7 @@ export default function ConfirmEmailSentPage() {
                 className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-white/30 hover:bg-white/5"
               >
                 <ArrowLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
-                Voltar para o login
+                Back to login
               </Link>
             </div>
           </div>
