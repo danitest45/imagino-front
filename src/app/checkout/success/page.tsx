@@ -32,21 +32,21 @@ function CheckoutSuccessContent() {
 
   return (
     <div className="min-h-screen mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Pagamento concluído!</h1>
+      <h1 className="text-2xl font-bold mb-4">Payment completed!</h1>
       {info ? (
         <p className="mb-4 text-center">
-          Plano: <span className="font-semibold text-purple-400">{info.plan}</span>
+          Plan: <span className="font-semibold text-purple-400">{info.plan}</span>
           <br />
           Status: {info.subscriptionStatus || '--'}
           <br />
-          Próxima renovação:{' '}
+          Next renewal:{' '}
           {info.currentPeriodEnd ? new Date(info.currentPeriodEnd).toLocaleDateString() : '--'}
         </p>
       ) : (
-        <p className="mb-4">Carregando...</p>
+        <p className="mb-4">Loading...</p>
       )}
       <Link href="/profile" className="text-purple-400 hover:underline">
-        Ir para o perfil
+        Go to profile
       </Link>
     </div>
   );
@@ -55,7 +55,7 @@ function CheckoutSuccessContent() {
 function LoadingState() {
   return (
     <div className="min-h-screen mt-24 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
-      <p className="text-lg">Carregando...</p>
+      <p className="text-lg">Loading...</p>
     </div>
   );
 }

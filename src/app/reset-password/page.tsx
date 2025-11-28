@@ -38,14 +38,14 @@ function ResetPasswordContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirm) {
-      toast('As senhas não coincidem');
+      toast('Passwords do not match');
       return;
     }
 
     setLoading(true);
     try {
       await resetPassword(token, password);
-      toast('Senha redefinida com sucesso');
+      toast('Password reset successfully');
       router.push('/login');
     } catch (err) {
       const problem = err as Problem;
@@ -95,11 +95,11 @@ function ResetPasswordContent() {
 
           <div className="flex flex-col justify-center space-y-6 p-8 sm:p-10">
             <div>
-              <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">Nova senha</h2>
+              <h2 className="text-center text-2xl font-semibold text-white sm:text-3xl">New password</h2>
               <p className="mt-2 text-center text-sm text-gray-400">
                 Prefer to revisit later?{' '}
                 <Link href="/login" className="font-medium text-fuchsia-300 hover:text-fuchsia-200">
-                  Voltar para entrar
+                  Return to sign in
                 </Link>
               </p>
             </div>
@@ -107,7 +107,7 @@ function ResetPasswordContent() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
                 <label htmlFor="password" className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                  Nova senha
+                  New password
                 </label>
                 <div className="relative">
                   <Lock
@@ -120,14 +120,14 @@ function ResetPasswordContent() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    placeholder="Crie uma senha forte"
+                    placeholder="Create a strong password"
                     className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-12 text-sm text-white placeholder:text-gray-500 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
                     autoComplete="new-password"
                     required
                   />
                   <button
                     type="button"
-                    aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     aria-pressed={showPassword}
                     onClick={() => setShowPassword(prev => !prev)}
                     className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/10 hover:text-white"
@@ -139,7 +139,7 @@ function ResetPasswordContent() {
 
               <div className="space-y-2">
                 <label htmlFor="confirm" className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                  Confirmar senha
+                  Confirm password
                 </label>
                 <div className="relative">
                   <Lock
@@ -152,14 +152,14 @@ function ResetPasswordContent() {
                     type={showConfirm ? 'text' : 'password'}
                     value={confirm}
                     onChange={e => setConfirm(e.target.value)}
-                    placeholder="Repita sua nova senha"
+                    placeholder="Repeat your new password"
                     className="w-full rounded-2xl border border-white/10 bg-white/5 py-3 pl-11 pr-12 text-sm text-white placeholder:text-gray-500 focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40"
                     autoComplete="new-password"
                     required
                   />
                   <button
                     type="button"
-                    aria-label={showConfirm ? 'Ocultar senha' : 'Mostrar senha'}
+                    aria-label={showConfirm ? 'Hide password' : 'Show password'}
                     aria-pressed={showConfirm}
                     onClick={() => setShowConfirm(prev => !prev)}
                     className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-gray-400 transition hover:bg-white/10 hover:text-white"
@@ -174,16 +174,16 @@ function ResetPasswordContent() {
                 disabled={loading}
                 className="w-full rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? 'Atualizando…' : 'Redefinir senha'}
+                {loading ? 'Updating…' : 'Reset password'}
               </button>
             </form>
 
             <p className="text-center text-xs text-gray-500">
-              Ao redefinir, você concorda em seguir nossa{' '}
+              By resetting, you agree to follow our{' '}
               <Link href="/security" className="text-fuchsia-300 hover:text-fuchsia-200">
-                política de segurança
+                security policy
               </Link>{' '}
-              para manter sua equipe protegida.
+              to keep your team protected.
             </p>
           </div>
         </div>
@@ -203,7 +203,7 @@ function ResetPasswordLoading() {
         className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,_rgba(15,23,42,0.92),_rgba(15,15,26,0.95))]"
         aria-hidden
       />
-      Carregando...
+      Loading...
     </div>
   );
 }

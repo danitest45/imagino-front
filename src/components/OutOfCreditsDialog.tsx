@@ -33,21 +33,21 @@ export default function OutOfCreditsDialog({ open, current, needed, onClose }: P
               </svg>
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold text-white">Créditos insuficientes</h2>
+              <h2 className="text-xl font-semibold text-white">Not enough credits</h2>
               <p className="text-sm text-gray-300">
-                Você precisa de mais créditos para continuar. Adquira um pacote ou faça upgrade do seu plano.
+                You need more credits to continue. Purchase an add-on or upgrade your plan.
               </p>
             </div>
           </div>
 
           {(current !== undefined || needed !== undefined) && (
             <div className="rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-left">
-              <p className="text-xs uppercase tracking-wide text-gray-400">Saldo atual</p>
+              <p className="text-xs uppercase tracking-wide text-gray-400">Current balance</p>
               <div className="mt-1 flex items-center justify-between text-sm text-gray-200">
-                <span className="font-medium">{current ?? '--'} créditos</span>
+                <span className="font-medium">{current ?? '--'} credits</span>
                 {needed !== undefined ? (
                   <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white">
-                    Necessário: {needed}
+                    Needed: {needed}
                   </span>
                 ) : null}
               </div>
@@ -59,13 +59,13 @@ export default function OutOfCreditsDialog({ open, current, needed, onClose }: P
               href="/pricing"
               className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-400/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-400"
             >
-              Ver planos e comprar créditos
+              View plans and buy credits
             </Link>
             <button
               onClick={onClose}
               className="inline-flex items-center justify-center rounded-xl border border-white/10 px-4 py-2.5 text-sm font-semibold text-gray-100 transition hover:border-white/30 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/40"
             >
-              Fechar
+              Close
             </button>
           </div>
         </div>

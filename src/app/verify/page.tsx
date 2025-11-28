@@ -87,25 +87,25 @@ function VerifyEmailPageContent() {
               <div className="space-y-4">
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
                   <ShieldCheck className="h-4 w-4" />
-                  Segurança ativa
+                  Security enabled
                 </span>
-                <h1 className="text-3xl font-semibold text-white">E-mail verificado com sucesso</h1>
+                <h1 className="text-3xl font-semibold text-white">Email verified successfully</h1>
                 <p className="text-sm text-slate-100/80">
-                  Parabéns! Sua conta está protegida e pronta para uso. Use o mesmo e-mail e senha para acessar o painel e criar experiências inteligentes.
+                  Congratulations! Your account is protected and ready to use. Sign in with the same email and password to access the dashboard and create smart experiences.
                 </p>
               </div>
               <div className="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-4 text-sm text-slate-100/80">
                 <p className="flex items-center gap-2">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold">1</span>
-                  Volte ao login usando o e-mail que acabou de confirmar.
+                  Return to login using the email you just confirmed.
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/20 text-purple-200 text-xs font-semibold">2</span>
-                  Digite sua senha e acesse o painel para criar projetos.
+                  Enter your password and open the dashboard to start building projects.
                 </p>
                 <p className="flex items-center gap-2">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-200 text-xs font-semibold">3</span>
-                  Se precisar, atualize seus dados em Configurações &gt; Perfil.
+                  If needed, update your info in Settings &gt; Profile.
                 </p>
               </div>
             </div>
@@ -115,20 +115,20 @@ function VerifyEmailPageContent() {
                 <CheckCircle2 className="h-7 w-7" />
               </div>
               <div className="space-y-3 text-center">
-                <h2 className="text-2xl font-semibold text-white sm:text-3xl">Tudo certo! A verificação foi concluída</h2>
+                <h2 className="text-2xl font-semibold text-white sm:text-3xl">All set! Verification is complete</h2>
                 <p className="text-sm text-slate-200/80">
-                  Confirmamos seu endereço de e-mail. Agora você pode acessar o imagino.AI e continuar explorando as ferramentas de criação.
+                  We confirmed your email address. You can now access imagino.AI and keep exploring creation tools.
                 </p>
               </div>
 
               <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 text-sm text-slate-100/80">
                 <p className="flex items-start gap-2 text-left">
-                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold">Dica</span>
-                  Se quiser acompanhar novidades e modelos, habilite notificações dentro do painel em “Preferências”.
+                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold">Tip</span>
+                  To follow updates and models, enable notifications inside the dashboard under “Preferences.”
                 </p>
                 <p className="flex items-start gap-2 text-left">
-                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/20 text-purple-200 text-xs font-semibold">Ajuda</span>
-                  Problemas para entrar? Clique em “Esqueci a senha” na tela de login para redefinir com segurança.
+                  <span className="mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-purple-500/20 text-purple-200 text-xs font-semibold">Help</span>
+                  Trouble signing in? Click “Forgot password” on the login screen to reset securely.
                 </p>
               </div>
 
@@ -138,14 +138,14 @@ function VerifyEmailPageContent() {
                     onClick={() => router.push('/login')}
                     className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
                   >
-                    Acessar login
+                    Go to login
                   </button>
                   <button
                     onClick={() => router.back()}
                     className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-gray-200 transition hover:border-white/30 hover:bg-white/5"
                   >
                     <Undo2 className="h-4 w-4 transition group-hover:-translate-x-0.5" />
-                    Voltar
+                    Go back
                   </button>
                 </div>
               </div>
@@ -159,7 +159,7 @@ function VerifyEmailPageContent() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
       <div className="bg-gray-800/80 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md text-center space-y-4">
-        <h1 className="text-2xl font-bold text-white">Erro ao verificar</h1>
+        <h1 className="text-2xl font-bold text-white">Verification error</h1>
         <p className="text-gray-300">{message}</p>
         <input
           type="email"
@@ -173,7 +173,7 @@ function VerifyEmailPageContent() {
           disabled={loadingResend}
           className="w-full py-2 rounded-md bg-purple-600 text-white font-semibold transition-all hover:bg-purple-700 disabled:opacity-50"
         >
-          {loadingResend ? 'Enviando...' : 'Reenviar'}
+          {loadingResend ? 'Sending...' : 'Resend'}
         </button>
       </div>
     </div>
@@ -191,7 +191,7 @@ function VerifyLoading() {
         className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,_rgba(15,23,42,0.92),_rgba(15,15,26,0.95))]"
         aria-hidden
       />
-      Verificando...
+      Verifying...
     </div>
   );
 }

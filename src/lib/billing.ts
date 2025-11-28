@@ -9,7 +9,7 @@ export interface BillingMe {
 
 export async function getBillingMe(): Promise<BillingMe> {
   const res = await fetchWithAuth(apiUrl('/api/billing/me'), { credentials: 'include' });
-  if (!res.ok) throw new Error('Erro ao obter assinatura');
+  if (!res.ok) throw new Error('Error retrieving subscription');
   return res.json();
 }
 
@@ -21,7 +21,7 @@ export async function createCheckoutSession(plan: 'PRO' | 'ULTRA'): Promise<{ ur
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ plan }),
   });
-  if (!res.ok) throw new Error('Erro ao criar sessão de checkout');
+  if (!res.ok) throw new Error('Error creating checkout session');
   return res.json();
 }
 
@@ -30,7 +30,7 @@ export async function createPortalSession(): Promise<{ url: string }> {
     method: 'POST',
     credentials: 'include',
   });
-  if (!res.ok) throw new Error('Erro ao criar sessão do portal');
+  if (!res.ok) throw new Error('Error creating portal session');
   return res.json();
 }
 
