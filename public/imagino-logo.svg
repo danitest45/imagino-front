@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="logo-gradient" x1="112" y1="96" x2="400" y2="416" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FF3DBB" />
+      <stop offset="0.5" stop-color="#7D5CFF" />
+      <stop offset="1" stop-color="#1CC8F9" />
+    </linearGradient>
+    <filter id="glow" x="0" y="0" width="512" height="512" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" fill="#0a0417" />
+  <g filter="url(#glow)">
+    <path d="M256 108V292" stroke="url(#logo-gradient)" stroke-width="32" stroke-linecap="round" />
+    <path d="M256 212C240 212 192 208 176 188" stroke="url(#logo-gradient)" stroke-width="32" stroke-linecap="round" />
+    <path d="M256 212C272 212 320 208 336 188" stroke="url(#logo-gradient)" stroke-width="32" stroke-linecap="round" />
+    <path d="M256 292C240 292 208 308 200 324" stroke="url(#logo-gradient)" stroke-width="32" stroke-linecap="round" />
+    <path d="M256 292C272 292 304 308 312 324" stroke="url(#logo-gradient)" stroke-width="32" stroke-linecap="round" />
+    <circle cx="256" cy="84" r="32" fill="url(#logo-gradient)" />
+    <circle cx="168" cy="180" r="32" fill="url(#logo-gradient)" />
+    <circle cx="344" cy="180" r="32" fill="url(#logo-gradient)" />
+    <circle cx="248" cy="336" r="32" fill="url(#logo-gradient)" />
+    <circle cx="320" cy="336" r="32" fill="url(#logo-gradient)" />
+  </g>
+</svg>

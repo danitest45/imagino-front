@@ -1,6 +1,7 @@
 'use client';
 
 import { useContext, useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Info, Mail } from 'lucide-react';
@@ -120,8 +121,11 @@ export default function Navbar() {
             className="relative flex items-center text-lg sm:text-xl font-semibold text-white tracking-tight"
             aria-label="imagino.AI home"
           >
-            <span className="mr-1 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2 py-1 text-xs font-bold uppercase text-white shadow-lg shadow-purple-500/30">
-              imagino.AI
+            <span className="mr-1 inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-fuchsia-500/80 via-purple-500/80 to-cyan-400/80 px-3 py-2 text-xs font-bold uppercase text-white shadow-lg shadow-purple-500/30 ring-1 ring-white/10">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-black/30 ring-1 ring-white/10">
+                <Image src="/imagino-logo.svg" alt="Imagino.AI logo" width={32} height={32} priority />
+              </span>
+              <span className="tracking-wide">imagino.AI</span>
             </span>
           </Link>
 
