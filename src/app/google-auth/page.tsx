@@ -1,10 +1,18 @@
 'use client';
 
-import { useEffect, useContext } from 'react';
+import { Suspense, useEffect, useContext } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AuthContext } from '../../context/AuthContext';
 
 export default function GoogleAuthPage() {
+  return (
+    <Suspense fallback={<GoogleAuthLoading />}>
+      <GoogleAuthContent />
+    </Suspense>
+  );
+}
+
+function GoogleAuthContent() {
   const params = useSearchParams();
   const router = useRouter();
   const auth = useContext(AuthContext);
@@ -22,6 +30,14 @@ export default function GoogleAuthPage() {
   return (
     <div className="min-h-screen flex items-center justify-center text-white">
       <p>Autenticando com Google...</p>
+    </div>
+  );
+}
+
+function GoogleAuthLoading() {
+  return (
+    <div className="min-h-screen flex items-center justify-center text-white">
+      <p>Carregando...</p>
     </div>
   );
 }
