@@ -117,12 +117,17 @@ export default function Navbar() {
         <div className="flex items-center gap-10">
           <Link
             href="/"
-            className="relative flex items-center text-lg sm:text-xl font-semibold text-white tracking-tight"
-            aria-label="imagino.AI home"
+            className="relative inline-flex items-center gap-2 rounded-full px-2 py-1 text-sm font-semibold text-white/90 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-fuchsia-500"
+            aria-label="IMAGINO.AI home"
           >
-            <span className="mr-1 rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2 py-1 text-xs font-bold uppercase text-white shadow-lg shadow-purple-500/30">
-              imagino.AI
-            </span>
+            <img
+              src="/brand/logo-icon.png"
+              alt="IMAGINO.AI logo"
+              className="h-6 w-6 rounded-full object-contain"
+              loading="eager"
+              decoding="async"
+            />
+            <span className="text-base tracking-tight leading-none">IMAGINO.AI</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-2 rounded-full bg-white/5 px-1 py-1 text-sm text-gray-300 shadow-inner shadow-white/5">
