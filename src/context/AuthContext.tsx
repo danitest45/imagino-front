@@ -15,19 +15,32 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(getAccessToken());
-  const [isAuthenticated, setIsAuthenticated] = useState(!!getAccessToken());
-  const [loading, setLoading] = useState(true);
+  const initialToken = getAccessToken();
+  const [token, setToken] = useState<string | null>(initialToken);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!initialToken);
+  const [loading, setLoading] = useState(!!initialToken);
 
   // Attempts to refresh the token when the app loads
   useEffect(() => {
-    async function init() {
-      if (!getAccessToken()) {
-        const refreshed = await refreshAccessToken();
+    const savedToken = getAccessToken();
+
+    if (!savedToken) {
+      setLoading(false);
+      refreshAccessToken().then((refreshed) => {
         if (refreshed) {
-          setToken(getAccessToken());
-          setIsAuthenticated(true);
+          const newToken = getAccessToken();
+          setToken(newToken);
+          setIsAuthenticated(!!newToken);
         }
+      });
+      return;
+    }
+
+    async function init() {
+      const refreshed = await refreshAccessToken();
+      if (refreshed) {
+        setToken(getAccessToken());
+        setIsAuthenticated(true);
       }
       setLoading(false);
     }
@@ -48,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ token, isAuthenticated, login, logout }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }
