@@ -812,7 +812,18 @@ export default function ImageModelPage() {
     }
 
     setLoading(true);
-    updateSelectedJobId(null);
+
+    const tempId = `temp-${Date.now()}`;
+    const placeholderJob: UiJob = {
+      id: tempId,
+      status: 'loading',
+      url: null,
+      aspectRatio: '1:1',
+    };
+
+    setImages(prev => [placeholderJob, ...prev]);
+    setCurrentPage(1);
+    updateSelectedJobId(tempId);
 
     const params: Record<string, unknown> = {};
 
@@ -834,18 +845,15 @@ export default function ImageModelPage() {
         throw new Error('Model slug not available');
       }
       const jobId = await createImageJob(modelSlug, params);
-      const newJob: UiJob = {
-        id: jobId,
-        status: 'loading',
-        url: null,
-        aspectRatio: '1:1',
-      };
 
-      setImages(prev => [newJob, ...prev]);
-      setCurrentPage(1);
+      setImages(prev =>
+        prev.map(job => (job.id === tempId ? { ...job, id: jobId } : job)),
+      );
       updateSelectedJobId(jobId);
       startPolling(jobId, { markAsCurrent: true });
     } catch (err) {
+      setImages(prev => prev.filter(job => job.id !== tempId));
+
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
       if (problem.code === 'EMAIL_NOT_VERIFIED') {
