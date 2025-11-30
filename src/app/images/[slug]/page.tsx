@@ -158,11 +158,14 @@ export default function ImageModelPage() {
   const [versionError, setVersionError] = useState<string | null>(null);
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
+  const [filePreviews, setFilePreviews] = useState<Record<string, string>>({});
+  const filePreviewsRef = useRef<Record<string, string>>({});
   const [images, setImages] = useState<UiJob[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const selectedJobIdRef = useRef<string | null>(null);
-  const pollersRef = useRef<Map<string, number>>(new Map());
+  const pollersRef = useRef<Map<string, { intervalId: number; timeoutId: number }>>(new Map());
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [advancedModalOpen, setAdvancedModalOpen] = useState(false);
   const [outOfCredits, setOutOfCredits] =
@@ -175,7 +178,6 @@ export default function ImageModelPage() {
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
   const capabilities = details?.capabilities ?? [];
-  const showDetailsSkeleton = detailsLoading;
   const showVersionSkeleton = detailsLoading || versionLoading;
   const updateSelectedJobId = useCallback((jobId: string | null) => {
     selectedJobIdRef.current = jobId;
@@ -185,7 +187,8 @@ export default function ImageModelPage() {
   const stopPolling = useCallback((jobId: string) => {
     const poller = pollersRef.current.get(jobId);
     if (poller) {
-      clearInterval(poller);
+      clearInterval(poller.intervalId);
+      clearTimeout(poller.timeoutId);
       pollersRef.current.delete(jobId);
     }
   }, []);
@@ -194,7 +197,16 @@ export default function ImageModelPage() {
     (jobId: string, options?: { markAsCurrent?: boolean }) => {
       if (pollersRef.current.has(jobId)) return;
 
-      const poll = window.setInterval(async () => {
+      const timeoutId = window.setTimeout(() => {
+        stopPolling(jobId);
+        setImages(prev => prev.map(job => (job.id === jobId ? { ...job, status: 'failed' } : job)));
+        if (options?.markAsCurrent) {
+          setLoading(false);
+        }
+        toast('Image generation timed out after 5 minutes.');
+      }, 5 * 60 * 1000);
+
+      const intervalId = window.setInterval(async () => {
         try {
           const content = await getJobStatus(jobId);
           const status = content?.status?.toUpperCase();
@@ -244,15 +256,29 @@ export default function ImageModelPage() {
         }
       }, 3000);
 
-      pollersRef.current.set(jobId, poll);
+      pollersRef.current.set(jobId, { intervalId, timeoutId });
     },
     [setHistory, stopPolling, updateSelectedJobId],
   );
 
   useEffect(
     () => () => {
-      pollersRef.current.forEach(intervalId => clearInterval(intervalId));
+      pollersRef.current.forEach(({ intervalId, timeoutId }) => {
+        clearInterval(intervalId);
+        clearTimeout(timeoutId);
+      });
       pollersRef.current.clear();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    filePreviewsRef.current = filePreviews;
+  }, [filePreviews]);
+
+  useEffect(
+    () => () => {
+      Object.values(filePreviewsRef.current).forEach(url => URL.revokeObjectURL(url));
     },
     [],
   );
@@ -510,8 +536,7 @@ export default function ImageModelPage() {
     return images[0];
   }, [images, selectedJobId]);
 
-  const centerImageUrl = centerJob?.url ?? null;
-  const centerStatus = centerJob?.status ?? (loading ? 'loading' : 'done');
+  const centerStatus = centerJob?.status ?? (loading || isSubmitting ? 'loading' : 'done');
   const totalPages = Math.max(Math.ceil(images.length / ITEMS_PER_PAGE), 1);
   const paginatedImages = images.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -590,10 +615,10 @@ export default function ImageModelPage() {
 
     if (isImageUploadField(key, property)) {
       const fileName = fileNames[key];
-      const preview =
-        typeof formValues[key] === 'string' && formValues[key]
+      const preview = filePreviews[key]
+        ?? (typeof formValues[key] === 'string' && formValues[key]
           ? (formValues[key] as string)
-          : '';
+          : '');
       return (
         <div key={key} className={uploadWrapperClass}>
           <div className="w-full space-y-1 sm:w-2/5">
@@ -643,14 +668,33 @@ export default function ImageModelPage() {
                       delete next[key];
                       return next;
                     });
+                    const currentPreview = filePreviews[key];
+                    if (currentPreview) {
+                      URL.revokeObjectURL(currentPreview);
+                    }
+                    setFilePreviews(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
                     return;
                   }
-                  const reader = new FileReader();
-                  reader.onload = e => {
-                    updateFormValue(key, property, e.target?.result ?? '');
-                    setFileNames(prev => ({ ...prev, [key]: file.name }));
-                  };
-                  reader.readAsDataURL(file);
+
+                  if (file.size > 10 * 1024 * 1024) {
+                    toast('File too large. Please choose a file under 10MB.');
+                    event.target.value = '';
+                    return;
+                  }
+
+                  const objectUrl = URL.createObjectURL(file);
+                  const existingPreview = filePreviews[key];
+                  if (existingPreview) {
+                    URL.revokeObjectURL(existingPreview);
+                  }
+
+                  updateFormValue(key, property, file);
+                  setFileNames(prev => ({ ...prev, [key]: file.name }));
+                  setFilePreviews(prev => ({ ...prev, [key]: objectUrl }));
                 }}
               />
             </label>
@@ -660,8 +704,17 @@ export default function ImageModelPage() {
                 <button
                   type="button"
                   onClick={() => {
+                    const existingPreview = filePreviews[key];
+                    if (existingPreview) {
+                      URL.revokeObjectURL(existingPreview);
+                    }
                     updateFormValue(key, property, '');
                     setFileNames(prev => {
+                      const next = { ...prev };
+                      delete next[key];
+                      return next;
+                    });
+                    setFilePreviews(prev => {
                       const next = { ...prev };
                       delete next[key];
                       return next;
@@ -812,6 +865,7 @@ export default function ImageModelPage() {
     }
 
     setLoading(true);
+    setIsSubmitting(true);
 
     const tempId = `temp-${Date.now()}`;
     const placeholderJob: UiJob = {
@@ -826,11 +880,17 @@ export default function ImageModelPage() {
     updateSelectedJobId(tempId);
 
     const params: Record<string, unknown> = {};
+    const files: Record<string, File> = {};
 
     Object.keys(schemaProperties).forEach(key => {
       const value = formValues[key];
       if (typeof value === 'boolean') {
         params[key] = value;
+        return;
+      }
+      if (value instanceof File) {
+        files[key] = value;
+        params[key] = fileNames[key] ?? value.name;
         return;
       }
       if (value === '' || value === undefined || value === null) {
@@ -844,35 +904,43 @@ export default function ImageModelPage() {
       if (!modelSlug) {
         throw new Error('Model slug not available');
       }
-      const jobId = await createImageJob(modelSlug, params);
+      const jobId = await createImageJob(modelSlug, params, {
+        files: Object.keys(files).length > 0 ? files : undefined,
+      });
 
       setImages(prev =>
         prev.map(job => (job.id === tempId ? { ...job, id: jobId } : job)),
       );
       updateSelectedJobId(jobId);
       startPolling(jobId, { markAsCurrent: true });
+      setLoading(false);
+      setIsSubmitting(false);
     } catch (err) {
       setImages(prev => prev.filter(job => job.id !== tempId));
 
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
-      if (problem.code === 'EMAIL_NOT_VERIFIED') {
-        setEmailModal(true);
-      } else if (action.kind === 'toast') {
-        toast(action.message);
-      } else if (action.kind === 'modal') {
-        if (problem.code === 'INSUFFICIENT_CREDITS') {
-          setOutOfCredits(problem.meta as { current?: number; needed?: number });
-        } else if (problem.code === 'FORBIDDEN_FEATURE') {
-          setUpgradeDialog(true);
+      if (problem && typeof problem === 'object' && 'code' in problem) {
+        if (problem.code === 'EMAIL_NOT_VERIFIED') {
+          setEmailModal(true);
+        } else if (action.kind === 'toast') {
+          toast(action.message);
+        } else if (action.kind === 'modal') {
+          if (problem.code === 'INSUFFICIENT_CREDITS') {
+            setOutOfCredits(problem.meta as { current?: number; needed?: number });
+          } else if (problem.code === 'FORBIDDEN_FEATURE') {
+            setUpgradeDialog(true);
+          }
+        } else if (action.kind === 'redirect' && action.cta) {
+          toast(action.message);
+          router.push(action.cta);
         }
-      } else if (action.kind === 'redirect' && action.cta) {
-        toast(action.message);
-        router.push(action.cta);
       } else {
-      toast('We could not start the image generation.');
+        const message = err instanceof Error ? err.message : 'We could not start the image generation.';
+        toast(message);
       }
       setLoading(false);
+      setIsSubmitting(false);
     }
   }
 
@@ -893,7 +961,7 @@ export default function ImageModelPage() {
   }, [advancedModalOpen]);
 
   const isGenerateDisabled =
-    loading || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
+    isSubmitting || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
     <div className="flex min-h-screen w-full justify-center animate-fade-in">
@@ -1024,7 +1092,7 @@ export default function ImageModelPage() {
                 disabled={isGenerateDisabled}
                 className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
               >
-                {loading ? 'Generating...' : 'Generate with imagino.AI'}
+                {isSubmitting ? 'Generating...' : 'Generate with imagino.AI'}
               </button>
               <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
                 {capabilities.length > 0 && <span>{capabilities.join(' · ')}</span>}
@@ -1035,7 +1103,7 @@ export default function ImageModelPage() {
           <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
               <div className="flex justify-end">
-                {loading && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
+                {isSubmitting && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
                 {centerJob ? (

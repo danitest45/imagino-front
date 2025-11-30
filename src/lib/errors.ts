@@ -81,6 +81,11 @@ export function mapProblemToUI(problem: Problem): ProblemUIAction {
         kind: 'toast',
         message: 'Invalid email or password.',
       };
+    case 'NETWORK_ERROR':
+      return {
+        kind: 'toast',
+        message: 'Network error. Please try again.',
+      };
     default:
       return {
         kind: 'toast',
