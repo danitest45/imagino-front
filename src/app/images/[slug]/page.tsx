@@ -228,14 +228,29 @@ export default function ImageModelPage() {
     });
     const ui = filtered.map(mapApiToUiJob);
 
-    setImages(ui);
-    setCurrentPage(1);
+    setImages(prevImages => {
+      const preservedLoading = prevImages.filter(
+        job => job.status === 'loading' && !ui.some(historyJob => historyJob.id === job.id),
+      );
+      const merged = [...preservedLoading, ...ui];
 
-    if (ui.length > 0) {
-      setSelectedJobId(ui[0].id);
-    } else {
-      setSelectedJobId(null);
-    }
+      setSelectedJobId(prevSelected => {
+        if (prevSelected && merged.some(job => job.id === prevSelected)) {
+          return prevSelected;
+        }
+
+        const loadingJob = merged.find(job => job.status === 'loading');
+        if (loadingJob) {
+          return loadingJob.id;
+        }
+
+        return merged[0]?.id ?? null;
+      });
+
+      return merged;
+    });
+
+    setCurrentPage(1);
   }, [history, slug]);
 
   useEffect(() => {
