@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 export interface ImageJob {
   id: string;
-  status: 'loading' | 'done';
+  status: 'loading' | 'done' | 'failed';
   urls: string[] | null;
   resolution: { width: number; height: number };
 }
@@ -40,7 +40,7 @@ export function useImageJobs() {
             window.dispatchEvent(new Event('creditsUpdated'));
           }
           if (jobStatus === 'FAILED') {
-            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'done', urls: null } : j));
+            setJobs(prev => prev.map(j => j.id === job.id ? { ...j, status: 'failed', urls: null } : j));
             clearInterval(interval);
           }
         }, 2000);

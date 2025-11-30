@@ -1,17 +1,20 @@
 'use client';
 import { useState } from 'react';
-import { Download, Loader2, Maximize2 } from 'lucide-react';
+import { AlertTriangle, Download, Loader2, Maximize2 } from 'lucide-react';
 import { downloadJob } from '../lib/download';
 
 type Props = {
   src?: string;
   jobId?: string;
-  loading?: boolean;
+  status?: 'loading' | 'done' | 'failed';
   onClick: () => void;
 };
 
-export default function ImageCard({ src, jobId, loading, onClick }: Props) {
+export default function ImageCard({ src, jobId, status = 'done', onClick }: Props) {
   const [hovered, setHovered] = useState(false);
+  const isLoading = status === 'loading';
+  const isFailed = status === 'failed';
+  const canShowImage = !!src && !isLoading && !isFailed;
 
   return (
     <div
@@ -20,11 +23,18 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {src && !loading ? (
+      {canShowImage ? (
         <>
           <img src={src} alt="Generated image" className="h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
         </>
+      ) : isFailed ? (
+        <div className="relative flex h-48 flex-col items-center justify-center gap-2 overflow-hidden bg-black/40 p-4 text-center sm:h-64 md:h-72">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/15 via-transparent to-purple-500/15" />
+          <AlertTriangle className="relative z-10 h-8 w-8 text-red-300" />
+          <p className="relative z-10 text-sm font-semibold text-red-100">Generation failed</p>
+          <p className="relative z-10 text-xs text-red-100/80">Please try again with a new prompt.</p>
+        </div>
       ) : (
         <div className="relative flex h-48 items-center justify-center overflow-hidden sm:h-64 md:h-72">
           <div className="absolute inset-0 animate-pulse bg-gradient-to-br from-white/10 via-white/5 to-transparent" />
@@ -32,7 +42,7 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
         </div>
       )}
 
-      {src && !loading && (
+      {canShowImage && (
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4 pt-12 text-xs font-medium text-gray-200">
           <div className="flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-wide">
             <SparklesIcon />
@@ -45,7 +55,7 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
         </div>
       )}
 
-      {hovered && src && !loading && jobId && (
+      {hovered && canShowImage && jobId && (
         <button
           type="button"
           onClick={e => {

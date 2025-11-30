@@ -64,7 +64,7 @@ export default function ClientGallery() {
           {loading || heroShowcase.length === 0
             ? heroPlaceholders.map((_, i) => (
                 <div key={`hero-placeholder-${i}`} className="break-inside-avoid">
-                  <ImageCard loading onClick={() => {}} />
+                  <ImageCard status="loading" onClick={() => {}} />
                 </div>
               ))
             : heroShowcase.map(job => (
@@ -103,7 +103,7 @@ export default function ClientGallery() {
           {loading
             ? placeholders.map((_, i) => (
                 <div key={`placeholder-${i}`} className="mb-5 break-inside-avoid">
-                  <ImageCard loading onClick={() => {}} />
+                  <ImageCard status="loading" onClick={() => {}} />
                 </div>
               ))
             : jobs.map(job => (

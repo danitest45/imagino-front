@@ -112,7 +112,7 @@ const handleSubmit = async () => {
             ? Array.from({ length: 4 }).map((_, i) => (
                 <ImageCard
                   key={`${job.id}-${i}`}
-                  loading={true}
+                  status="loading"
                   onClick={() => {}}
                 />
               ))
@@ -121,13 +121,18 @@ const handleSubmit = async () => {
                     key={`${job.id}-${i}`}
                     src={url}
                     jobId={job.id}
-                    loading={false}
+                    status="done"
                     onClick={() => {
                       setModalJobId(job.id);
                       setModalOpen(true);
                     }}
                   />
-                ))}
+                )) ?? (
+                  <ImageCard
+                    status={job.status}
+                    onClick={() => {}}
+                  />
+                )}
         </div>
       ))}
     </div>
