@@ -160,6 +160,7 @@ export default function ReplicatePage() {
 
       setImages((prev: UiJob[]) => [newJob, ...prev]);
       setCurrentPage(1);
+      setSelectedJobId(jobId);
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);

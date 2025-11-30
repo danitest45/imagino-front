@@ -834,6 +834,7 @@ export default function ImageModelPage() {
 
       setImages(prev => [newJob, ...prev]);
       setCurrentPage(1);
+      setSelectedJobId(jobId);
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
