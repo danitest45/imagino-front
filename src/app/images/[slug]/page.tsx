@@ -248,11 +248,17 @@ export default function ImageModelPage() {
             }
           }
         } catch (pollError) {
-          console.error('Polling error:', pollError);
+          // Mark the job as failed so UI shows an error state for the image
+          setImages(prev => prev.map(job => (job.id === jobId ? { ...job, status: 'failed' } : job)));
+          // Stop the poller and clear loading for current request
           stopPolling(jobId);
           if (options?.markAsCurrent) {
             setLoading(false);
+            // Let the user know the image generation failed to update
+            toast('Image generation failed — there was an error checking the job status.');
           }
+          // Avoid calling console.error here (dev overlay), leave non-blocking info in debug
+          console.debug('Polling encountered an error for job', jobId, pollError);
         }
       }, 3000);
 
