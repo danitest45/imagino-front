@@ -381,10 +381,16 @@ export async function updateUser(
 }
 
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
-  const rawUrl = j.imageUrl ?? j.imageUrls?.[0] ?? null;     // <<<<<< pega singular OU primeira do array
+  const rawStatus = (j.status ?? (j as Record<string, unknown>).Status) as string | undefined;
+  const normalizedStatus = rawStatus?.toUpperCase();
+  const rawUrl = (Array.isArray(j.imageUrls) && j.imageUrls.length > 0)
+    ? j.imageUrls[0]
+    : j.imageUrl ?? null;
   return {
     id: j.jobId || j.id,
-    status: j.status?.toUpperCase() === 'COMPLETED' ? 'done' : 'loading',
+    status: normalizedStatus === 'COMPLETED' ? 'done'
+      : normalizedStatus === 'FAILED' ? 'failed'
+      : 'loading',
     url: normalizeUrl(rawUrl),                               // <<<<<< normaliza
     aspectRatio: j.aspectRatio ?? '1:1',
   };
