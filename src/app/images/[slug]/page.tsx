@@ -803,7 +803,6 @@ export default function ImageModelPage() {
     }
 
     setLoading(true);
-    setSelectedJobId(null);
 
     const params: Record<string, unknown> = {};
 
