@@ -6,13 +6,6 @@ import { useEffect, useState } from 'react';
 import { getPublicImageModels } from '../../lib/api';
 import type { PublicImageModelSummary } from '../../types/image-model';
 
-export const fallbackModels: PublicImageModelSummary[] = [
-  {
-    slug: 'replicate',
-    displayName: 'Replicate Studio',
-  },
-];
-
 export default function Sidebar() {
   const pathname = usePathname();
   const [models, setModels] = useState<PublicImageModelSummary[]>([]);
@@ -25,16 +18,9 @@ export default function Sidebar() {
       try {
         const data = await getPublicImageModels();
         if (!active) return;
-        if (data.length > 0) {
-          setModels(data);
-        } else {
-          setModels(fallbackModels);
-        }
+        setModels(data);
       } catch (error) {
         console.error('Failed to fetch image models', error);
-        if (active) {
-          setModels(fallbackModels);
-        }
       } finally {
         if (active) {
           setLoading(false);
@@ -98,6 +84,12 @@ export default function Sidebar() {
                 </Link>
               );
             })}
+
+        {!loading && models.length === 0 && (
+          <div className="rounded-2xl border border-white/10 bg-black/50 px-4 py-3 text-sm text-gray-300">
+            No models available right now.
+          </div>
+        )}
       </nav>
 
       <div className="mt-auto space-y-2 rounded-3xl border border-white/10 bg-black/40 p-5 text-xs text-gray-400">
