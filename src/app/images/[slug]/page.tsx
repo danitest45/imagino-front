@@ -979,7 +979,7 @@ export default function ImageModelPage() {
                     <ImageCard
                       src={centerImageUrl}
                       jobId={selectedJobId ?? undefined}
-                      loading={false}
+                      status="done"
                       onClick={() => {
                         setModalOpen(true);
                       }}
@@ -987,7 +987,7 @@ export default function ImageModelPage() {
                   </div>
                 ) : loading ? (
                   <div className="w-full max-w-full">
-                    <ImageCard loading={true} onClick={() => {}} />
+                    <ImageCard status="loading" onClick={() => {}} />
                   </div>
                 ) : (
                   <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
