@@ -2,7 +2,7 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   createImageJob,
@@ -159,8 +159,9 @@ export default function ImageModelPage() {
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [images, setImages] = useState<UiJob[]>([]);
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const selectedJobIdRef = useRef<string | null>(null);
+  const pollersRef = useRef<Map<string, number>>(new Map());
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [advancedModalOpen, setAdvancedModalOpen] = useState(false);
@@ -176,6 +177,85 @@ export default function ImageModelPage() {
   const capabilities = details?.capabilities ?? [];
   const showDetailsSkeleton = detailsLoading;
   const showVersionSkeleton = detailsLoading || versionLoading;
+  const updateSelectedJobId = useCallback((jobId: string | null) => {
+    selectedJobIdRef.current = jobId;
+    setSelectedJobId(jobId);
+  }, []);
+
+  const stopPolling = useCallback((jobId: string) => {
+    const poller = pollersRef.current.get(jobId);
+    if (poller) {
+      clearInterval(poller);
+      pollersRef.current.delete(jobId);
+    }
+  }, []);
+
+  const startPolling = useCallback(
+    (jobId: string, options?: { markAsCurrent?: boolean }) => {
+      if (pollersRef.current.has(jobId)) return;
+
+      const poll = window.setInterval(async () => {
+        try {
+          const content = await getJobStatus(jobId);
+          const status = content?.status?.toUpperCase();
+          const rawUrl =
+            content?.imageUrl ?? (Array.isArray(content?.imageUrls) ? content.imageUrls[0] : null);
+
+          if (status === 'COMPLETED') {
+            stopPolling(jobId);
+            const fullUrl = normalizeUrl(rawUrl);
+
+            setImages(prev =>
+              prev.map(job => (job.id === jobId
+                ? { ...job, status: 'done', url: fullUrl ?? job.url ?? null }
+                : job)),
+            );
+
+            if (options?.markAsCurrent || selectedJobIdRef.current === jobId) {
+              updateSelectedJobId(jobId);
+            }
+
+            try {
+              const updatedHistory = await getUserHistory();
+              setHistory(updatedHistory);
+            } catch (historyError) {
+              console.warn('Failed to refresh history after completion', historyError);
+            }
+
+            if (options?.markAsCurrent) {
+              window.dispatchEvent(new Event('creditsUpdated'));
+              setLoading(false);
+            }
+          }
+
+          if (status === 'FAILED') {
+            stopPolling(jobId);
+            setImages(prev => prev.map(job => (job.id === jobId ? { ...job, status: 'failed' } : job)));
+            if (options?.markAsCurrent) {
+              setLoading(false);
+            }
+          }
+        } catch (pollError) {
+          console.error('Polling error:', pollError);
+          stopPolling(jobId);
+          if (options?.markAsCurrent) {
+            setLoading(false);
+          }
+        }
+      }, 3000);
+
+      pollersRef.current.set(jobId, poll);
+    },
+    [setHistory, stopPolling, updateSelectedJobId],
+  );
+
+  useEffect(
+    () => () => {
+      pollersRef.current.forEach(intervalId => clearInterval(intervalId));
+      pollersRef.current.clear();
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!history) return;
@@ -185,21 +265,29 @@ export default function ImageModelPage() {
       if (!jobModel) return true;
       return jobModel === slug;
     });
-    const ui = filtered
-      .map(mapApiToUiJob)
-      .filter(j => !!j.url);
+    const ui = filtered.map(mapApiToUiJob);
 
     setImages(ui);
     setCurrentPage(1);
 
-    if (ui.length > 0) {
-      setSelectedImageUrl(ui[0].url ?? null);
-      setSelectedJobId(ui[0].id);
-    } else {
-      setSelectedImageUrl(null);
-      setSelectedJobId(null);
-    }
-  }, [history, slug]);
+    setSelectedJobId(prev => {
+      if (prev && ui.some(job => job.id === prev)) {
+        selectedJobIdRef.current = prev;
+        return prev;
+      }
+      const fallback = ui[0]?.id ?? null;
+      selectedJobIdRef.current = fallback;
+      return fallback;
+    });
+
+    ui.forEach(job => {
+      if (job.status === 'loading') {
+        startPolling(job.id);
+      } else {
+        stopPolling(job.id);
+      }
+    });
+  }, [history, slug, startPolling, stopPolling]);
 
   useEffect(() => {
     if (!slug) return;
@@ -414,10 +502,18 @@ export default function ImageModelPage() {
       })
     : false;
 
-  const centerImageUrl = selectedImageUrl;
-  const doneImages = images.filter(img => img.status === 'done' && img.url);
-  const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
-  const paginatedImages = doneImages.slice(
+  const centerJob = useMemo(() => {
+    if (selectedJobId) {
+      const match = images.find(img => img.id === selectedJobId);
+      if (match) return match;
+    }
+    return images[0];
+  }, [images, selectedJobId]);
+
+  const centerImageUrl = centerJob?.url ?? null;
+  const centerStatus = centerJob?.status ?? (loading ? 'loading' : 'done');
+  const totalPages = Math.max(Math.ceil(images.length / ITEMS_PER_PAGE), 1);
+  const paginatedImages = images.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
@@ -716,8 +812,7 @@ export default function ImageModelPage() {
     }
 
     setLoading(true);
-    setSelectedImageUrl(null);
-    setSelectedJobId(null);
+    updateSelectedJobId(null);
 
     const params: Record<string, unknown> = {};
 
@@ -748,47 +843,8 @@ export default function ImageModelPage() {
 
       setImages(prev => [newJob, ...prev]);
       setCurrentPage(1);
-
-      const poll = setInterval(async () => {
-        try {
-          const content = await getJobStatus(jobId);
-          if (!content) return;
-          const status = content.status?.toUpperCase();
-          const rawUrl =
-            content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
-
-          if (status === 'COMPLETED') {
-            clearInterval(poll);
-            const fullUrl = normalizeUrl(rawUrl);
-
-            setImages(prev =>
-              prev.map(job => (job.id === jobId ? { ...job, status: 'done', url: fullUrl } : job)),
-            );
-            setSelectedImageUrl(fullUrl);
-            setSelectedJobId(jobId);
-
-            try {
-              const updatedHistory = await getUserHistory();
-              setHistory(updatedHistory);
-            } catch (historyError) {
-              console.warn('Failed to update history:', historyError);
-            }
-
-            window.dispatchEvent(new Event('creditsUpdated'));
-            setLoading(false);
-          }
-
-          if (status === 'FAILED') {
-            clearInterval(poll);
-            setImages(prev => prev.map(job => (job.id === jobId ? { ...job, status: 'done' } : job)));
-            setLoading(false);
-          }
-        } catch (pollError) {
-          console.error('Polling error:', pollError);
-          clearInterval(poll);
-          setLoading(false);
-        }
-      }, 2000);
+      updateSelectedJobId(jobId);
+      startPolling(jobId, { markAsCurrent: true });
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
@@ -974,20 +1030,18 @@ export default function ImageModelPage() {
                 {loading && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
-                {centerImageUrl ? (
+                {centerJob ? (
                   <div className="w-full max-w-full">
                     <ImageCard
-                      src={centerImageUrl}
-                      jobId={selectedJobId ?? undefined}
-                      status="done"
+                      src={centerJob.url ?? undefined}
+                      jobId={centerJob.id}
+                      status={centerStatus}
                       onClick={() => {
-                        setModalOpen(true);
+                        if (centerStatus === 'done') {
+                          setModalOpen(true);
+                        }
                       }}
                     />
-                  </div>
-                ) : loading ? (
-                  <div className="w-full max-w-full">
-                    <ImageCard status="loading" onClick={() => {}} />
                   </div>
                 ) : (
                   <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
@@ -1022,9 +1076,9 @@ export default function ImageModelPage() {
                 )}
               </div>
 
-              {doneImages.length === 0 ? (
+              {images.length === 0 ? (
                 <p className="mt-3 text-sm text-gray-400 sm:mt-4">
-                  Generated images will appear here as soon as they are ready.
+                  Generated images and in-progress jobs will appear here as soon as they are ready.
                 </p>
               ) : (
                 <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
@@ -1032,18 +1086,28 @@ export default function ImageModelPage() {
                     <button
                       key={job.id}
                       onClick={() => {
-                        setSelectedImageUrl(job.url!);
-                        setSelectedJobId(job.id);
+                        updateSelectedJobId(job.id);
                       }}
                       className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
-                        selectedImageUrl === job.url ? 'border-purple-500' : 'border-white/10'
+                        selectedJobId === job.id ? 'border-purple-500' : 'border-white/10'
                       }`}
                     >
-                      <img
-                        src={job.url!}
-                        className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
-                        alt=""
-                      />
+                      {job.status === 'done' && job.url ? (
+                        <img
+                          src={job.url}
+                          className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+                          alt=""
+                        />
+                      ) : job.status === 'failed' ? (
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
+                          <span className="text-xs font-semibold">Failed</span>
+                          <span className="text-[11px] text-red-100/80">Tap to retry generation</span>
+                        </div>
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-white/5 text-[11px] uppercase tracking-wide text-gray-300">
+                          Loading...
+                        </div>
+                      )}
                     </button>
                   ))}
                 </div>
