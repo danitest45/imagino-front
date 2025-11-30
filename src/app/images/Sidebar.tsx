@@ -95,7 +95,7 @@ export default function Sidebar() {
       <div className="mt-auto space-y-2 rounded-3xl border border-white/10 bg-black/40 p-5 text-xs text-gray-400">
         <p className="text-[11px] uppercase tracking-[0.35em] text-fuchsia-200">Need more models?</p>
         <p className="leading-relaxed text-sm text-gray-300">
-          Additional providers are coming soon. Tell us what you&apos;d like to see next at support@imagino.ai.
+          Additional providers are coming soon. Tell us what you&apos;d like to see next at support@imaginoai-app.com.
         </p>
       </div>
     </aside>
