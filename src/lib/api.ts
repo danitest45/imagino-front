@@ -381,7 +381,7 @@ export async function updateUser(
 }
 
 export function mapApiToUiJob(j: ImageJobApi): UiJob {
-  const rawStatus = (j.status ?? (j as Record<string, unknown>)?.Status) as
+  const rawStatus = (j.status ?? (j as { Status?: string }).Status) as
     | string
     | undefined;
   const normalizedStatus = rawStatus?.toUpperCase();
