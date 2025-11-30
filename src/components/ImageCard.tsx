@@ -1,17 +1,19 @@
 'use client';
 import { useState } from 'react';
-import { Download, Loader2, Maximize2 } from 'lucide-react';
+import { AlertCircle, Download, Loader2, Maximize2 } from 'lucide-react';
 import { downloadJob } from '../lib/download';
 
 type Props = {
   src?: string;
   jobId?: string;
   loading?: boolean;
+  status?: 'loading' | 'done' | 'failed';
   onClick: () => void;
 };
 
-export default function ImageCard({ src, jobId, loading, onClick }: Props) {
+export default function ImageCard({ src, jobId, loading, status = 'done', onClick }: Props) {
   const [hovered, setHovered] = useState(false);
+  const displayStatus: Props['status'] = loading ? 'loading' : status;
 
   return (
     <div
@@ -20,7 +22,12 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
     >
-      {src && !loading ? (
+      {displayStatus === 'failed' ? (
+        <div className="flex h-48 items-center justify-center gap-2 bg-gradient-to-br from-red-500/20 via-black/60 to-black/80 p-6 text-sm text-red-200 sm:h-64 md:h-72">
+          <AlertCircle className="h-6 w-6" />
+          Generation failed
+        </div>
+      ) : src && displayStatus === 'done' ? (
         <>
           <img src={src} alt="Generated image" className="h-full w-full object-cover" />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
@@ -32,7 +39,7 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
         </div>
       )}
 
-      {src && !loading && (
+      {src && displayStatus === 'done' && (
         <div className="absolute inset-x-0 bottom-0 flex items-center justify-between px-4 pb-4 pt-12 text-xs font-medium text-gray-200">
           <div className="flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-3 py-1 text-[11px] uppercase tracking-wide">
             <SparklesIcon />
@@ -45,7 +52,7 @@ export default function ImageCard({ src, jobId, loading, onClick }: Props) {
         </div>
       )}
 
-      {hovered && src && !loading && jobId && (
+      {hovered && src && displayStatus === 'done' && jobId && (
         <button
           type="button"
           onClick={e => {

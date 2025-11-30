@@ -2,16 +2,14 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   createImageJob,
   getImageModelDetails,
   getImageModelVersionDetails,
-  getJobStatus,
   getUserHistory,
   mapApiToUiJob,
-  normalizeUrl,
 } from '../../../lib/api';
 import type { UiJob, ImageJobApi } from '../../../types/image-job';
 import type {
@@ -22,8 +20,10 @@ import type {
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import {
+  AlertCircle,
   ChevronLeft,
   ChevronRight,
+  Loader2,
   SlidersHorizontal,
   UploadCloud,
 } from 'lucide-react';
@@ -32,6 +32,7 @@ import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
 import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
+import { useJobPolling } from '../../../hooks/useJobPolling';
 
 type ModelAwareJob = ImageJobApi & {
   model?: string;
@@ -159,7 +160,6 @@ export default function ImageModelPage() {
   const [formValues, setFormValues] = useState<Record<string, unknown>>({});
   const [fileNames, setFileNames] = useState<Record<string, string>>({});
   const [images, setImages] = useState<UiJob[]>([]);
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -177,6 +177,47 @@ export default function ImageModelPage() {
   const showDetailsSkeleton = detailsLoading;
   const showVersionSkeleton = detailsLoading || versionLoading;
 
+  const updateJob = useCallback((jobId: string, updater: (job: UiJob) => UiJob) => {
+    setImages(prev => prev.map(job => (job.id === jobId ? updater(job) : job)));
+  }, []);
+
+  const handleJobResolved = useCallback(
+    async (
+      jobId: string,
+      status: UiJob['status'],
+      payload: { imageUrl: string | null; imageUrls?: string[] },
+    ) => {
+      setHistory(prev =>
+        prev.map(job =>
+          job.jobId === jobId || job.id === jobId
+            ? {
+                ...job,
+                status: status === 'done' ? 'completed' : 'failed',
+                imageUrl: payload.imageUrl ?? job.imageUrl,
+                imageUrls: payload.imageUrls ?? job.imageUrls,
+              }
+            : job,
+        ),
+      );
+
+      if (status === 'done') {
+        setSelectedJobId(jobId);
+
+        try {
+          const updatedHistory = await getUserHistory();
+          setHistory(updatedHistory);
+        } catch (historyError) {
+          console.warn('Failed to update history:', historyError);
+        }
+      } else if (status === 'failed') {
+        setSelectedJobId(prev => prev ?? jobId);
+      }
+    },
+    [setHistory],
+  );
+
+  useJobPolling({ jobs: images, onJobUpdate: updateJob, onJobResolved: handleJobResolved });
+
   useEffect(() => {
     if (!history) return;
     const filtered = history.filter(job => {
@@ -185,21 +226,28 @@ export default function ImageModelPage() {
       if (!jobModel) return true;
       return jobModel === slug;
     });
-    const ui = filtered
-      .map(mapApiToUiJob)
-      .filter(j => !!j.url);
+    const ui = filtered.map(mapApiToUiJob);
 
     setImages(ui);
     setCurrentPage(1);
 
     if (ui.length > 0) {
-      setSelectedImageUrl(ui[0].url ?? null);
       setSelectedJobId(ui[0].id);
     } else {
-      setSelectedImageUrl(null);
       setSelectedJobId(null);
     }
   }, [history, slug]);
+
+  useEffect(() => {
+    const selected = images.find(job => job.id === selectedJobId) ?? images[0];
+    if (selected) {
+      setSelectedJobId(selected.id);
+    }
+  }, [images, selectedJobId]);
+
+  useEffect(() => {
+    setLoading(images.some(job => job.status === 'loading'));
+  }, [images]);
 
   useEffect(() => {
     if (!slug) return;
@@ -414,13 +462,52 @@ export default function ImageModelPage() {
       })
     : false;
 
-  const centerImageUrl = selectedImageUrl;
-  const doneImages = images.filter(img => img.status === 'done' && img.url);
-  const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
-  const paginatedImages = doneImages.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
+  const centerJob = useMemo(() => {
+    if (images.length === 0) return null;
+    return images.find(job => job.id === selectedJobId) ?? images[0];
+  }, [images, selectedJobId]);
+
+  const totalPages = Math.max(Math.ceil(images.length / ITEMS_PER_PAGE), 1);
+  const paginatedImages = useMemo(
+    () =>
+      images.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE,
+      ),
+    [currentPage, images],
   );
+
+  const renderJobThumbnail = (job: UiJob) => {
+    const isSelected = selectedJobId === job.id;
+    return (
+      <button
+        key={job.id}
+        onClick={() => {
+          setSelectedJobId(job.id);
+        }}
+        className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
+          isSelected ? 'border-purple-500' : 'border-white/10 hover:border-purple-400'
+        }`}
+      >
+        {job.status === 'failed' ? (
+          <div className="flex h-full w-full items-center justify-center gap-1 text-[11px] text-red-300">
+            <AlertCircle className="h-4 w-4" />
+            Failed
+          </div>
+        ) : job.status === 'loading' ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-fuchsia-200" />
+          </div>
+        ) : (
+          <img
+            src={job.url ?? ''}
+            className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+            alt=""
+          />
+        )}
+      </button>
+    );
+  };
 
   function updateFormValue(
     key: string,
@@ -716,7 +803,6 @@ export default function ImageModelPage() {
     }
 
     setLoading(true);
-    setSelectedImageUrl(null);
     setSelectedJobId(null);
 
     const params: Record<string, unknown> = {};
@@ -748,47 +834,6 @@ export default function ImageModelPage() {
 
       setImages(prev => [newJob, ...prev]);
       setCurrentPage(1);
-
-      const poll = setInterval(async () => {
-        try {
-          const content = await getJobStatus(jobId);
-          if (!content) return;
-          const status = content.status?.toUpperCase();
-          const rawUrl =
-            content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
-
-          if (status === 'COMPLETED') {
-            clearInterval(poll);
-            const fullUrl = normalizeUrl(rawUrl);
-
-            setImages(prev =>
-              prev.map(job => (job.id === jobId ? { ...job, status: 'done', url: fullUrl } : job)),
-            );
-            setSelectedImageUrl(fullUrl);
-            setSelectedJobId(jobId);
-
-            try {
-              const updatedHistory = await getUserHistory();
-              setHistory(updatedHistory);
-            } catch (historyError) {
-              console.warn('Failed to update history:', historyError);
-            }
-
-            window.dispatchEvent(new Event('creditsUpdated'));
-            setLoading(false);
-          }
-
-          if (status === 'FAILED') {
-            clearInterval(poll);
-            setImages(prev => prev.map(job => (job.id === jobId ? { ...job, status: 'done' } : job)));
-            setLoading(false);
-          }
-        } catch (pollError) {
-          console.error('Polling error:', pollError);
-          clearInterval(poll);
-          setLoading(false);
-        }
-      }, 2000);
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
@@ -974,12 +1019,13 @@ export default function ImageModelPage() {
                 {loading && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
               </div>
               <div className="mt-2 flex w-full justify-center sm:mt-3">
-                {centerImageUrl ? (
+                {centerJob ? (
                   <div className="w-full max-w-full">
                     <ImageCard
-                      src={centerImageUrl}
-                      jobId={selectedJobId ?? undefined}
-                      loading={false}
+                      src={centerJob.url ?? undefined}
+                      jobId={centerJob.id ?? undefined}
+                      loading={centerJob.status === 'loading'}
+                      status={centerJob.status}
                       onClick={() => {
                         setModalOpen(true);
                       }}
@@ -999,11 +1045,11 @@ export default function ImageModelPage() {
 
             <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4 xl:sticky xl:top-4">
               <div className="flex items-center justify-end gap-2 text-white">
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                      disabled={currentPage === 1}
+              {totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                    disabled={currentPage === 1}
                       className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
                     >
                       <ChevronLeft size={14} />
@@ -1017,35 +1063,18 @@ export default function ImageModelPage() {
                       className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
                     >
                       <ChevronRight size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
+                  </button>
+                </div>
+              )}
+            </div>
 
-              {doneImages.length === 0 ? (
+              {images.length === 0 ? (
                 <p className="mt-3 text-sm text-gray-400 sm:mt-4">
                   Generated images will appear here as soon as they are ready.
                 </p>
               ) : (
                 <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
-                  {paginatedImages.map(job => (
-                    <button
-                      key={job.id}
-                      onClick={() => {
-                        setSelectedImageUrl(job.url!);
-                        setSelectedJobId(job.id);
-                      }}
-                      className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
-                        selectedImageUrl === job.url ? 'border-purple-500' : 'border-white/10'
-                      }`}
-                    >
-                      <img
-                        src={job.url!}
-                        className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
-                        alt=""
-                      />
-                    </button>
-                  ))}
+                  {paginatedImages.map(renderJobThumbnail)}
                 </div>
               )}
             </section>

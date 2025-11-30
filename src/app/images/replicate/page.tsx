@@ -2,24 +2,23 @@
 
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   createReplicateJob,
-  getJobStatus,
   getUserHistory,
 } from '../../../lib/api';
 import type { UiJob } from '../../../types/image-job';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import { mapApiToUiJob } from '../../../lib/api';
-import { normalizeUrl } from '../../../lib/api';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { AlertCircle, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
 import { toast } from '../../../lib/toast';
 import OutOfCreditsDialog from '../../../components/OutOfCreditsDialog';
 import UpgradePlanDialog from '../../../components/UpgradePlanDialog';
 import { useRouter } from 'next/navigation';
 import ResendVerificationDialog from '../../../components/ResendVerificationDialog';
+import { useJobPolling } from '../../../hooks/useJobPolling';
 
 
 const aspectRatioOptions = [
@@ -55,7 +54,6 @@ export default function ReplicatePage() {
   const [selectedAspectRatio, setSelectedAspectRatio] = useState('1:1');
   const [quality, setQuality] = useState(3);
   const [images, setImages] = useState<UiJob[]>([]);
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,28 +67,76 @@ export default function ReplicatePage() {
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
 
+  const updateJob = useCallback((jobId: string, updater: (job: UiJob) => UiJob) => {
+    setImages(prev => prev.map(job => (job.id === jobId ? updater(job) : job)));
+  }, []);
 
-  
+  const handleJobResolved = useCallback(
+    async (
+      jobId: string,
+      status: UiJob['status'],
+      payload: { imageUrl: string | null; imageUrls?: string[] },
+    ) => {
+      setHistory(prev =>
+        prev.map(job =>
+          job.jobId === jobId || job.id === jobId
+            ? {
+                ...job,
+                status: status === 'done' ? 'completed' : 'failed',
+                imageUrl: payload.imageUrl ?? job.imageUrl,
+                imageUrls: payload.imageUrls ?? job.imageUrls,
+              }
+            : job,
+        ),
+      );
+
+      if (status === 'done') {
+        setSelectedJobId(jobId);
+        window.dispatchEvent(new Event('creditsUpdated'));
+
+        try {
+          const updatedHistory = await getUserHistory();
+          setHistory(updatedHistory);
+        } catch (historyError) {
+          console.warn('Failed to update history:', historyError);
+        }
+      } else if (status === 'failed') {
+        setSelectedJobId(prev => prev ?? jobId);
+      }
+    },
+    [setHistory],
+  );
+
+  useJobPolling({ jobs: images, onJobUpdate: updateJob, onJobResolved: handleJobResolved });
+
+
+
 
   useEffect(() => {
     if (!history) return;
     // convert jobs from the API to the format used by the UI
-    const ui = history
-      .map(mapApiToUiJob) // take imageUrl or imageUrls[0] and normalize
-      .filter(j => !!j.url);
+    const ui = history.map(mapApiToUiJob);
 
     setImages(ui);
     setCurrentPage(1);
 
-    // keep the most recent selected in the center
     if (ui.length > 0) {
-      setSelectedImageUrl(ui[0].url ?? null);
       setSelectedJobId(ui[0].id);
     } else {
-      setSelectedImageUrl(null);
       setSelectedJobId(null);
     }
   }, [history]);
+
+  useEffect(() => {
+    const selected = images.find(job => job.id === selectedJobId) ?? images[0];
+    if (selected) {
+      setSelectedJobId(selected.id);
+    }
+  }, [images, selectedJobId]);
+
+  useEffect(() => {
+    setLoading(images.some(job => job.status === 'loading'));
+  }, [images]);
 
 
 
@@ -102,7 +148,6 @@ export default function ReplicatePage() {
     }
 
     setLoading(true);
-    setSelectedImageUrl(null);
     setSelectedJobId(null);
     try {
       const jobId = await createReplicateJob(prompt, selectedAspectRatio, quality);
@@ -115,52 +160,6 @@ export default function ReplicatePage() {
 
       setImages((prev: UiJob[]) => [newJob, ...prev]);
       setCurrentPage(1);
-
-      const poll = setInterval(async () => {
-        try {
-          const content = await getJobStatus(jobId);
-          if (!content) return;
-          const status = content.status?.toUpperCase();
-
-          const rawUrl =
-            content.imageUrl ?? (Array.isArray(content.imageUrls) ? content.imageUrls[0] : null);
-
-          if (status === 'COMPLETED') {
-            clearInterval(poll);
-
-            const fullUrl = normalizeUrl(rawUrl);
-
-            setImages((prev: UiJob[]) =>
-              prev.map((j: UiJob) => (j.id === jobId ? { ...j, status: 'done', url: fullUrl } : j))
-            );
-            setSelectedImageUrl(fullUrl);
-            setSelectedJobId(jobId);
-
-            // Gracefully handle failures when refreshing the user history
-            try {
-              const updatedHistory = await getUserHistory();
-              setHistory(updatedHistory);
-            } catch (historyError) {
-              console.warn('Failed to update history:', historyError);
-              // Continuar sem quebrar o fluxo principal
-            }
-            
-            window.dispatchEvent(new Event('creditsUpdated'));
-            setLoading(false);
-          }
-
-          if (status === 'FAILED') {
-            clearInterval(poll);
-            setImages(prev => prev.map(j => (j.id === jobId ? { ...j, status: 'done' } : j)));
-            setLoading(false);
-          }
-        } catch (pollError) {
-          console.error('Polling error:', pollError);
-          // Opcional: limpar o interval em caso de erro persistente
-          clearInterval(poll);
-          setLoading(false);
-        }
-      }, 2000);
     } catch (err) {
       const problem = err as Problem;
       const action = mapProblemToUI(problem);
@@ -182,16 +181,57 @@ export default function ReplicatePage() {
     }
   }
 
-  // choose the image to display in the center
-  const centerImageUrl = selectedImageUrl;
-  const doneImages = images.filter(img => img.status === 'done' && img.url);
-  const totalPages = Math.max(Math.ceil(doneImages.length / ITEMS_PER_PAGE), 1);
-  const paginatedImages = doneImages.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE,
+  const centerJob = useMemo(() => {
+    if (images.length === 0) return null;
+    return images.find(job => job.id === selectedJobId) ?? images[0];
+  }, [images, selectedJobId]);
+
+  const totalPages = Math.max(Math.ceil(images.length / ITEMS_PER_PAGE), 1);
+  const paginatedImages = useMemo(
+    () =>
+      images.slice(
+        (currentPage - 1) * ITEMS_PER_PAGE,
+        currentPage * ITEMS_PER_PAGE,
+      ),
+    [currentPage, images],
   );
 
-  const showCenterOnMobile = !!centerImageUrl || loading;
+  const showCenterOnMobile = !!centerJob || loading;
+
+  const renderJobThumbnail = (job: UiJob, className: string) => {
+    const isSelected = selectedJobId === job.id;
+    const baseClass =
+      'cursor-pointer rounded-md border-2 flex-none transition-all relative overflow-hidden bg-black/40';
+
+    return (
+      <button
+        key={job.id}
+        onClick={() => {
+          setSelectedJobId(job.id);
+        }}
+        className={`${baseClass} ${className} ${
+          isSelected ? 'border-purple-500' : 'border-transparent hover:border-purple-400'
+        }`}
+      >
+        {job.status === 'failed' ? (
+          <div className="flex h-full w-full items-center justify-center gap-1 text-[11px] text-red-300">
+            <AlertCircle className="h-4 w-4" />
+            Failed
+          </div>
+        ) : job.status === 'loading' ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Loader2 className="h-5 w-5 animate-spin text-fuchsia-200" />
+          </div>
+        ) : (
+          <img
+            src={job.url ?? ''}
+            className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+            alt=""
+          />
+        )}
+      </button>
+    );
+  };
 
   return (
     <div className="flex h-full flex-1 flex-col lg:flex-row lg:items-start animate-fade-in">
@@ -301,27 +341,14 @@ export default function ReplicatePage() {
         </p>
 
         {/* Mobile history directly under controls when center is hidden */}
-        {!showCenterOnMobile && doneImages.length > 0 && (
+        {!showCenterOnMobile && images.length > 0 && (
           <div className="mt-3 lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
               <h3 className="text-white text-sm">Recent renders</h3>
-              {totalPages > 1 && <div className="text-xs text-gray-400">{doneImages.length} renders</div>}
+              {totalPages > 1 && <div className="text-xs text-gray-400">{images.length} renders</div>}
             </div>
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
+              {images.slice(0, 30).map(job => renderJobThumbnail(job, 'w-20 h-20'))}
             </div>
           </div>
         )}
@@ -329,12 +356,13 @@ export default function ReplicatePage() {
 
       {/* Center panel: selected image or generation state */}
       <div className={`${showCenterOnMobile ? 'flex' : 'hidden'} lg:flex flex-1 p-4 pt-2 flex-col items-center justify-start`}>
-        {centerImageUrl ? (
+        {centerJob ? (
           <div className="max-w-[512px] w-full">
             <ImageCard
-              src={centerImageUrl}
-              jobId={selectedJobId ?? undefined}
-              loading={false}
+              src={centerJob.url ?? undefined}
+              jobId={centerJob.id ?? undefined}
+              loading={centerJob.status === 'loading'}
+              status={centerJob.status}
               onClick={() => {
                 setModalOpen(true);
               }}
@@ -351,29 +379,16 @@ export default function ReplicatePage() {
         )}
 
         {/* Mobile history carousel (when center is shown) */}
-        {doneImages.length > 0 && showCenterOnMobile && (
+        {images.length > 0 && showCenterOnMobile && (
           <div className="mt-4 w-full lg:hidden">
             <div className="flex items-center justify-between mb-2 px-1">
               <h3 className="text-white text-sm">Recent renders</h3>
               {totalPages > 1 && (
-                <div className="text-xs text-gray-400">{doneImages.length} renders</div>
+                <div className="text-xs text-gray-400">{images.length} renders</div>
               )}
             </div>
             <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-              {doneImages.slice(0, 30).map(job => (
-                <img
-                  key={job.id}
-                  src={job.url!}
-                  onClick={() => {
-                    setSelectedImageUrl(job.url!);
-                    setSelectedJobId(job.id);
-                  }}
-                  className={`cursor-pointer rounded-md border-2 object-cover w-20 h-20 flex-none transition-all ${
-                    selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                  }`}
-                  alt=""
-                />
-              ))}
+              {images.slice(0, 30).map(job => renderJobThumbnail(job, 'w-20 h-20'))}
             </div>
           </div>
         )}
@@ -382,24 +397,13 @@ export default function ReplicatePage() {
       {/* Removed separate mobile history block to avoid layout gap; it's now inside the left panel */}
 
       {/* Right panel: history */}
-      {doneImages.length > 0 && (
+      {images.length > 0 && (
         <div className="hidden lg:block w-full lg:w-64 flex-shrink-0 p-4 bg-black/30 backdrop-blur-md">
           <h3 className="text-white mb-2 text-sm md:text-base">Recent renders</h3>
           <div className="grid grid-cols-3 lg:grid-cols-2 gap-2 overflow-hidden">
-            {paginatedImages.map(job => (
-              <img
-                key={job.id}
-                src={job.url!}
-                onClick={() => {
-                  setSelectedImageUrl(job.url!);
-                  setSelectedJobId(job.id);
-                }}
-                className={`cursor-pointer rounded-md border-2 object-cover w-16 h-16 lg:w-24 lg:h-24 transition-all transform hover:scale-105 ${
-                  selectedImageUrl === job.url ? 'border-purple-500' : 'border-transparent'
-                } hover:border-purple-400`}
-                alt=""
-              />
-            ))}
+            {paginatedImages.map(job =>
+              renderJobThumbnail(job, 'w-16 h-16 lg:w-24 lg:h-24'),
+            )}
           </div>
           {totalPages > 1 && (
             <div className="flex justify-center gap-4 mt-2 text-white">

@@ -4,7 +4,7 @@ export interface ImageJobApi {
   jobId: string;
   prompt: string;
   userId: string;
-  status: 'loading' | 'processing' | 'done' | 'failed';
+  status?: string;
   imageUrl: string | null;
   imageUrls?: string[];          // <- what the backend is sending
   aspectRatio?: string | null;
@@ -15,7 +15,7 @@ export interface ImageJobApi {
 // Format already used by the page UI
 export interface UiJob {
   id: string;
-  status: 'loading' | 'done';
+  status: 'loading' | 'done' | 'failed';
   url: string | null;
   aspectRatio: string;
 }
