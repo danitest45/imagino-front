@@ -8,107 +8,172 @@ import type {
 } from '../types/image-model';
 import type { UserDto } from '../types/user';
 import { fetchWithAuth } from './auth';
-import { apiFetch } from './api-client';
+import { apiFetch, buildProblem } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
+import type { Problem } from './errors';
+
+function isProblem(error: unknown): error is Problem {
+  return Boolean(error)
+    && typeof error === 'object'
+    && error !== null
+    && 'status' in error
+    && 'title' in error;
+}
+
+async function ensureOkResponse(res: Response, context: string): Promise<void> {
+  if (res.ok) return;
+  try {
+    const problem = await buildProblem(res);
+    throw { ...problem, detail: problem.detail ?? `${context}: ${res.status} ${res.statusText}` } as Problem;
+  } catch {
+    throw new Error(`${context}: ${res.status} ${res.statusText}`);
+  }
+}
+
+function rethrowWithContext(error: unknown, context: string): never {
+  if (isProblem(error)) {
+    throw { ...error, detail: error.detail ?? context };
+  }
+  const message = error instanceof Error ? error.message : String(error);
+  throw {
+    status: 0,
+    title: context,
+    detail: `${context}: ${message}`,
+    code: 'NETWORK_ERROR',
+  } satisfies Problem;
+}
 
 
 export async function createRunpodJob(
   prompt: string,
   options: { width: number; height: number },
 ) {
-  const res = await fetchWithAuth(
-    apiUrl('/api/comfy'),
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        prompt,
-        negativePrompt: 'low quality, blurry',
-        width: options.width,
-        height: options.height,
-        numInferenceSteps: 30,
-        refinerInferenceSteps: 50,
-        guidanceScale: 7.5,
-        scheduler: 'K_EULER',
-      }),
-    },
-  );
-  const json = await res.json();
-  return json.content.jobId as string;
+  try {
+    const res = await fetchWithAuth(
+      apiUrl('/api/comfy'),
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt,
+          negativePrompt: 'low quality, blurry',
+          width: options.width,
+          height: options.height,
+          numInferenceSteps: 30,
+          refinerInferenceSteps: 50,
+          guidanceScale: 7.5,
+          scheduler: 'K_EULER',
+        }),
+        skipProblem: true,
+      },
+    );
+    await ensureOkResponse(res, 'Failed to create runpod job');
+    const json = await res.json();
+    return String(json.content?.jobId ?? json.jobId ?? json.id ?? '');
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to create runpod job');
+  }
 }
 
 export async function createReplicateJob(prompt: string, aspectRatio: string, quality?: number) {
-  const res = await fetchWithAuth(apiUrl('/api/replicate/jobs'), {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt,
-      aspectRatio,
-      ...(typeof quality === 'number' ? { quality } : {}),
-    }),
-  });
-  const json = await res.json();
-  return json.jobId as string;
+  try {
+    const res = await fetchWithAuth(apiUrl('/api/replicate/jobs'), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt,
+        aspectRatio,
+        ...(typeof quality === 'number' ? { quality } : {}),
+      }),
+      skipProblem: true,
+    });
+
+    await ensureOkResponse(res, 'Failed to create replicate job');
+    const json = await res.json();
+    return String(json.jobId ?? json.id ?? '');
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to create replicate job');
+  }
 }
 
 export async function getJobStatus(jobId: string) {
   try {
     const res = await fetchWithAuth(
       apiUrl(`/api/image/jobs/${jobId}`),
+      { skipProblem: true },
     );
+    await ensureOkResponse(res, 'Failed to fetch job status');
     return (await res.json());
-  } catch {
-    return null;
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to fetch job status');
   }
 }
 
 export async function getJobDetails(jobId: string): Promise<JobDetails> {
-  const res = await fetchWithAuth(
-    apiUrl(`/api/image/jobs/details/${jobId}`),
-  );
-  const json = await res.json();
-  return {
-    imageUrl: normalizeUrl(json.imageUrl) ?? '',
-    prompt: json.prompt,
-    username: json.username,
-    createdAt: json.createdAt,
-    aspectRatio: json.aspectRatio,
-  };
+  try {
+    const res = await fetchWithAuth(
+      apiUrl(`/api/image/jobs/details/${jobId}`),
+      { skipProblem: true },
+    );
+    await ensureOkResponse(res, 'Failed to fetch job details');
+    const json = await res.json();
+    return {
+      imageUrl: normalizeUrl(json.imageUrl) ?? '',
+      prompt: json.prompt,
+      username: json.username,
+      createdAt: json.createdAt,
+      aspectRatio: json.aspectRatio,
+    };
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to fetch job details');
+  }
 }
 
 export async function getLatestJobs(): Promise<LatestJob[]> {
-  const res = await apiFetch(
-    apiUrl('/api/image/jobs/latest'),
-  );
-  const json = (await res.json()) as Array<Record<string, unknown>>;
-  return json.map(j => ({
-    id: String(j.id ?? j.jobId ?? j.jobID ?? ''),
-    imageUrl: normalizeUrl(String(j.imageUrl ?? j.ImageUrl ?? '')) ?? '',
-    prompt: String(j.prompt ?? j.Prompt ?? ''),
-    username: (j.username ?? j.Username ?? null) as string | null,
-    createdAt: String(j.createdAt ?? j.CreatedAt ?? ''),
-    aspectRatio: (j.aspectRatio ?? j.AspectRatio ?? null) as string | null,
-  }));
+  try {
+    const res = await apiFetch(
+      apiUrl('/api/image/jobs/latest'),
+      { skipProblem: true },
+    );
+    await ensureOkResponse(res, 'Failed to fetch latest jobs');
+    const json = (await res.json()) as Array<Record<string, unknown>>;
+    return json.map(j => ({
+      id: String(j.id ?? j.jobId ?? j.jobID ?? ''),
+      imageUrl: normalizeUrl(String(j.imageUrl ?? j.ImageUrl ?? '')) ?? '',
+      prompt: String(j.prompt ?? j.Prompt ?? ''),
+      username: (j.username ?? j.Username ?? null) as string | null,
+      createdAt: String(j.createdAt ?? j.CreatedAt ?? ''),
+      aspectRatio: (j.aspectRatio ?? j.AspectRatio ?? null) as string | null,
+    }));
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to fetch latest jobs');
+  }
 }
 
 export async function getPublicImageModels(): Promise<PublicImageModelSummary[]> {
-  const res = await apiFetch(
-    apiUrl('/api/image/models?visibility=public'),
-  );
-  const json = await res.json();
+  try {
+    const res = await apiFetch(
+      apiUrl('/api/image/models?visibility=public'),
+      { skipProblem: true },
+    );
+    await ensureOkResponse(res, 'Failed to fetch public image models');
+    const json = await res.json();
 
-  if (!Array.isArray(json)) {
-    return [];
+    if (!Array.isArray(json)) {
+      return [];
+    }
+
+    return json
+      .map(model => ({
+        slug: String(model.slug ?? model.Slug ?? ''),
+        displayName: String(model.displayName ?? model.DisplayName ?? ''),
+      }))
+      .filter(model => model.slug && model.displayName);
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to fetch public image models');
   }
-
-  return json
-    .map(model => ({
-      slug: String(model.slug ?? model.Slug ?? ''),
-      displayName: String(model.displayName ?? model.DisplayName ?? ''),
-    }))
-    .filter(model => model.slug && model.displayName);
 }
 
 function parseJsonSchema(schema: unknown): JsonSchema | null {
@@ -240,29 +305,46 @@ export async function getImageModelVersionDetails(
 export async function createImageJob(
   modelSlug: string,
   params: Record<string, unknown>,
-  options?: { presetId?: string | null },
+  options?: { presetId?: string | null; files?: Record<string, File> },
 ): Promise<string> {
-  const res = await fetchWithAuth(
-    apiUrl('/api/image/jobs'),
-    {
-      method: 'POST',
-      headers: {
+  try {
+    const hasFiles = options?.files && Object.keys(options.files).length > 0;
+    const requestInit: Parameters<typeof fetchWithAuth>[1] = { method: 'POST', skipProblem: true };
+
+    if (hasFiles) {
+      const formData = new FormData();
+      formData.append('modelSlug', modelSlug);
+      formData.append('presetId', options?.presetId ?? '');
+      formData.append('params', JSON.stringify(params));
+
+      Object.entries(options?.files ?? {}).forEach(([key, file]) => {
+        formData.append(key, file, file.name);
+      });
+
+      requestInit.body = formData;
+    } else {
+      requestInit.headers = {
         'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+      };
+      requestInit.body = JSON.stringify({
         modelSlug,
         presetId: options?.presetId ?? null,
         params,
-      }),
-    },
-  );
+      });
+    }
 
-  if (!res.ok) {
-    throw new Error('Failed to create image job');
+    const res = await fetchWithAuth(
+      apiUrl('/api/image/jobs'),
+      requestInit,
+    );
+
+    await ensureOkResponse(res, 'Failed to create image job');
+
+    const json = await res.json();
+    return String(json.jobId ?? json.id ?? '');
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to create image job');
   }
-
-  const json = await res.json();
-  return String(json.jobId ?? json.id ?? '');
 }
 
 export async function registerUser(email: string, password: string) {

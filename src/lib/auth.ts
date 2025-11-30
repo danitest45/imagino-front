@@ -26,30 +26,33 @@ export async function refreshAccessToken(): Promise<boolean> {
   }
 }
 
+type AuthRequestInit = RequestInit & { skipProblem?: boolean };
+
 export async function fetchWithAuth(
   input: RequestInfo | URL,
-  init: RequestInit = {},
+  init: AuthRequestInit = {},
 ): Promise<Response> {
-  const headers = new Headers(init.headers);
+  const { skipProblem, ...restInit } = init;
+  const headers = new Headers(restInit.headers);
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
-  let res = await fetch(input, { ...init, headers, credentials: 'include' });
+  let res = await fetch(input, { ...restInit, headers, credentials: 'include' });
   if (res.status === 401) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
-      const retryHeaders = new Headers(init.headers);
+      const retryHeaders = new Headers(restInit.headers);
       if (accessToken) {
         retryHeaders.set('Authorization', `Bearer ${accessToken}`);
       }
       res = await fetch(input, {
-        ...init,
+        ...restInit,
         headers: retryHeaders,
         credentials: 'include',
       });
     }
   }
-  if (!res.ok) {
+  if (!res.ok && !skipProblem) {
     throw await buildProblem(res);
   }
   return res;

@@ -18,9 +18,12 @@ export async function buildProblem(res: Response): Promise<Problem> {
   };
 }
 
-export async function apiFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
-  const res = await fetch(input, { ...init, credentials: 'include' });
-  if (!res.ok) {
+type ApiRequestInit = RequestInit & { skipProblem?: boolean };
+
+export async function apiFetch(input: RequestInfo | URL, init: ApiRequestInit = {}): Promise<Response> {
+  const { skipProblem, ...restInit } = init;
+  const res = await fetch(input, { ...restInit, credentials: 'include' });
+  if (!res.ok && !skipProblem) {
     throw await buildProblem(res);
   }
   return res;
