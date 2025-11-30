@@ -15,6 +15,7 @@ import type { Problem } from './errors';
 function isProblem(error: unknown): error is Problem {
   return Boolean(error)
     && typeof error === 'object'
+    && error !== null
     && 'status' in error
     && 'title' in error;
 }
