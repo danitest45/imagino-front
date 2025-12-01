@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { createVideoJob, getVideoJobStatus } from '../../lib/api';
 
@@ -19,7 +19,7 @@ interface VideoJob {
   referenceName?: string;
 }
 
-export default function VideosPage() {
+function VideosPageContent() {
   const searchParams = useSearchParams();
   const modelSlug = useMemo(
     () => searchParams?.get('modelSlug') ?? DEFAULT_VIDEO_MODEL,
@@ -330,5 +330,21 @@ export default function VideosPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function VideosPage() {
+  return (
+    <Suspense
+      fallback={(
+        <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
+          <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+            <p className="text-sm text-gray-200">Carregando configurações do modelo...</p>
+          </div>
+        </div>
+      )}
+    >
+      <VideosPageContent />
+    </Suspense>
   );
 }
