@@ -31,7 +31,7 @@ function CheckoutSuccessContent() {
   }, []);
 
   return (
-    <div className="min-h-screen mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex flex-col items-center">
+    <div className="min-h-[100dvh] mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-4">Payment completed!</h1>
       {info ? (
         <p className="mb-4 text-center">
@@ -54,7 +54,7 @@ function CheckoutSuccessContent() {
 
 function LoadingState() {
   return (
-    <div className="min-h-screen mt-24 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
+    <div className="min-h-[100dvh] mt-24 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100">
       <p className="text-lg">Loading...</p>
     </div>
   );

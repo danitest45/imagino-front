@@ -262,7 +262,8 @@ export default function Navbar() {
       {/* Mobile navigation */}
       <div
         className={`lg:hidden transition-[max-height] duration-500 ease-in-out ${
-          mobileOpen ? 'max-h-[100vh]' : 'max-h-0'
+            /* Use dynamic viewport height so mobile address bar doesn't trap the drawer. */
+            mobileOpen ? 'max-h-[100dvh]' : 'max-h-0'
         } overflow-hidden border-t border-white/5 bg-black/70 backdrop-blur-xl`}
       >
         <nav className="space-y-1 px-4 py-6">

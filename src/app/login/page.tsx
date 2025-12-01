@@ -72,7 +72,7 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-16">
+      <div className="relative flex min-h-[100dvh] items-center justify-center px-4 py-16">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]" aria-hidden />
         <div className="absolute inset-0 -z-20 bg-[linear-gradient(135deg,_rgba(15,23,42,0.92),_rgba(15,15,26,0.95))]" aria-hidden />
 

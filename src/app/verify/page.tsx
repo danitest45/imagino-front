@@ -55,7 +55,7 @@ function VerifyEmailPageContent() {
 
   if (status === 'loading') {
     return (
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-16 text-white">
+      <div className="relative flex min-h-[100dvh] items-center justify-center px-4 py-16 text-white">
         <div
           className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]"
           aria-hidden
@@ -71,7 +71,7 @@ function VerifyEmailPageContent() {
 
   if (status === 'success') {
     return (
-      <div className="relative flex min-h-screen items-center justify-center px-4 py-16">
+      <div className="relative flex min-h-[100dvh] items-center justify-center px-4 py-16">
         <div
           className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]"
           aria-hidden
@@ -157,7 +157,7 @@ function VerifyEmailPageContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
+    <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-gray-900 via-purple-900 to-gray-950 px-4 py-8">
       <div className="bg-gray-800/80 backdrop-blur-md p-8 rounded-xl shadow-2xl w-full max-w-md text-center space-y-4">
         <h1 className="text-2xl font-bold text-white">Verification error</h1>
         <p className="text-gray-300">{message}</p>
@@ -182,7 +182,7 @@ function VerifyEmailPageContent() {
 
 function VerifyLoading() {
   return (
-    <div className="relative flex min-h-screen items-center justify-center px-4 py-16 text-white">
+    <div className="relative flex min-h-[100dvh] items-center justify-center px-4 py-16 text-white">
       <div
         className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.25),_transparent_55%),_radial-gradient(circle_at_bottom,_rgba(14,165,233,0.2),_transparent_55%)]"
         aria-hidden

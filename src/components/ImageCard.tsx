@@ -15,6 +15,13 @@ export default function ImageCard({ src, jobId, status = 'done', onClick }: Prop
   const isLoading = status === 'loading';
   const isFailed = status === 'failed';
   const canShowImage = !!src && !isLoading && !isFailed;
+  const optimizedSrc = src
+    ? `/api/images/optimize?url=${encodeURIComponent(src)}&width=1024&format=webp`
+    : undefined;
+  const optimizedSrcSet = src
+    ? `/api/images/optimize?url=${encodeURIComponent(src)}&width=512&format=webp 512w, /api/images/optimize?url=${encodeURIComponent(src)}&width=1024&format=webp 1024w`
+    : undefined;
+  const imageSizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw';
 
   return (
     <div
@@ -25,7 +32,18 @@ export default function ImageCard({ src, jobId, status = 'done', onClick }: Prop
     >
       {canShowImage ? (
         <>
-          <img src={src} alt="Generated image" className="h-full w-full object-cover" />
+          {/* Request a lighter WebP preview first so mobile devices avoid black flashes. */}
+          <img
+            src={optimizedSrc ?? src}
+            srcSet={optimizedSrcSet}
+            sizes={optimizedSrcSet ? imageSizes : undefined}
+            loading="lazy"
+            decoding="async"
+            width={1024}
+            height={1024}
+            alt="Generated image"
+            className="h-full w-full object-cover"
+          />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
         </>
       ) : isFailed ? (
