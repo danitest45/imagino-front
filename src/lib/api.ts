@@ -111,6 +111,76 @@ export async function getJobStatus(jobId: string) {
   }
 }
 
+export async function createVideoJob(
+  modelSlug: string,
+  params: Record<string, unknown>,
+): Promise<{ jobId: string; status?: string; videoUrl?: string | null }> {
+  try {
+    const requestInit: Parameters<typeof fetchWithAuth>[1] = {
+      method: 'POST',
+      skipProblem: true,
+    };
+    const files = Object.entries(params).filter(([, value]) => value instanceof File);
+
+    if (files.length > 0) {
+      const formData = new FormData();
+      const jsonParams: Record<string, unknown> = {};
+
+      formData.append('modelSlug', modelSlug);
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value instanceof File) {
+          formData.append(key, value, value.name);
+        } else {
+          jsonParams[key] = value;
+        }
+      });
+
+      formData.append('params', JSON.stringify(jsonParams));
+      requestInit.body = formData;
+    } else {
+      requestInit.headers = { 'Content-Type': 'application/json' };
+      requestInit.body = JSON.stringify({ modelSlug, params });
+    }
+
+    const res = await fetchWithAuth(
+      apiUrl('/api/video/jobs'),
+      requestInit,
+    );
+
+    await ensureOkResponse(res, 'Failed to create video job');
+    const json = await res.json();
+    const rawUrl = json.videoUrl ?? json.video_url;
+    return {
+      jobId: String(json.jobId ?? json.id ?? ''),
+      status: json.status ? String(json.status) : undefined,
+      videoUrl: typeof rawUrl === 'string' ? normalizeUrl(rawUrl) : null,
+    };
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to create video job');
+  }
+}
+
+export async function getVideoJobStatus(jobId: string) {
+  try {
+    const res = await fetchWithAuth(
+      apiUrl(`/api/video/jobs/${jobId}`),
+      { skipProblem: true },
+    );
+    await ensureOkResponse(res, 'Failed to fetch video job status');
+    const json = await res.json();
+    const rawUrl = json.videoUrl ?? json.video_url;
+    return {
+      jobId: String(json.jobId ?? json.id ?? jobId),
+      status: json.status ? String(json.status) : undefined,
+      videoUrl: typeof rawUrl === 'string' ? normalizeUrl(rawUrl) : null,
+      ...json,
+    };
+  } catch (error) {
+    rethrowWithContext(error, 'Failed to fetch video job status');
+  }
+}
+
 export async function getJobDetails(jobId: string): Promise<JobDetails> {
   try {
     const res = await fetchWithAuth(
