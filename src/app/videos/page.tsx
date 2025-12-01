@@ -253,7 +253,6 @@ export default function VideosPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-2">
               {jobs.map(job => {
-                const isProcessing = job.status === 'PROCESSING' || job.status === 'PENDING';
                 const isFailed = job.status === 'FAILED';
                 const isCompleted = job.status === 'COMPLETED';
 
