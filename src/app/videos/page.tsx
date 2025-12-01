@@ -144,6 +144,10 @@ function VideosPageContent() {
           </div>
         </div>
 
+        <div className="mb-6 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-100">
+          Aviso: esta página está em desenvolvimento e pode sofrer alterações.
+        </div>
+
         <form
           onSubmit={handleSubmit}
           className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-fuchsia-500/10"
