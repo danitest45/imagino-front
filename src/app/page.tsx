@@ -53,7 +53,9 @@ const stats = [
 
 export default function Home() {
   return (
-    <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-16 px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+    <main
+      className="relative mx-auto flex min-h-[100dvh] w-full max-w-7xl flex-col gap-16 px-4 pb-24 pt-32 sm:px-6 lg:px-8"
+    >
       <div className="absolute left-0 right-0 top-20 mx-auto hidden h-[520px] max-w-4xl rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-600/10 to-cyan-400/20 blur-3xl lg:block" />
 
       <section className="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">

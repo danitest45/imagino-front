@@ -970,7 +970,7 @@ export default function ImageModelPage() {
     isSubmitting || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
   return (
-    <div className="flex min-h-screen w-full justify-center animate-fade-in">
+    <div className="flex min-h-[100dvh] w-full justify-center animate-fade-in">
       <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
         {detailsError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">

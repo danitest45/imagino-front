@@ -28,7 +28,7 @@ function GoogleAuthContent() {
   }, [params, auth, router]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center text-white">
+    <div className="min-h-[100dvh] flex items-center justify-center text-white">
       <p>Autenticando com Google...</p>
     </div>
   );
@@ -36,7 +36,7 @@ function GoogleAuthContent() {
 
 function GoogleAuthLoading() {
   return (
-    <div className="min-h-screen flex items-center justify-center text-white">
+    <div className="min-h-[100dvh] flex items-center justify-center text-white">
       <p>Carregando...</p>
     </div>
   );

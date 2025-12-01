@@ -22,6 +22,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
   const [details, setDetails] = useState<JobDetails | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [activeImageUrl, setActiveImageUrl] = useState<string | null>(null);
+  const [preferFullSize, setPreferFullSize] = useState(false);
   const fallbackNormalized = useMemo(() => fallbackUrl?.trim() || null, [fallbackUrl]);
 
   useEffect(() => {
@@ -70,7 +71,25 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
   useEffect(() => {
     setActiveImageUrl(preferredImageUrl);
     setImageLoaded(false);
+    setPreferFullSize(false);
   }, [preferredImageUrl]);
+
+  const optimizedImageUrl = useMemo(() => {
+    if (!preferredImageUrl) return null;
+    const targetWidth = preferFullSize ? 2048 : 1024;
+    return `/api/images/optimize?url=${encodeURIComponent(preferredImageUrl)}&width=${targetWidth}&format=webp`;
+  }, [preferredImageUrl, preferFullSize]);
+
+  const optimizedFallbackUrl = useMemo(() => {
+    if (!fallbackNormalized) return null;
+    const targetWidth = preferFullSize ? 2048 : 1024;
+    return `/api/images/optimize?url=${encodeURIComponent(fallbackNormalized)}&width=${targetWidth}&format=webp`;
+  }, [fallbackNormalized, preferFullSize]);
+
+  useEffect(() => {
+    // Start with an optimized preview that still respects the requested detail level.
+    setActiveImageUrl(optimizedImageUrl ?? preferredImageUrl);
+  }, [optimizedImageUrl, preferredImageUrl]);
   if (!isOpen) return null;
 
   return (
@@ -102,9 +121,17 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
               <img
                 key={activeImageUrl}
                 src={activeImageUrl}
+                loading="lazy"
+                decoding="async"
+                width={preferFullSize ? 2048 : 1024}
+                height={preferFullSize ? 2048 : 1024}
                 alt="Generated image"
                 onLoad={() => setImageLoaded(true)}
                 onError={() => {
+                  if (activeImageUrl !== optimizedFallbackUrl && optimizedFallbackUrl) {
+                    setActiveImageUrl(optimizedFallbackUrl);
+                    return;
+                  }
                   if (activeImageUrl !== fallbackNormalized && fallbackNormalized) {
                     setActiveImageUrl(fallbackNormalized);
                     return;
@@ -146,20 +173,33 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
             </div>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-white/20 hover:bg-white/15"
-                disabled
-              >
-                <Share2 className="h-4 w-4" />
-                Sharing soon
-              </button>
-              {jobId && (
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-2">
                 <button
                   type="button"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
+                  className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-white/20 hover:bg-white/15"
+                  disabled
+                >
+                  <Share2 className="h-4 w-4" />
+                  Sharing soon
+                </button>
+                {!preferFullSize && preferredImageUrl && (
+                  <button
+                    type="button"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/40 bg-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-fuchsia-400/70 hover:bg-white/15"
+                    onClick={() => {
+                      // Allow users to explicitly request the heavy version instead of forcing it on mobile.
+                      setPreferFullSize(true);
+                      setImageLoaded(false);
+                    }}
+                  >
+                    Load full detail
+                  </button>
+                )}
+                {jobId && (
+                  <button
+                    type="button"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-3 py-2 text-xs font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
                   onClick={() => downloadJob(jobId)}
                 >
                   <Download className="h-4 w-4" />

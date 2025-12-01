@@ -8,7 +8,7 @@ export default function ImagesLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="-mt-20 pt-20 flex min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+    <div className="-mt-20 pt-20 flex min-h-[100dvh] bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <Sidebar />

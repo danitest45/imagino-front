@@ -53,7 +53,7 @@ export default function ImagesIndexPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-black px-4 text-center text-sm text-gray-200">
+      <div className="flex min-h-[100dvh] items-center justify-center bg-black px-4 text-center text-sm text-gray-200">
         <div className="max-w-md space-y-3 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-fuchsia-500/20">
           <p className="text-base font-semibold text-white">Unable to load models</p>
           <p className="text-gray-300">{error}</p>

@@ -44,7 +44,7 @@ export default function ProfilePage() {
   }, [token]);
 
   return (
-    <div className="relative -mt-20 min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 px-4 pb-16 pt-32 text-gray-100">
+    <div className="relative -mt-20 min-h-[100dvh] overflow-x-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 px-4 pb-16 pt-32 text-gray-100">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-32 top-20 h-72 w-72 rounded-full bg-fuchsia-500/20 blur-3xl" />
         <div className="absolute right-0 top-1/3 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />

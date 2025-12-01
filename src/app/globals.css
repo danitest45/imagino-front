@@ -20,7 +20,8 @@
 }
 
 body {
-  min-height: 100vh;
+  /* Use dynamic viewport units so the mobile URL bar doesn't hide content. */
+  min-height: 100dvh;
   color: var(--foreground);
   background:
     radial-gradient(at 10% 15%, rgba(129, 140, 248, 0.18), transparent 60%),

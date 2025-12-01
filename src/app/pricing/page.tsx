@@ -18,7 +18,7 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen mt-16 md:mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex items-center justify-center">
+    <div className="min-h-[100dvh] mt-16 md:mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex items-center justify-center">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">Choose Your Plan</h1>
