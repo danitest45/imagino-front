@@ -20,30 +20,11 @@ interface VideoJob {
 }
 
 function VideosPageContent() {
-  const isUnderDevelopment = true;
   const searchParams = useSearchParams();
   const modelSlug = useMemo(
     () => searchParams?.get('modelSlug') ?? DEFAULT_VIDEO_MODEL,
     [searchParams],
   );
-
-  if (isUnderDevelopment) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
-        <div className="mx-auto max-w-3xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
-          <div className="rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-6 shadow-lg shadow-yellow-500/20">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-yellow-200/90">
-              Videos
-            </p>
-            <h1 className="mt-2 text-2xl font-bold text-white">This page is under development</h1>
-            <p className="mt-3 text-sm text-yellow-100/80">
-              Video generation is temporarily disabled while we work on improvements. Please check back soon.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const [prompt, setPrompt] = useState('');
   const [duration, setDuration] = useState(DURATIONS[1]);
@@ -59,6 +40,8 @@ function VideosPageContent() {
     pollersRef.current.forEach(intervalId => window.clearInterval(intervalId));
     pollersRef.current.clear();
   }, []);
+
+  const isUnderDevelopment = true;
 
   const updateJob = (jobId: string, data: Partial<VideoJob>) => {
     setJobs(prev => prev.map(job => (job.id === jobId ? { ...job, ...data } : job)));
@@ -96,6 +79,10 @@ function VideosPageContent() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isUnderDevelopment) {
+      setError('Video generation is temporarily disabled while this page is under development.');
+      return;
+    }
     if (!prompt.trim()) {
       setError('Digite um prompt para gerar o vídeo.');
       return;
@@ -164,99 +151,112 @@ function VideosPageContent() {
         </div>
 
         <div className="mb-6 rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-sm text-yellow-100">
-          Aviso: esta página está em desenvolvimento e pode sofrer alterações.
+          Notice: this page is under development and video generation is temporarily disabled.
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-fuchsia-500/10"
-        >
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-gray-200" htmlFor="prompt">
-                Prompt <span className="text-fuchsia-300">*</span>
-              </label>
-              <textarea
-                id="prompt"
-                value={prompt}
-                onChange={e => setPrompt(e.target.value)}
-                required
-                rows={3}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none"
-                placeholder="Descreva a cena ou animação que deseja gerar"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-200" htmlFor="duration">
-                Duração <span className="text-fuchsia-300">*</span>
-              </label>
-              <select
-                id="duration"
-                value={duration}
-                onChange={e => setDuration(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none"
-              >
-                {DURATIONS.map(value => (
-                  <option key={value} value={value}>
-                    {value} segundos
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-200" htmlFor="resolution">
-                Resolução <span className="text-fuchsia-300">*</span>
-              </label>
-              <select
-                id="resolution"
-                value={resolution}
-                onChange={e => setResolution(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none"
-              >
-                {RESOLUTIONS.map(value => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium text-gray-200" htmlFor="referenceImage">
-                Imagem de referência (opcional)
-              </label>
-              <input
-                id="referenceImage"
-                type="file"
-                accept="image/*"
-                onChange={event => setReferenceImage(event.target.files?.[0] ?? null)}
-                className="block w-full rounded-xl border border-dashed border-white/15 bg-black/30 px-4 py-3 text-sm text-gray-200 file:mr-4 file:rounded-lg file:border-0 file:bg-fuchsia-500/90 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:border-fuchsia-400/60"
-              />
-              {referenceImage && (
-                <p className="text-xs text-gray-400">Arquivo selecionado: {referenceImage.name}</p>
-              )}
-            </div>
-          </div>
-
-          {error && (
-            <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
-              {error}
+        <div className="relative">
+          {isUnderDevelopment && (
+            <div className="absolute inset-0 z-10 rounded-2xl border border-yellow-500/40 bg-black/70 p-6 text-center text-sm text-yellow-50 backdrop-blur-sm">
+              <p className="text-base font-semibold">Video generation is disabled while we improve this page.</p>
+              <p className="mt-1 text-xs text-yellow-100/80">Thank you for your patience.</p>
             </div>
           )}
 
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {submitting ? 'Gerando...' : 'Gerar vídeo'}
-            </button>
-            <p className="text-xs text-gray-400">Você verá o job na lista assim que o processamento começar.</p>
-          </div>
-        </form>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-fuchsia-500/10"
+          >
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="prompt">
+                  Prompt <span className="text-fuchsia-300">*</span>
+                </label>
+                <textarea
+                  id="prompt"
+                  value={prompt}
+                  onChange={e => setPrompt(e.target.value)}
+                  required
+                  rows={3}
+                  disabled={isUnderDevelopment || submitting}
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                  placeholder="Descreva a cena ou animação que deseja gerar"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="duration">
+                  Duração <span className="text-fuchsia-300">*</span>
+                </label>
+                <select
+                  id="duration"
+                  value={duration}
+                  onChange={e => setDuration(e.target.value)}
+                  disabled={isUnderDevelopment || submitting}
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {DURATIONS.map(value => (
+                    <option key={value} value={value}>
+                      {value} segundos
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="resolution">
+                  Resolução <span className="text-fuchsia-300">*</span>
+                </label>
+                <select
+                  id="resolution"
+                  value={resolution}
+                  onChange={e => setResolution(e.target.value)}
+                  disabled={isUnderDevelopment || submitting}
+                  className="w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white shadow-inner shadow-black/30 focus:border-fuchsia-400/60 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {RESOLUTIONS.map(value => (
+                    <option key={value} value={value}>
+                      {value}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-sm font-medium text-gray-200" htmlFor="referenceImage">
+                  Imagem de referência (opcional)
+                </label>
+                <input
+                  id="referenceImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={event => setReferenceImage(event.target.files?.[0] ?? null)}
+                  disabled={isUnderDevelopment || submitting}
+                  className="block w-full rounded-xl border border-dashed border-white/15 bg-black/30 px-4 py-3 text-sm text-gray-200 file:mr-4 file:rounded-lg file:border-0 file:bg-fuchsia-500/90 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:border-fuchsia-400/60 disabled:cursor-not-allowed disabled:opacity-60"
+                />
+                {referenceImage && (
+                  <p className="text-xs text-gray-400">Arquivo selecionado: {referenceImage.name}</p>
+                )}
+              </div>
+            </div>
+
+            {error && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+                {error}
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={submitting || isUnderDevelopment}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-fuchsia-500/30 transition hover:shadow-purple-500/40 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {submitting ? 'Gerando...' : 'Gerar vídeo'}
+              </button>
+              <p className="text-xs text-gray-400">Você verá o job na lista assim que o processamento começar.</p>
+            </div>
+          </form>
+        </div>
 
         <div className="mt-10">
           <div className="mb-4 flex items-center justify-between">
