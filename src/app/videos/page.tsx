@@ -129,8 +129,15 @@ function VideosPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
-      <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
+      <div className="pointer-events-auto absolute inset-0 z-20 flex cursor-not-allowed items-center justify-center bg-black/60">
+        <div className="max-w-md rounded-2xl border border-white/15 bg-white/10 px-6 py-4 text-center text-sm text-white shadow-xl shadow-black/30">
+          <p className="text-base font-semibold">This page is currently in production.</p>
+          <p className="mt-1 text-white/80">Features are under active development.</p>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 opacity-50 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.2em] text-fuchsia-300/80">Geração de vídeos</p>
