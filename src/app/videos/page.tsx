@@ -130,7 +130,7 @@ function VideosPageContent() {
 
   return (
     <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
-      <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center bg-black/60">
+      <div className="pointer-events-auto absolute inset-0 z-20 flex cursor-not-allowed items-center justify-center bg-black/60">
         <div className="max-w-md rounded-2xl border border-white/15 bg-white/10 px-6 py-4 text-center text-sm text-white shadow-xl shadow-black/30">
           <p className="text-base font-semibold">This page is currently in production.</p>
           <p className="mt-1 text-white/80">Features are under active development.</p>
