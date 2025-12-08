@@ -20,11 +20,30 @@ interface VideoJob {
 }
 
 function VideosPageContent() {
+  const isUnderDevelopment = true;
   const searchParams = useSearchParams();
   const modelSlug = useMemo(
     () => searchParams?.get('modelSlug') ?? DEFAULT_VIDEO_MODEL,
     [searchParams],
   );
+
+  if (isUnderDevelopment) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
+        <div className="mx-auto max-w-3xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+          <div className="rounded-2xl border border-yellow-500/40 bg-yellow-500/10 p-6 shadow-lg shadow-yellow-500/20">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-yellow-200/90">
+              Videos
+            </p>
+            <h1 className="mt-2 text-2xl font-bold text-white">This page is under development</h1>
+            <p className="mt-3 text-sm text-yellow-100/80">
+              Video generation is temporarily disabled while we work on improvements. Please check back soon.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const [prompt, setPrompt] = useState('');
   const [duration, setDuration] = useState(DURATIONS[1]);
