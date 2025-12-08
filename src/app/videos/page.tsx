@@ -129,7 +129,18 @@ function VideosPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-950 via-gray-950 to-black text-white">
+      <div className="pointer-events-auto absolute inset-0 z-10 flex items-start justify-center bg-black/80 px-4 pt-20 text-center">
+        <div className="max-w-xl space-y-3 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-fuchsia-500/20">
+          <p className="text-sm uppercase tracking-[0.2em] text-gray-300">Videos</p>
+          <h2 className="text-2xl font-semibold text-white sm:text-3xl">This page is under development</h2>
+          <p className="text-sm text-gray-200">
+            We&apos;re still building the video creation experience. For now, the controls are disabled and interactions are
+            blocked.
+          </p>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
