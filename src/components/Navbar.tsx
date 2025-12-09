@@ -10,7 +10,6 @@ import type { UserDto } from '../types/user';
 
 const navLinks = [
   { href: '/images', label: 'Images' },
-  { href: '/voices', label: 'Voices' },
   { href: '/videos', label: 'Videos' },
   { href: '/pricing', label: 'Pricing' },
 ];
