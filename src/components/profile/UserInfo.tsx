@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useState, useRef } from 'react';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -76,12 +77,14 @@ export default function UserInfo() {
           <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-500/20 to-cyan-400/20 blur-3xl" aria-hidden />
           <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:text-left">
             <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-black/40 p-1 shadow-inner shadow-purple-500/30">
+              <div className="relative flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-black/40 p-1 shadow-inner shadow-purple-500/30">
                 {(form?.profileImageUrl || user.profileImageUrl) ? (
-                  <img
+                  <Image
                     src={form?.profileImageUrl || user.profileImageUrl || ''}
                     alt="Profile avatar"
-                    className="h-full w-full rounded-full object-cover"
+                    fill
+                    sizes="112px"
+                    className="rounded-full object-cover"
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-purple-500/40 to-fuchsia-500/40 text-2xl font-semibold text-white">

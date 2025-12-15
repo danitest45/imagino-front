@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Download, Share2, X } from 'lucide-react';
 import { getJobDetails } from '../lib/api';
@@ -118,7 +119,7 @@ export default function ImageCardModal({ isOpen, onClose, jobId, fallbackUrl }: 
                   <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white" />
                 </div>
               )}
-              <img
+              <Image
                 key={activeImageUrl}
                 src={activeImageUrl}
                 loading="lazy"

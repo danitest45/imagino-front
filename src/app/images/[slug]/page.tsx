@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
@@ -707,11 +708,15 @@ export default function ImageModelPage() {
               }`}
             >
               {preview ? (
-                <img
-                  src={preview}
-                  alt={label}
-                  className="h-20 w-full rounded-lg object-cover shadow-lg"
-                />
+                <div className="relative h-20 w-full overflow-hidden rounded-lg shadow-lg">
+                  <Image
+                    src={preview}
+                    alt={label}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                </div>
               ) : (
                 <>
                   <UploadCloud className="h-8 w-8 text-fuchsia-300" />
@@ -1277,7 +1282,7 @@ export default function ImageModelPage() {
                     </div>
                   ) : (
                     <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
-                      Escreva seu briefing criativo e clique em "Gerar com imagino.AI" para começar.
+                      Escreva seu briefing criativo e clique em &quot;Gerar com imagino.AI&quot; para começar.
                     </div>
                   )}
                 </div>
@@ -1326,11 +1331,15 @@ export default function ImageModelPage() {
                         }`}
                       >
                         {job.status === 'done' && job.url ? (
-                          <img
-                            src={job.url}
-                            className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
-                            alt=""
-                          />
+                          <div className="relative h-full w-full">
+                            <Image
+                              src={job.url}
+                              alt=""
+                              fill
+                              sizes="(max-width: 1024px) 33vw, 200px"
+                              className="object-cover transition duration-200 group-hover:scale-105"
+                            />
+                          </div>
                         ) : job.status === 'failed' ? (
                           <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
                             <span className="text-xs font-semibold">Falhou</span>
@@ -1404,7 +1413,15 @@ export default function ImageModelPage() {
                     className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-white/5 text-left shadow-lg shadow-black/20 transition hover:-translate-y-1 hover:border-fuchsia-300/60 hover:shadow-fuchsia-500/20 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50"
                   >
                     {entry.status === 'done' && entry.url ? (
-                      <img src={entry.url} alt="Imagem gerada" className="h-full w-full object-cover transition duration-200 group-hover:scale-105" />
+                      <div className="relative h-full w-full">
+                        <Image
+                          src={entry.url}
+                          alt="Imagem gerada"
+                          fill
+                          sizes="(max-width: 1024px) 33vw, 200px"
+                          className="object-cover transition duration-200 group-hover:scale-105"
+                        />
+                      </div>
                     ) : entry.status === 'failed' ? (
                       <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
                         <span className="text-xs font-semibold">Falhou</span>

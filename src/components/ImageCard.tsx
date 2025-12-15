@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useState } from 'react';
 import { AlertTriangle, Download, Loader2, Maximize2 } from 'lucide-react';
 import { downloadJob } from '../lib/download';
@@ -33,7 +34,7 @@ export default function ImageCard({ src, jobId, status = 'done', onClick }: Prop
       {canShowImage ? (
         <>
           {/* Request a lighter WebP preview first so mobile devices avoid black flashes. */}
-          <img
+          <Image
             src={optimizedSrc ?? src}
             srcSet={optimizedSrcSet}
             sizes={optimizedSrcSet ? imageSizes : undefined}

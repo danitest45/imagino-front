@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useContext, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -219,7 +220,13 @@ export default function Navbar() {
                   className="group relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-fuchsia-500/80 via-purple-500/80 to-cyan-400/80 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:scale-[1.02]"
                 >
                   {user?.profileImageUrl ? (
-                    <img src={user.profileImageUrl} alt="Avatar" className="h-full w-full object-cover" />
+                    <Image
+                      src={user.profileImageUrl}
+                      alt="Avatar"
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                    />
                   ) : (
                     avatarLetter
                   )}
