@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import ImageCard from '../../../components/ImageCard';
 import ImageCardModal from '../../../components/ImageCardModal';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -9,6 +10,7 @@ import {
   getImageModelDetails,
   getImageModelVersionDetails,
   getJobStatus,
+  getPublicImageModels,
   getUserHistory,
   mapApiToUiJob,
   normalizeUrl,
@@ -18,13 +20,16 @@ import type {
   ImageModelDetails,
   ImageModelVersionDetails,
   JsonSchemaProperty,
+  PublicImageModelSummary,
 } from '../../../types/image-model';
 import { useAuth } from '../../../context/AuthContext';
 import { useImageHistory } from '../../../hooks/useImageHistory';
 import {
   ChevronLeft,
   ChevronRight,
+  LayoutGrid,
   SlidersHorizontal,
+  Sparkles,
   UploadCloud,
 } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../../lib/errors';
@@ -37,6 +42,12 @@ type ModelAwareJob = ImageJobApi & {
   model?: string;
   modelSlug?: string;
   provider?: string;
+};
+
+type AlbumEntry = UiJob & {
+  prompt?: string;
+  modelSlug?: string;
+  createdAt?: string;
 };
 
 function formatLabel(key: string): string {
@@ -172,8 +183,11 @@ export default function ImageModelPage() {
     useState<{ current?: number; needed?: number } | null>(null);
   const [upgradeDialog, setUpgradeDialog] = useState(false);
   const [emailModal, setEmailModal] = useState(false);
+  const [models, setModels] = useState<PublicImageModelSummary[]>([]);
+  const [modelsLoading, setModelsLoading] = useState(true);
+  const [modelsError, setModelsError] = useState<string | null>(null);
   const { token } = useAuth();
-  const { history, setHistory } = useImageHistory();
+  const { history, setHistory, loading: historyLoading } = useImageHistory();
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10;
   const router = useRouter();
@@ -288,6 +302,33 @@ export default function ImageModelPage() {
     },
     [],
   );
+
+  useEffect(() => {
+    let active = true;
+    setModelsLoading(true);
+    setModelsError(null);
+
+    getPublicImageModels()
+      .then(data => {
+        if (!active) return;
+        setModels(data);
+      })
+      .catch(error => {
+        console.warn('Failed to fetch image models', error);
+        if (!active) return;
+        setModelsError('Não conseguimos carregar os modelos agora.');
+        setModels([]);
+      })
+      .finally(() => {
+        if (active) {
+          setModelsLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!history) return;
@@ -533,6 +574,28 @@ export default function ImageModelPage() {
         return false;
       })
     : false;
+
+  const modelLookup = useMemo(() => {
+    const lookup = new Map<string, string>();
+    models.forEach(model => lookup.set(model.slug, model.displayName));
+    return lookup;
+  }, [models]);
+
+  const albumImages: AlbumEntry[] = useMemo(
+    () =>
+      history.map(job => {
+        const uiJob = mapApiToUiJob(job);
+        const raw = job as ModelAwareJob;
+        const jobModel = raw.model ?? raw.modelSlug ?? raw.provider;
+        return {
+          ...uiJob,
+          prompt: job.prompt,
+          modelSlug: jobModel ?? undefined,
+          createdAt: job.createdAt,
+        };
+      }),
+    [history],
+  );
 
   const centerJob = useMemo(() => {
     if (selectedJobId) {
@@ -969,234 +1032,404 @@ export default function ImageModelPage() {
   const isGenerateDisabled =
     isSubmitting || !token || !schemaAvailable || missingRequired || !defaultVersionTag;
 
+
   return (
     <div className="flex min-h-[100dvh] w-full justify-center animate-fade-in">
-      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-4 px-3 pb-8 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
+      <div className="mx-auto flex w-full max-w-[1920px] flex-col gap-5 px-3 pb-10 pt-2 sm:px-4 md:px-5 lg:px-8 xl:px-10 lg:pt-4">
         {detailsError && (
           <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
             {detailsError}
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(300px,360px)_minmax(0,1fr)] xl:grid-cols-[minmax(320px,380px)_minmax(0,1fr)] xl:items-start xl:gap-6">
-          <div className="flex flex-col gap-3 lg:gap-4">
-            {showVersionSkeleton && (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, index) => (
-                  <div
-                    key={`schema-skeleton-${index}`}
-                    className="h-32 w-full max-w-[520px] rounded-2xl border border-white/10 bg-white/[0.08] animate-pulse"
-                  />
-                ))}
-              </div>
-            )}
-
-            {!showVersionSkeleton && schemaAvailable && (
-              <div className="space-y-2">
-                <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold text-white">Creative brief</p>
-                    <span className="text-[11px] text-gray-500">Tell us what you want to generate</span>
-                  </div>
-                  {promptKey ? (
-                    <div className="mt-3 flex flex-col gap-3 sm:gap-4">
-                      <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
-                        {schemaProperties[promptKey]?.title ?? 'Prompt'}
-                      </label>
-                      <textarea
-                        id={`${slug}-${promptKey}`}
-                        value={promptValue}
-                        onChange={event =>
-                          updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
-                        }
-                        placeholder={
-                          schemaProperties[promptKey]?.description ??
-                          'Describe the scene, style, and lighting you want...'
-                        }
-                        className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
-                      />
-                    </div>
-                  ) : (
-                    <p className="mt-4 text-sm text-gray-400">
-                      This model does not have a configurable prompt field.
-                    </p>
-                  )}
-                </section>
-
-                {imageUploadKeys.length > 0 && (
-                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Visual reference</p>
-                      <span className="text-[11px] text-gray-500">Upload guide images</span>
-                    </div>
-                    <div
-                      className={`mt-3 grid grid-cols-1 gap-3 ${
-                        hasMultipleImageUploadFields ? 'lg:grid-cols-2' : ''
-                      }`}
-                    >
-                      {imageUploadKeys.map(renderField)}
-                    </div>
-                  </section>
-                )}
-
-                {resolutionKeys.length > 0 && (
-                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Resolution</p>
-                      <span className="text-[11px] text-gray-500">Dimensions and aspect ratio</span>
-                    </div>
-                    <div className="mt-3 flex flex-col gap-3">
-                      {resolutionKeys.map(renderField)}
-                    </div>
-                  </section>
-                )}
-
-                {outputFormatKeys.length > 0 && (
-                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <p className="text-sm font-semibold text-white">Image output</p>
-                      <span className="text-[11px] text-gray-500">File format</span>
-                    </div>
-                    <div className="mt-3 flex flex-col gap-3">
-                      {outputFormatKeys.map(renderField)}
-                    </div>
-                  </section>
-                )}
-
-                {modalKeys.length > 0 && (
-                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
-                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                      <div className="space-y-1">
-                        <p className="text-sm font-semibold text-white">More settings</p>
-                        <p className="text-xs text-gray-400">
-                          Open the modal panel to adjust advanced model parameters.
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setAdvancedModalOpen(true)}
-                        className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
-                      >
-                        <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
-                        Open panel ({modalKeys.length})
-                      </button>
-                    </div>
-                  </section>
-                )}
-              </div>
-            )}
-
-            {!showVersionSkeleton && !schemaAvailable && (
-              <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
-                {versionError ?? 'Details unavailable'}
-              </div>
-            )}
-
-            <div className="grid w-full max-w-full gap-3 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
-              <button
-                onClick={handleGenerate}
-                disabled={isGenerateDisabled}
-                className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
-              >
-                {isSubmitting ? 'Generating...' : 'Generate with imagino.AI'}
-              </button>
-              <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
-                {capabilities.length > 0 && <span>{capabilities.join(' · ')}</span>}
-              </div>
+        <section className="rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900/70 via-purple-950/60 to-slate-900/70 p-4 shadow-[0_30px_120px_-40px_rgba(168,85,247,0.4)] ring-1 ring-white/5 sm:p-6">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-2">
+              <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-200">
+                <Sparkles className="h-4 w-4" /> Modelos disponíveis
+              </p>
+              <h1 className="text-2xl font-semibold text-white sm:text-3xl">Escolha o motor de criação</h1>
+              <p className="text-sm text-gray-300">
+                Simplificamos a seleção: escolha o modelo acima e gere suas cenas sem sair da mesma tela.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white/90 shadow-inner shadow-fuchsia-500/20">
+              <LayoutGrid className="h-4 w-4 text-fuchsia-300" />
+              <span>{models.length > 0 ? `${models.length} modelos` : 'Carregando modelos'}</span>
             </div>
           </div>
 
-          <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
-              <div className="flex justify-end">
-                {isSubmitting && <span className="text-[11px] text-fuchsia-200">Generating...</span>}
+          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {modelsLoading &&
+              Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={`model-skeleton-${index}`}
+                  className="h-24 w-full animate-pulse rounded-2xl border border-white/10 bg-white/5"
+                />
+              ))}
+
+            {!modelsLoading && modelsError && (
+              <div className="col-span-full rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-100">
+                {modelsError}
               </div>
-              <div className="mt-2 flex w-full justify-center sm:mt-3">
-                {centerJob ? (
-                  <div className="w-full max-w-full">
-                    <ImageCard
-                      src={centerJob.url ?? undefined}
-                      jobId={centerJob.id}
-                      status={centerStatus}
-                      onClick={() => {
-                        if (centerStatus === 'done') {
-                          setModalOpen(true);
-                        }
-                      }}
+            )}
+
+            {!modelsLoading &&
+              models.map(model => {
+                const active = model.slug === slug;
+                return (
+                  <Link
+                    key={model.slug}
+                    href={`/images/${model.slug}`}
+                    className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-2xl border p-4 transition duration-200 hover:translate-y-[-2px] hover:shadow-lg hover:shadow-fuchsia-500/20 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 ${
+                      active
+                        ? 'border-fuchsia-400/70 bg-gradient-to-r from-fuchsia-500/15 via-purple-500/10 to-cyan-400/10'
+                        : 'border-white/10 bg-black/40 hover:border-fuchsia-400/50'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-gray-400">Modelo</p>
+                        <p className="text-base font-semibold text-white">{model.displayName}</p>
+                      </div>
+                      <span
+                        className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold ${
+                          active ? 'bg-fuchsia-500/30 text-white' : 'bg-white/10 text-gray-200'
+                        }`}
+                      >
+                        {model.provider ?? 'AI'}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between text-[11px] text-gray-400">
+                      <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2 py-1">
+                        <Sparkles className="h-3 w-3 text-fuchsia-300" />
+                        {model.capabilities?.[0] ?? 'Criação rápida'}
+                      </span>
+                      {active && <span className="text-fuchsia-200">Selecionado</span>}
+                    </div>
+                  </Link>
+                );
+              })}
+          </div>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-black/40 p-3 shadow-[0_30px_120px_-50px_rgba(0,0,0,0.9)] backdrop-blur-sm sm:p-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-fuchsia-200">Geração de imagens</p>
+              <h2 className="text-xl font-semibold text-white sm:text-2xl">Configure o pedido e gere agora</h2>
+              <p className="text-sm text-gray-300">Ajuste o prompt, uploads e parâmetros essenciais antes de enviar.</p>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-200">
+              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+              {capabilities.length > 0 ? capabilities.join(' · ') : 'Pronto para criar'}
+            </div>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(320px,420px)_minmax(0,1fr)] xl:grid-cols-[minmax(360px,460px)_minmax(0,1fr)] xl:items-start xl:gap-6">
+            <div className="flex flex-col gap-4">
+              {showVersionSkeleton && (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      key={`schema-skeleton-${index}`}
+                      className="h-32 w-full max-w-[520px] rounded-2xl border border-white/10 bg-white/[0.08] animate-pulse"
                     />
-                  </div>
-                ) : (
-                  <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
-                    Write your creative brief and click &quot;Generate with imagino.AI&quot; to get started.
-                  </div>
-                )}
-              </div>
-            </section>
-
-            <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4 xl:sticky xl:top-4">
-              <div className="flex items-center justify-end gap-2 text-white">
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
-                    >
-                      <ChevronLeft size={14} />
-                    </button>
-                    <span className="text-[11px] text-gray-300">
-                      {currentPage} / {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
-                    >
-                      <ChevronRight size={14} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {images.length === 0 ? (
-                <p className="mt-3 text-sm text-gray-400 sm:mt-4">
-                  Generated images and in-progress jobs will appear here as soon as they are ready.
-                </p>
-              ) : (
-                <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
-                  {paginatedImages.map(job => (
-                    <button
-                      key={job.id}
-                      onClick={() => {
-                        updateSelectedJobId(job.id);
-                      }}
-                      className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
-                        selectedJobId === job.id ? 'border-purple-500' : 'border-white/10'
-                      }`}
-                    >
-                      {job.status === 'done' && job.url ? (
-                        <img
-                          src={job.url}
-                          className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
-                          alt=""
-                        />
-                      ) : job.status === 'failed' ? (
-                        <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
-                          <span className="text-xs font-semibold">Failed</span>
-                          <span className="text-[11px] text-red-100/80">Tap to retry generation</span>
-                        </div>
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center bg-white/5 text-[11px] uppercase tracking-wide text-gray-300">
-                          Loading...
-                        </div>
-                      )}
-                    </button>
                   ))}
                 </div>
               )}
-            </section>
+
+              {!showVersionSkeleton && schemaAvailable && (
+                <div className="space-y-3">
+                  <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold text-white">Brief criativo</p>
+                      <span className="text-[11px] text-gray-500">Conte o que precisa gerar</span>
+                    </div>
+                    {promptKey ? (
+                      <div className="mt-3 flex flex-col gap-3 sm:gap-4">
+                        <label htmlFor={`${slug}-${promptKey}`} className="text-sm font-medium text-gray-200">
+                          {schemaProperties[promptKey]?.title ?? 'Prompt'}
+                        </label>
+                        <textarea
+                          id={`${slug}-${promptKey}`}
+                          value={promptValue}
+                          onChange={event =>
+                            updateFormValue(promptKey, schemaProperties[promptKey], event.target.value)
+                          }
+                          placeholder={
+                            schemaProperties[promptKey]?.description ??
+                            'Descreva a cena, estilo e iluminação que deseja...'
+                          }
+                          className="min-h-[120px] resize-none rounded-2xl border border-white/10 bg-slate-900/70 p-4 text-sm text-white shadow-lg transition focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 placeholder:text-gray-500"
+                        />
+                      </div>
+                    ) : (
+                      <div className="mt-3 rounded-2xl border border-white/10 bg-black/40 p-3 text-xs text-gray-300">
+                        Este modelo não exige prompt.
+                      </div>
+                    )}
+                  </section>
+
+                  {imageUploadKeys.length > 0 && (
+                    <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-white">Imagens de referência</p>
+                        <span className="text-[11px] text-gray-500">Upload para guiar o resultado</span>
+                      </div>
+
+                      <div
+                        className={`mt-3 grid grid-cols-1 gap-3 ${
+                          hasMultipleImageUploadFields ? 'lg:grid-cols-2' : ''
+                        }`}
+                      >
+                        {imageUploadKeys.map(renderField)}
+                      </div>
+                    </section>
+                  )}
+
+                  {resolutionKeys.length > 0 && (
+                    <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-white">Resolução</p>
+                        <span className="text-[11px] text-gray-500">Dimensões e proporção</span>
+                      </div>
+                      <div className="mt-3 flex flex-col gap-3">
+                        {resolutionKeys.map(renderField)}
+                      </div>
+                    </section>
+                  )}
+
+                  {outputFormatKeys.length > 0 && (
+                    <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-white">Saída da imagem</p>
+                        <span className="text-[11px] text-gray-500">Formato do arquivo</span>
+                      </div>
+                      <div className="mt-3 flex flex-col gap-3">
+                        {outputFormatKeys.map(renderField)}
+                      </div>
+                    </section>
+                  )}
+
+                  {modalKeys.length > 0 && (
+                    <section className="w-full rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm font-semibold text-white">Mais ajustes</p>
+                          <p className="text-xs text-gray-400">
+                            Abra o painel para refinar parâmetros avançados do modelo.
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setAdvancedModalOpen(true)}
+                          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-fuchsia-400/30 bg-fuchsia-500/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-fuchsia-400/60 hover:bg-fuchsia-500/20 sm:w-auto"
+                        >
+                          <SlidersHorizontal className="h-4 w-4 text-fuchsia-200" />
+                          Abrir painel ({modalKeys.length})
+                        </button>
+                      </div>
+                    </section>
+                  )}
+                </div>
+              )}
+
+              {!showVersionSkeleton && !schemaAvailable && (
+                <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-4 text-sm text-rose-200">
+                  {versionError ?? 'Details unavailable'}
+                </div>
+              )}
+
+              <div className="grid w-full max-w-full gap-3 lg:grid-cols-[minmax(0,1fr)_220px] lg:items-center">
+                <button
+                  onClick={handleGenerate}
+                  disabled={isGenerateDisabled}
+                  className="order-1 w-full rounded-2xl bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition duration-300 hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 disabled:cursor-not-allowed disabled:opacity-60 xl:order-2"
+                >
+                  {isSubmitting ? 'Gerando...' : 'Gerar com imagino.AI'}
+                </button>
+                <div className="order-2 hidden text-right text-[11px] text-gray-500 xl:block">
+                  {capabilities.length > 0 && <span>{capabilities.join(' · ')}</span>}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid gap-3 lg:gap-4 xl:grid-cols-[minmax(0,1fr)_260px] 2xl:grid-cols-[minmax(0,1fr)_300px] xl:items-start">
+              <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4">
+                <div className="flex justify-between text-xs text-fuchsia-200">
+                  {isSubmitting && <span>Gerando...</span>}
+                  {details?.displayName && <span className="text-gray-300">{details.displayName}</span>}
+                </div>
+                <div className="mt-2 flex w-full justify-center sm:mt-3">
+                  {centerJob ? (
+                    <div className="w-full max-w-full">
+                      <ImageCard
+                        src={centerJob.url ?? undefined}
+                        jobId={centerJob.id}
+                        status={centerStatus}
+                        onClick={() => {
+                          if (centerStatus === 'done') {
+                            setModalOpen(true);
+                          }
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full max-w-full rounded-2xl border border-dashed border-white/10 bg-black/30 p-6 text-center text-sm text-gray-400">
+                      Escreva seu briefing criativo e clique em "Gerar com imagino.AI" para começar.
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="w-full rounded-2xl border border-white/10 bg-black/30 p-3 backdrop-blur sm:p-4 xl:sticky xl:top-4">
+                <div className="flex items-center justify-between gap-2 text-white">
+                  <p className="text-sm font-semibold">Últimas execuções</p>
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(p - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
+                      >
+                        <ChevronLeft size={14} />
+                      </button>
+                      <span className="text-[11px] text-gray-300">
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="rounded-full border border-white/10 p-1 text-xs disabled:opacity-50"
+                      >
+                        <ChevronRight size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {images.length === 0 ? (
+                  <p className="mt-3 text-sm text-gray-400 sm:mt-4">
+                    As imagens geradas e execuções em andamento aparecerão aqui.
+                  </p>
+                ) : (
+                  <div className="mt-3 grid grid-cols-3 gap-3 sm:mt-4 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-2 2xl:grid-cols-3">
+                    {paginatedImages.map(job => (
+                      <button
+                        key={job.id}
+                        onClick={() => {
+                          updateSelectedJobId(job.id);
+                        }}
+                        className={`group relative aspect-square overflow-hidden rounded-xl border-2 bg-black/30 transition hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-fuchsia-500/40 ${
+                          selectedJobId === job.id ? 'border-purple-500' : 'border-white/10'
+                        }`}
+                      >
+                        {job.status === 'done' && job.url ? (
+                          <img
+                            src={job.url}
+                            className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
+                            alt=""
+                          />
+                        ) : job.status === 'failed' ? (
+                          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
+                            <span className="text-xs font-semibold">Falhou</span>
+                            <span className="text-[11px] text-red-100/80">Toque para tentar novamente</span>
+                          </div>
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-white/5 text-[11px] uppercase tracking-wide text-gray-300">
+                            Carregando...
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section className="rounded-3xl border border-white/10 bg-black/30 p-3 shadow-[0_30px_120px_-50px_rgba(168,85,247,0.3)] backdrop-blur sm:p-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] uppercase tracking-[0.25em] text-fuchsia-200">Seu álbum</p>
+              <h3 className="text-xl font-semibold text-white sm:text-2xl">Todas as imagens geradas</h3>
+              <p className="text-sm text-gray-300">
+                Visualize cada criação feita com a imagino.AI, independente do modelo utilizado.
+              </p>
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-gray-200">
+              <Sparkles className="h-4 w-4 text-fuchsia-200" />
+              {albumImages.length === 1 ? '1 imagem salva' : `${albumImages.length} imagens salvas`}
+            </div>
+          </div>
+
+          {historyLoading && (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div
+                  key={`album-skeleton-${index}`}
+                  className="aspect-square w-full animate-pulse rounded-2xl border border-white/10 bg-white/5"
+                />
+              ))}
+            </div>
+          )}
+
+          {!historyLoading && albumImages.length === 0 && (
+            <div className="mt-4 rounded-2xl border border-white/10 bg-black/40 p-6 text-center text-sm text-gray-300">
+              Suas gerações aparecerão aqui assim que forem concluídas.
+            </div>
+          )}
+
+          {!historyLoading && albumImages.length > 0 && (
+            <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+              {albumImages.map(entry => {
+                const label = entry.modelSlug ? modelLookup.get(entry.modelSlug) ?? entry.modelSlug : 'Modelo';
+                const dateLabel = entry.createdAt
+                  ? new Date(entry.createdAt).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })
+                  : '';
+                return (
+                  <button
+                    key={entry.id}
+                    onClick={() => {
+                      updateSelectedJobId(entry.id);
+                      setModalOpen(true);
+                    }}
+                    className="group relative aspect-square overflow-hidden rounded-2xl border border-white/10 bg-white/5 text-left shadow-lg shadow-black/20 transition hover:-translate-y-1 hover:border-fuchsia-300/60 hover:shadow-fuchsia-500/20 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50"
+                  >
+                    {entry.status === 'done' && entry.url ? (
+                      <img src={entry.url} alt="Imagem gerada" className="h-full w-full object-cover transition duration-200 group-hover:scale-105" />
+                    ) : entry.status === 'failed' ? (
+                      <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-red-500/10 text-red-100">
+                        <span className="text-xs font-semibold">Falhou</span>
+                        <span className="text-[11px] text-red-100/80">Toque para detalhes</span>
+                      </div>
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-white/5 text-[11px] uppercase tracking-wide text-gray-300">
+                        Em progresso
+                      </div>
+                    )}
+
+                    <div className="absolute inset-x-0 bottom-0 space-y-1 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-3 text-xs text-white">
+                      <p className="line-clamp-2 text-sm font-semibold text-white drop-shadow">{entry.prompt || 'Solicitação enviada'}</p>
+                      <div className="flex items-center justify-between text-[11px] text-gray-200">
+                        <span className="truncate">{label}</span>
+                        {dateLabel && <span>{dateLabel}</span>}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      </div>
 
       {advancedModalOpen && (
         <div
@@ -1258,7 +1491,6 @@ export default function ImageModelPage() {
         email={typeof window !== 'undefined' ? localStorage.getItem('userEmail') : ''}
         onClose={() => setEmailModal(false)}
       />
-      </div>
     </div>
   );
 }
