@@ -14,7 +14,7 @@ export default function ImagesIndexPage() {
 
     async function resolveDefaultModel() {
       try {
-        const models = await getPublicImageModels();
+        const models = (await getPublicImageModels()).slice().reverse();
         if (models.length === 0 || !models[0].slug) {
           throw new Error('No image models are available yet.');
         }
