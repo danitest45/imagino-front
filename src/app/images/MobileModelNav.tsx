@@ -18,7 +18,8 @@ export default function MobileModelNav() {
       try {
         const data = await getPublicImageModels();
         if (!active) return;
-        setModels(data);
+        const orderedModels = [...data].reverse();
+        setModels(orderedModels);
       } catch (error) {
         console.warn('Failed to fetch mobile image models', error);
         if (active) {
@@ -48,7 +49,7 @@ export default function MobileModelNav() {
   const skeletonItems = Array.from({ length: 3 }).map((_, index) => (
     <div
       key={`mobile-model-skeleton-${index}`}
-      className="h-10 w-28 flex-shrink-0 animate-pulse rounded-2xl border border-white/10 bg-white/5"
+      className="h-10 w-32 flex-shrink-0 animate-pulse rounded-2xl border border-white/10 bg-gradient-to-r from-white/5 via-white/0 to-fuchsia-500/10"
     />
   ));
 
@@ -69,14 +70,26 @@ export default function MobileModelNav() {
             <Link
               key={model.slug}
               href={`/images/${model.slug}`}
-              className={`inline-flex h-10 flex-shrink-0 items-center gap-2 rounded-2xl border px-4 text-sm font-semibold transition ${
+              className={`relative inline-flex h-11 flex-shrink-0 items-center gap-2 rounded-2xl border px-4 text-sm font-semibold transition ${
                 isActive
-                  ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/30 via-purple-500/30 to-cyan-400/20 text-white shadow-lg shadow-purple-500/30'
-                  : 'border-white/10 bg-black/40 text-gray-200 hover:border-fuchsia-400/40 hover:text-white'
+                  ? 'border-fuchsia-300/70 bg-gradient-to-r from-fuchsia-600/30 via-purple-500/25 to-cyan-400/25 text-white shadow-lg shadow-fuchsia-500/30'
+                  : 'border-white/10 bg-gradient-to-r from-white/5 via-white/0 to-fuchsia-500/10 text-gray-100 hover:border-fuchsia-300/50 hover:text-white'
               }`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span className="truncate">{model.displayName}</span>
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-xl border text-xs uppercase tracking-wide ${
+                  isActive
+                    ? 'border-fuchsia-200/70 bg-white/10 text-white'
+                    : 'border-white/10 bg-black/50 text-gray-200'
+                }`}
+              >
+                {model.displayName.slice(0, 2)}
+              </span>
+              <div className="flex flex-col text-left leading-tight">
+                <span className="truncate text-sm font-semibold">{model.displayName}</span>
+                <span className="text-[10px] uppercase tracking-[0.28em] text-gray-400">{model.slug.replace(/-/g, ' ')}</span>
+              </div>
             </Link>
           );
         })}

@@ -18,7 +18,8 @@ export default function Sidebar() {
       try {
         const data = await getPublicImageModels();
         if (!active) return;
-        setModels(data);
+        const orderedModels = [...data].reverse();
+        setModels(orderedModels);
       } catch (error) {
         console.error('Failed to fetch image models', error);
       } finally {
@@ -38,7 +39,7 @@ export default function Sidebar() {
   const skeletonItems = Array.from({ length: 3 }).map((_, index) => (
     <div
       key={`model-skeleton-${index}`}
-      className="h-[88px] w-full animate-pulse rounded-3xl border border-white/10 bg-white/5"
+      className="h-[104px] w-full animate-pulse rounded-3xl border border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-fuchsia-500/10"
     />
   ));
 
@@ -68,18 +69,40 @@ export default function Sidebar() {
                   href={href}
                   className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
                     active
-                      ? 'border-fuchsia-400/60 bg-gradient-to-r from-fuchsia-500/25 via-purple-500/20 to-cyan-400/20 shadow-lg shadow-purple-500/40'
-                      : 'border-white/10 bg-black/40 hover:border-fuchsia-400/40 hover:bg-black/50'
+                      ? 'border-fuchsia-300/70 bg-gradient-to-br from-fuchsia-600/30 via-purple-500/25 to-cyan-400/25 shadow-xl shadow-purple-500/40'
+                      : 'border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-fuchsia-500/5 hover:border-fuchsia-300/50 hover:shadow-lg hover:shadow-fuchsia-500/20'
                   }`}
                 >
-                  <div className="relative flex items-center justify-between">
-                    <h3 className="text-base font-semibold text-white">{model.displayName}</h3>
-                    <span
-                      className={`inline-flex h-3 w-3 shrink-0 rounded-full ${
-                        active ? 'bg-fuchsia-400' : 'bg-white/30'
+                  <div className="pointer-events-none absolute -inset-1 -z-10 opacity-0 blur-2xl transition duration-300 group-hover:opacity-70" aria-hidden>
+                    <div className="h-full w-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/25" />
+                  </div>
+
+                  <div className="relative flex items-center gap-4">
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl border text-base font-semibold uppercase tracking-wide ${
+                        active
+                          ? 'border-fuchsia-200/60 bg-white/10 text-white shadow-inner shadow-fuchsia-500/40'
+                          : 'border-white/10 bg-black/60 text-gray-200'
+                      }`}
+                    >
+                      {model.displayName.slice(0, 2)}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <h3 className="text-base font-semibold text-white">{model.displayName}</h3>
+                      <p className="text-xs uppercase tracking-[0.28em] text-gray-400">
+                        {model.slug.replace(/-/g, ' ')}
+                      </p>
+                    </div>
+                    <div
+                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-semibold ${
+                        active
+                          ? 'border-fuchsia-200/80 bg-white/10 text-white'
+                          : 'border-white/10 bg-white/5 text-gray-200'
                       }`}
                       aria-hidden
-                    />
+                    >
+                      {active ? 'Active' : 'Go'}
+                    </div>
                   </div>
                 </Link>
               );
