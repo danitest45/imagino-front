@@ -93,16 +93,6 @@ export default function Sidebar() {
                         {model.slug.replace(/-/g, ' ')}
                       </p>
                     </div>
-                    <div
-                      className={`flex h-8 w-8 items-center justify-center rounded-full border text-[11px] font-semibold ${
-                        active
-                          ? 'border-fuchsia-200/80 bg-white/10 text-white'
-                          : 'border-white/10 bg-white/5 text-gray-200'
-                      }`}
-                      aria-hidden
-                    >
-                      {active ? 'Active' : 'Go'}
-                    </div>
                   </div>
                 </Link>
               );
