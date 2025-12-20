@@ -25,7 +25,7 @@ export default function ImageCard({ src, jobId, status = 'done', onClick }: Prop
 
   return (
     <div
-      className="group relative w-full cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-purple-500/10 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-400/40 hover:shadow-purple-500/30 animate-fade-in"
+      className="group relative flex w-full cursor-pointer overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl shadow-purple-500/10 transition duration-300 hover:-translate-y-1 hover:border-fuchsia-400/40 hover:shadow-purple-500/30 animate-fade-in"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onClick}
@@ -42,7 +42,7 @@ export default function ImageCard({ src, jobId, status = 'done', onClick }: Prop
             width={1024}
             height={1024}
             alt="Generated image"
-            className="h-full w-full object-cover"
+            className="mx-auto max-h-[70vh] w-full max-w-full object-contain"
           />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
         </>
