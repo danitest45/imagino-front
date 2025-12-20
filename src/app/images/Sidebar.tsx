@@ -79,7 +79,7 @@ export default function Sidebar() {
                   </div>
 
                   {isNewest && (
-                    <div className="pointer-events-none absolute right-4 top-3 -translate-y-1 flex items-center" aria-hidden>
+                    <div className="pointer-events-none absolute right-4 -top-2 flex items-center" aria-hidden>
                       <span className="relative inline-flex items-center gap-1 overflow-hidden rounded-full border border-white/20 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-fuchsia-500/40">
                         <span className="absolute inset-0 animate-ping rounded-full bg-white/30" />
                         <span className="relative">New</span>
