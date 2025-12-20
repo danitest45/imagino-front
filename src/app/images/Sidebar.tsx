@@ -68,7 +68,7 @@ export default function Sidebar() {
                 <Link
                   key={model.slug}
                   href={href}
-                  className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
+                  className={`group relative block overflow-visible rounded-3xl border px-5 py-5 transition ${
                     active
                       ? 'border-fuchsia-300/70 bg-gradient-to-br from-fuchsia-600/30 via-purple-500/25 to-cyan-400/25 shadow-xl shadow-purple-500/40'
                       : 'border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-fuchsia-500/5 hover:border-fuchsia-300/50 hover:shadow-lg hover:shadow-fuchsia-500/20'
@@ -79,10 +79,10 @@ export default function Sidebar() {
                   </div>
 
                   {isNewest && (
-                    <div className="pointer-events-none absolute right-4 -top-2 flex items-center" aria-hidden>
-                      <span className="relative inline-flex items-center gap-1 overflow-hidden rounded-full border border-white/20 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-fuchsia-500/40">
-                        <span className="absolute inset-0 animate-ping rounded-full bg-white/30" />
-                        <span className="relative">New</span>
+                    <div className="pointer-events-none absolute -right-1 -top-4 flex items-center" aria-hidden>
+                      <span className="relative inline-flex items-center gap-1 rounded-full border border-white/30 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-[0_12px_22px_-6px_rgba(236,72,153,0.55)] drop-shadow-[0_6px_12px_rgba(0,0,0,0.45)]">
+                        <span className="absolute inset-0 animate-ping rounded-full bg-white/35" />
+                        <span className="relative -translate-y-[1px] -rotate-3">New</span>
                       </span>
                     </div>
                   )}
