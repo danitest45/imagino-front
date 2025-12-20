@@ -10,9 +10,11 @@ export default function Sidebar() {
   const pathname = usePathname();
   const [models, setModels] = useState<PublicImageModelSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNewPing, setShowNewPing] = useState(true);
 
   useEffect(() => {
     let active = true;
+    const timer = window.setTimeout(() => setShowNewPing(false), 10000);
 
     async function loadModels() {
       try {
@@ -33,6 +35,7 @@ export default function Sidebar() {
 
     return () => {
       active = false;
+      window.clearTimeout(timer);
     };
   }, []);
 
@@ -60,14 +63,15 @@ export default function Sidebar() {
       <nav className="space-y-3">
         {loading
           ? skeletonItems
-          : models.map(model => {
+          : models.map((model, index) => {
               const href = `/images/${model.slug}`;
               const active = pathname === href;
+              const isNewest = index === 0;
               return (
                 <Link
                   key={model.slug}
                   href={href}
-                  className={`group relative block overflow-hidden rounded-3xl border px-5 py-5 transition ${
+                  className={`group relative block overflow-visible rounded-3xl border px-5 py-5 transition ${
                     active
                       ? 'border-fuchsia-300/70 bg-gradient-to-br from-fuchsia-600/30 via-purple-500/25 to-cyan-400/25 shadow-xl shadow-purple-500/40'
                       : 'border-white/10 bg-gradient-to-br from-white/5 via-white/0 to-fuchsia-500/5 hover:border-fuchsia-300/50 hover:shadow-lg hover:shadow-fuchsia-500/20'
@@ -76,6 +80,15 @@ export default function Sidebar() {
                   <div className="pointer-events-none absolute -inset-1 -z-10 opacity-0 blur-2xl transition duration-300 group-hover:opacity-70" aria-hidden>
                     <div className="h-full w-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/25" />
                   </div>
+
+                  {isNewest && (
+                    <div className="pointer-events-none absolute -right-1 -top-4 flex items-center" aria-hidden>
+                      <span className="relative inline-flex items-center gap-1 rounded-full border border-white/30 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-[0_12px_22px_-6px_rgba(236,72,153,0.55)] drop-shadow-[0_6px_12px_rgba(0,0,0,0.45)]">
+                        {showNewPing && <span className="absolute inset-0 animate-ping rounded-full bg-white/35" />}
+                        <span className="relative -translate-y-[1px] -rotate-3">New</span>
+                      </span>
+                    </div>
+                  )}
 
                   <div className="relative flex items-center gap-4">
                     <div
