@@ -41,6 +41,9 @@ export default function ProfilePage() {
       }
     }
     loadCredits();
+    const handler = () => loadCredits();
+    window.addEventListener('creditsUpdated', handler);
+    return () => window.removeEventListener('creditsUpdated', handler);
   }, [token]);
 
   return (
