@@ -64,8 +64,9 @@ export default function MobileModelNav() {
       )}
 
       {!loading &&
-        models.map(model => {
+        models.map((model, index) => {
           const isActive = activeSlug === model.slug;
+          const isNewest = index === 0;
           return (
             <Link
               key={model.slug}
@@ -90,6 +91,12 @@ export default function MobileModelNav() {
                 <span className="truncate text-sm font-semibold">{model.displayName}</span>
                 <span className="text-[10px] uppercase tracking-[0.28em] text-gray-400">{model.slug.replace(/-/g, ' ')}</span>
               </div>
+              {isNewest && (
+                <span className="relative inline-flex items-center rounded-full border border-white/20 bg-white/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-fuchsia-400/40" aria-hidden />
+                  <span className="relative">New</span>
+                </span>
+              )}
             </Link>
           );
         })}

@@ -60,9 +60,10 @@ export default function Sidebar() {
       <nav className="space-y-3">
         {loading
           ? skeletonItems
-          : models.map(model => {
+          : models.map((model, index) => {
               const href = `/images/${model.slug}`;
               const active = pathname === href;
+              const isNewest = index === 0;
               return (
                 <Link
                   key={model.slug}
@@ -76,6 +77,15 @@ export default function Sidebar() {
                   <div className="pointer-events-none absolute -inset-1 -z-10 opacity-0 blur-2xl transition duration-300 group-hover:opacity-70" aria-hidden>
                     <div className="h-full w-full bg-gradient-to-r from-fuchsia-500/30 via-purple-500/20 to-cyan-400/25" />
                   </div>
+
+                  {isNewest && (
+                    <div className="pointer-events-none absolute right-4 top-4 flex items-center" aria-hidden>
+                      <span className="relative inline-flex items-center gap-1 overflow-hidden rounded-full border border-white/20 bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.25em] text-white shadow-lg shadow-fuchsia-500/40">
+                        <span className="absolute inset-0 animate-ping rounded-full bg-white/30" />
+                        <span className="relative">New</span>
+                      </span>
+                    </div>
+                  )}
 
                   <div className="relative flex items-center gap-4">
                     <div
