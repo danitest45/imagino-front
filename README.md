@@ -51,3 +51,19 @@ API requests are centralized and return [RFC 7807](https://www.rfc-editor.org/rf
 - **Rate limited** – perform many requests quickly to view the rate-limit toast.
 
 Unhandled errors fall back to a generic toast containing the backend `traceId` for support.
+## Phase 0B.1: autenticação e mídia
+
+Google inicia na API em `/api/auth/google/login` e retorna sem JWT na URL.
+O frontend obtém acesso pelo refresh cookie HttpOnly e mantém o JWT em memória.
+`NEXT_PUBLIC_GOOGLE_CLIENT_ID` e `NEXT_PUBLIC_GOOGLE_REDIRECT_URI` não são mais lidas;
+remover do painel apenas em uma etapa operacional autorizada.
+
+Configure `NEXT_PUBLIC_API_URL` por ambiente. O inventário encontrou as variáveis
+atuais em All Environments: previews existentes não constituem staging isolado.
+Antes de validar uma preview, apontá-la à API de staging, com dados sintéticos.
+
+O proxy de imagens aceita Replicate delivery e hosts exatos definidos na variável
+server-only `MEDIA_ALLOWED_HOSTS`. Configure os hosts públicos R2 de cada ambiente;
+não use wildcard ou hosts internos. DNS privado, redirects, conteúdo não imagem,
+respostas maiores que 20 MiB e downloads acima de 30 segundos são recusados.
+Veja o plano operacional na PR da API para os gates de rollout e rollback.

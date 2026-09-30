@@ -4,6 +4,7 @@ import { useContext, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '../../lib/api';
+import { apiUrl } from '../../lib/config';
 import { AuthContext } from '../../context/AuthContext';
 import { CheckCircle2, Eye, EyeOff, Loader2, Lock, Mail } from 'lucide-react';
 import { Problem, mapProblemToUI } from '../../lib/errors';
@@ -46,19 +47,8 @@ export default function LoginPage() {
     }
   };
 
-  // Redirect user to Google's consent screen
   const handleGoogleLogin = () => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    const redirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
-    const scope = 'openid email profile';
-    const authUrl =
-      `https://accounts.google.com/o/oauth2/v2/auth` +
-      `?client_id=${clientId}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri || '')}` +
-      `&response_type=code` +
-      `&scope=${encodeURIComponent(scope)}` +
-      `&prompt=select_account`;
-    window.location.href = authUrl;
+    window.location.assign(apiUrl('/api/auth/google/login'));
   };
 
   const highlights = useMemo(

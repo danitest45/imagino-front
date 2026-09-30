@@ -1,8 +1,9 @@
 'use client';
 
 import { Suspense, useEffect, useContext } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { AuthContext } from '../../context/AuthContext';
+import { getAccessToken, refreshAccessToken } from '../../lib/auth';
 
 export default function GoogleAuthPage() {
   return (
@@ -13,19 +14,27 @@ export default function GoogleAuthPage() {
 }
 
 function GoogleAuthContent() {
-  const params = useSearchParams();
   const router = useRouter();
   const auth = useContext(AuthContext);
+  const login = auth?.login;
 
   useEffect(() => {
-    const token = params.get('token');
-    if (token && auth) {
-      auth.login(token);
-      router.push('/images/replicate');
-    } else {
-      router.push('/login');
+    if (!login) return;
+    let canceled = false;
+    async function finishLogin() {
+      if (!getAccessToken()) await refreshAccessToken();
+      if (canceled) return;
+      const token = getAccessToken();
+      if (token) {
+        login!(token);
+        router.replace('/images/replicate');
+      } else {
+        router.replace('/login');
+      }
     }
-  }, [params, auth, router]);
+    void finishLogin();
+    return () => { canceled = true; };
+  }, [login, router]);
 
   return (
     <div className="min-h-[100dvh] flex items-center justify-center text-white">

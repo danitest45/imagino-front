@@ -2,16 +2,30 @@ import { buildProblem } from './api-client';
 import { apiUrl } from './config';
 
 export let accessToken: string | null = null;
+let authEpoch = 0;
 
 export function setAccessToken(token: string | null) {
   accessToken = token;
+  authEpoch += 1;
 }
 
 export function getAccessToken(): string | null {
   return accessToken;
 }
 
-export async function refreshAccessToken(): Promise<boolean> {
+let pendingRefresh: Promise<boolean> | null = null;
+
+// Rotation consumes the old cookie once. Share concurrent refresh calls from the
+// provider, OAuth return page and request retries.
+export function refreshAccessToken(): Promise<boolean> {
+  if (!pendingRefresh) {
+    pendingRefresh = performRefresh().finally(() => { pendingRefresh = null; });
+  }
+  return pendingRefresh;
+}
+
+async function performRefresh(): Promise<boolean> {
+  const epoch = authEpoch;
   try {
     const res = await fetch(apiUrl('/api/auth/refresh'), {
       method: 'POST',
@@ -19,7 +33,8 @@ export async function refreshAccessToken(): Promise<boolean> {
     });
     if (!res.ok) return false;
     const data = (await res.json()) as { token: string };
-    setAccessToken(data.token);
+    if (epoch !== authEpoch) return false;
+    accessToken = data.token;
     return true;
   } catch {
     return false;
@@ -59,6 +74,7 @@ export async function fetchWithAuth(
 }
 
 export async function logoutRequest(): Promise<void> {
+  setAccessToken(null);
   try {
     await fetch(apiUrl('/api/auth/logout'), {
       method: 'POST',

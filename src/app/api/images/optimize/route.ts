@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { allowedMediaUrl, downloadPublicImage } from '../../../../lib/server-media';
 
 export const runtime = 'nodejs';
 
@@ -21,37 +22,24 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const upstreamUrl = new URL(rawUrl);
+    const upstreamUrl = allowedMediaUrl(rawUrl);
     // Append a generic width hint; many providers respect either `w` or `width` query params.
     upstreamUrl.searchParams.set('width', String(targetWidth));
 
-    const upstreamResponse = await fetch(upstreamUrl.toString(), {
-      headers: {
-        Accept: `${preferredFormat === 'avif' ? 'image/avif,' : ''}image/webp,image/*;q=0.8,*/*;q=0.5`,
-      },
-    });
+    const { bytes, contentType } = await downloadPublicImage(upstreamUrl,
+      `${preferredFormat === 'avif' ? 'image/avif,' : ''}image/webp,image/*;q=0.8`);
 
-    if (!upstreamResponse.ok) {
-      const detail = `${upstreamResponse.status} ${upstreamResponse.statusText}`;
-      console.error('[optimize-image] Upstream error', detail);
-      return NextResponse.json({ error: 'Failed to fetch image', detail }, { status: 502 });
-    }
-
-    const buffer = await upstreamResponse.arrayBuffer();
-    const contentType = upstreamResponse.headers.get('content-type')
-      ?? `image/${preferredFormat}`;
-
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(bytes), {
       status: 200,
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=3600',
         'Access-Control-Allow-Origin': '*',
         'X-Imagino-Optimized-Width': String(targetWidth),
+        'X-Content-Type-Options': 'nosniff',
       },
     });
-  } catch (error) {
-    console.error('[optimize-image] Unexpected error', error);
-    return NextResponse.json({ error: 'Unable to optimize image' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Unable to fetch permitted image' }, { status: 400 });
   }
 }
