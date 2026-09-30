@@ -24,7 +24,7 @@ test('media proxy rejects private DNS answers, including IPv6 and mapped IPv4', 
   assert.equal(exportsForTest.publicMediaAddress('2606:4700:4700::1111'), true);
 });
 
-function loadDownloader({ address = '8.8.8.8', status = 302 }) {
+function loadDownloader({ address = '8.8.8.8', status = 302, contentType = 'image/png', contentLength, body = Buffer.from('fixture') }) {
   const { EventEmitter } = require('node:events');
   const { Readable } = require('node:stream');
   const state = { requests: 0, socketAddress: null };
@@ -36,9 +36,9 @@ function loadDownloader({ address = '8.8.8.8', status = 302 }) {
       process.nextTick(() => options.lookup('cdn.replicate.delivery', {}, (error, chosen) => {
         if (error) { request.destroy(error); return; }
         state.socketAddress = chosen;
-        const response = Readable.from([Buffer.from('fixture')]);
+        const response = Readable.from([body]);
         response.statusCode = status;
-        response.headers = { 'content-type': 'image/png', location: 'http://localhost/private' };
+        response.headers = { 'content-type': contentType, location: 'https://example.com/unexpected', ...(contentLength === undefined ? {} : { 'content-length': String(contentLength) }) };
         respond(response);
         response.on('close', () => request.emit('close'));
       }));
@@ -66,4 +66,32 @@ test('proxy aborts when an allowed host resolves to a private address', async ()
   const { output, state } = loadDownloader({ address: '169.254.169.254', status: 200 });
   await assert.rejects(output.downloadPublicImage(new URL('https://cdn.replicate.delivery/file'), 'image/png'));
   assert.equal(state.socketAddress, null);
+});
+
+test('proxy permits only the exact configured staging host over HTTPS', () => {
+  const host = 'pub-56f86851d1884a3b8e7a73f1624e4239.r2.dev';
+  assert.equal(exportsForTest.allowedMediaUrl(`https://${host}/fixture.png`, host).hostname, host);
+  assert.throws(() => exportsForTest.allowedMediaUrl(`http://${host}/fixture.png`, host));
+  assert.throws(() => exportsForTest.allowedMediaUrl('https://example.com/fixture.png', host));
+  assert.throws(() => exportsForTest.allowedMediaUrl('https://pub-00000000000000000000000000000000.r2.dev/fixture.png', host));
+});
+
+test('proxy rejects invalid MIME, declared oversized content and streaming overflow', async () => {
+  for (const options of [
+    { contentType: 'text/html' },
+    { contentLength: 20 * 1024 * 1024 + 1 },
+    { body: Buffer.alloc(20 * 1024 * 1024 + 1) },
+  ]) {
+    const { output, state } = loadDownloader({ status: 200, ...options });
+    await assert.rejects(output.downloadPublicImage(new URL('https://cdn.replicate.delivery/fixture'), 'image/png'));
+    assert.equal(state.requests, 1);
+  }
+});
+
+test('proxy accepts a bounded image response and preserves its MIME', async () => {
+  const fixture = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
+  const { output } = loadDownloader({ status: 200, body: fixture, contentLength: fixture.length });
+  const downloaded = await output.downloadPublicImage(new URL('https://cdn.replicate.delivery/fixture'), 'image/png');
+  assert.equal(downloaded.contentType, 'image/png');
+  assert.deepEqual(downloaded.bytes, fixture);
 });
