@@ -1176,7 +1176,7 @@ export default function ImageModelPage() {
                     >
                       {job.status === 'done' && job.url ? (
                         <img
-                          src={job.url}
+                          src={`/api/images/optimize?url=${encodeURIComponent(job.url)}&width=256&format=webp`}
                           className="h-full w-full object-cover transition duration-200 group-hover:scale-105"
                           alt=""
                         />
