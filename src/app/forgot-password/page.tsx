@@ -106,7 +106,7 @@ export default function ForgotPasswordPage() {
                   <span>Check your inbox</span>
                 </div>
                 <p>
-                  If an account exists for <span className="font-semibold text-white">{email}</span>, we sent a secure link to reset your password. Follow the instructions within 10 minutes to keep it active.
+                  If an account exists for <span className="font-semibold text-white">{email}</span>, we sent a secure link to reset your password. Follow the instructions within 30 minutes to keep it active.
                 </p>
                 <div className="flex flex-col gap-3 text-xs text-slate-300">
                   <p>Didn’t receive anything? Check your spam folder or try another email.</p>
