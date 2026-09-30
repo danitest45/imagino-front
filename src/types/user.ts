@@ -5,4 +5,7 @@ export interface UserDto {
   phoneNumber: string | null;
 }
 
-export type UpdateUserDto = Partial<UserDto>;
+export interface UserProfileUpdate {
+  username: string;
+  phoneNumber: string | null;
+}
