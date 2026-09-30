@@ -3,15 +3,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { Pencil } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { getUserId, getUserById, updateUser } from '../../lib/api';
+import { getCurrentUser, updateCurrentUserProfile, uploadCurrentUserAvatar } from '../../lib/api';
 import type { UserDto } from '../../types/user';
 
 export default function UserInfo() {
   const { token } = useAuth();
   const [user, setUser] = useState<UserDto | null>(null);
   const [form, setForm] = useState<UserDto | null>(null);
-  const [editing, setEditing] = useState<keyof UserDto | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<'username' | 'phoneNumber' | null>(null);
   const [visible, setVisible] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -21,9 +20,7 @@ export default function UserInfo() {
     async function load() {
       if (!token) return;
       try {
-        const id = await getUserId();
-        setUserId(id);
-        const data = await getUserById(id);
+        const data = await getCurrentUser();
         setUser(data);
         setForm(data);
       } catch (err) {
@@ -38,22 +35,28 @@ export default function UserInfo() {
     setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const result = reader.result as string;
-      setForm((prev) => (prev ? { ...prev, profileImageUrl: result } : prev));
-      setEditing('profileImageUrl');
-    };
-    reader.readAsDataURL(file);
+    try {
+      const imageUrl = await uploadCurrentUserAvatar(file);
+      setUser((prev) => (prev ? { ...prev, profileImageUrl: imageUrl } : prev));
+      setForm((prev) => (prev ? { ...prev, profileImageUrl: imageUrl } : prev));
+      window.dispatchEvent(new Event('userUpdated'));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      e.target.value = '';
+    }
   };
 
   const handleSave = async () => {
-    if (!token || !userId || !form) return;
+    if (!token || !form) return;
     try {
-      const updated = await updateUser(userId, form);
+      const updated = await updateCurrentUserProfile({
+        username: form.username,
+        phoneNumber: form.phoneNumber,
+      });
       setUser(updated);
       setForm(updated);
       setEditing(null);
@@ -63,8 +66,8 @@ export default function UserInfo() {
     }
   };
 
-  const fields: { key: keyof UserDto; label: string; helper?: string }[] = [
-    { key: 'email', label: 'Email address', helper: 'Where we send receipts and important updates.' },
+  const fields: { key: 'email' | 'username' | 'phoneNumber'; label: string; helper?: string }[] = [
+    { key: 'email', label: 'Email address', helper: 'Read only. Email changes will require a separate verification flow.' },
     { key: 'username', label: 'Display name', helper: 'Shown on shared creations and community feeds.' },
     { key: 'phoneNumber', label: 'Phone number', helper: 'Optional. Enables faster support follow-ups.' },
   ];
@@ -127,7 +130,7 @@ export default function UserInfo() {
                   <label className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400" htmlFor={field.key}>
                     {field.label}
                   </label>
-                  {editing === field.key ? (
+                  {field.key !== 'email' && editing === field.key ? (
                     <input
                       id={field.key}
                       name={field.key}
@@ -140,13 +143,15 @@ export default function UserInfo() {
                   )}
                   {field.helper && <p className="text-xs text-gray-400">{field.helper}</p>}
                 </div>
-                <button
+                {field.key !== 'email' && <button
                   type="button"
-                  onClick={() => setEditing(editing === field.key ? null : field.key)}
+                  onClick={() => {
+                    if (field.key !== 'email') setEditing(editing === field.key ? null : field.key);
+                  }}
                   className="relative inline-flex h-9 items-center justify-center rounded-full border border-white/15 bg-white/5 px-3 text-xs font-semibold uppercase tracking-[0.3em] text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
                 >
                   <Pencil className="h-3.5 w-3.5" />
-                </button>
+                </button>}
               </div>
             </div>
           ))}

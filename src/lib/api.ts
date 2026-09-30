@@ -6,7 +6,7 @@ import type {
   ImageModelVersionSummary,
   JsonSchema,
 } from '../types/image-model';
-import type { UserDto } from '../types/user';
+import type { UserDto, UserProfileUpdate } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch, buildProblem } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
@@ -492,17 +492,9 @@ export async function getUserHistory(): Promise<ImageJobApi[]> {
   return (await res.json()) as ImageJobApi[];
 }
 
-export async function getUserId(): Promise<string> {
+export async function getCurrentUser(): Promise<UserDto> {
   const res = await fetchWithAuth(
-    apiUrl('/api/users'),
-  );
-  const id = await res.text();
-  return id.replace(/^"|"$/g, '');
-}
-
-export async function getUserById(id: string): Promise<UserDto> {
-  const res = await fetchWithAuth(
-    apiUrl(`/api/users/${id}`),
+    apiUrl('/api/users/me'),
   );
   return (await res.json()) as UserDto;
 }
@@ -515,12 +507,9 @@ export async function getCredits(): Promise<number> {
   return json.credits as number;
 }
 
-export async function updateUser(
-  id: string,
-  dto: Partial<UserDto>,
-): Promise<UserDto> {
+export async function updateCurrentUserProfile(dto: UserProfileUpdate): Promise<UserDto> {
   const res = await fetchWithAuth(
-    apiUrl(`/api/users/${id}`),
+    apiUrl('/api/users/me'),
     {
       method: 'PUT',
       headers: {
@@ -530,6 +519,17 @@ export async function updateUser(
     },
   );
   return (await res.json()) as UserDto;
+}
+
+export async function uploadCurrentUserAvatar(file: File): Promise<string> {
+  const form = new FormData();
+  form.append('File', file);
+  const res = await fetchWithAuth(apiUrl('/api/users/me/profile-image'), {
+    method: 'POST',
+    body: form,
+  });
+  const json = (await res.json()) as { imageUrl: string };
+  return json.imageUrl;
 }
 
 export function mapApiToUiJob(j: ImageJobApi): UiJob {

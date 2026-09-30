@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Info, Mail } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
-import { getUserById, getUserId, getCredits } from '../lib/api';
+import { getCurrentUser, getCredits } from '../lib/api';
 import type { UserDto } from '../types/user';
 
 const navLinks = [
@@ -45,8 +45,7 @@ export default function Navbar() {
     async function load() {
       if (!token) return;
       try {
-        const id = await getUserId();
-        const data = await getUserById(id);
+        const data = await getCurrentUser();
         setUser(data);
       } catch (err) {
         console.error(err);
