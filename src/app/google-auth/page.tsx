@@ -27,7 +27,7 @@ function GoogleAuthContent() {
       const token = getAccessToken();
       if (token) {
         login!(token);
-        router.replace('/images/replicate');
+        router.replace('/images');
       } else {
         router.replace('/login');
       }

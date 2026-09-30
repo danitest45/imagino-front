@@ -67,3 +67,17 @@ server-only `MEDIA_ALLOWED_HOSTS`. Configure os hosts públicos R2 de cada ambie
 não use wildcard ou hosts internos. DNS privado, redirects, conteúdo não imagem,
 respostas maiores que 20 MiB e downloads acima de 30 segundos são recusados.
 Veja o plano operacional na PR da API para os gates de rollout e rollback.
+
+### Redirects de entrada — revisão antes da Phase 0B.2
+
+Login normal e Google OAuth redirecionam para `/images`; o catálogo existente
+seleciona o modelo disponível. A busca em todo o código encontrou também dois
+links explícitos para `/images/replicate`, preservados nesta revisão:
+
+| Referência | Classificação |
+| --- | --- |
+| `src/app/page.tsx` — Explore gallery | Link de galeria na home |
+| `src/app/_components/ClientGallery.tsx` — Browse entire library | Link da galeria comunitária |
+
+Esses links não são redirects de login e ficam para uma revisão posterior.
+Verificação local: `npm test` 7/7 e `npx tsc --noEmit` sem erros.
