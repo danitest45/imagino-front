@@ -14,10 +14,12 @@ export function getAccessToken(): string | null {
 }
 
 let pendingRefresh: Promise<boolean> | null = null;
+let pendingLogout: Promise<void> | null = null;
 
 // Rotation consumes the old cookie once. Share concurrent refresh calls from the
 // provider, OAuth return page and request retries.
 export function refreshAccessToken(): Promise<boolean> {
+  if (pendingLogout) return Promise.resolve(false);
   if (!pendingRefresh) {
     pendingRefresh = performRefresh().finally(() => { pendingRefresh = null; });
   }
@@ -73,9 +75,19 @@ export async function fetchWithAuth(
   return res;
 }
 
-export async function logoutRequest(): Promise<void> {
-  setAccessToken(null);
+export function logoutRequest(): Promise<void> {
+  if (!pendingLogout) {
+    setAccessToken(null);
+    pendingLogout = performLogout(pendingRefresh).finally(() => { pendingLogout = null; });
+  }
+  return pendingLogout;
+}
+
+async function performLogout(refreshToFinish: Promise<boolean> | null): Promise<void> {
   try {
+    // A pending rotation can still set a cookie even when its JWT is discarded.
+    // Revoke the resulting cookie after that response has finished.
+    await refreshToFinish;
     await fetch(apiUrl('/api/auth/logout'), {
       method: 'POST',
       credentials: 'include',
