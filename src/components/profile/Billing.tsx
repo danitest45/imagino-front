@@ -8,6 +8,8 @@ export default function Billing() {
   const [visible, setVisible] = useState(false);
   const [info, setInfo] = useState<BillingMe | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [openingPortal, setOpeningPortal] = useState(false);
 
   useEffect(() => {
     setVisible(true);
@@ -16,7 +18,7 @@ export default function Billing() {
         const data = await getBillingMe();
         setInfo(data);
       } catch (err) {
-        console.error(err);
+        setError('Não foi possível consultar a assinatura.');
       } finally {
         setLoading(false);
       }
@@ -26,10 +28,13 @@ export default function Billing() {
 
   const handleManage = async () => {
     try {
+      setOpeningPortal(true);
+      setError(null);
       const { url } = await createPortalSession();
       window.location.href = url;
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Não foi possível abrir o portal.');
+      setOpeningPortal(false);
     }
   };
 
@@ -47,13 +52,14 @@ export default function Billing() {
         visible ? 'opacity-100' : 'opacity-0'
       } space-y-6 transition-opacity duration-300`}
     >
+      {error && <p role="alert" className="text-red-300">{error}</p>}
       {loading ? (
         <div className="space-y-4 rounded-2xl border border-white/10 bg-black/30 p-6">
           <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
           <div className="h-8 w-48 animate-pulse rounded-full bg-white/10" />
           <div className="h-14 w-full animate-pulse rounded-2xl bg-white/5" />
         </div>
-      ) : !info?.plan ? (
+      ) : !info && error ? null : !info?.plan ? (
         <section className="relative overflow-hidden rounded-3xl border border-dashed border-fuchsia-400/50 bg-black/30 p-6 text-center shadow-inner shadow-purple-500/20 sm:text-left">
           <div className="absolute -right-14 top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-cyan-400/10 blur-3xl" aria-hidden />
           <h2 className="text-lg font-semibold text-white sm:text-xl">You&apos;re on the Free plan</h2>
@@ -83,6 +89,7 @@ export default function Billing() {
               <p>Invoices, usage summaries, and cancellations live in the billing portal.</p>
               <button
                 onClick={handleManage}
+                disabled={openingPortal}
                 className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
               >
                 Manage subscription

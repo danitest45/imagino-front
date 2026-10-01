@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
+import { createContext, useState, useEffect, ReactNode, useContext, useCallback } from 'react';
 import { setAccessToken, getAccessToken, refreshAccessToken, logoutRequest } from '../lib/auth';
 
 interface AuthContextType {
@@ -37,11 +37,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const login = (newToken: string) => {
+  const login = useCallback((newToken: string) => {
     setAccessToken(newToken);
     setToken(newToken);
     setIsAuthenticated(true);
-  };
+  }, []);
 
   const logout = async () => {
     await logoutRequest();
