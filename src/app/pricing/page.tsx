@@ -5,14 +5,16 @@ import { createCheckoutSession } from '../../lib/billing';
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<'PRO' | 'ULTRA' | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubscribe = async (plan: 'PRO' | 'ULTRA') => {
     try {
       setLoading(plan);
+      setError(null);
       const { url } = await createCheckoutSession(plan);
       window.location.href = url;
     } catch (err) {
-      console.error(err);
+      setError(err instanceof Error ? err.message : 'Não foi possível iniciar o checkout.');
       setLoading(null);
     }
   };
@@ -25,6 +27,7 @@ export default function PricingPage() {
           <p className="text-gray-400 text-lg">Select the perfect plan for your needs</p>
         </div>
         
+        {error && <p role="alert" className="mb-4 text-center text-red-300">{error}</p>}
         <div className="flex flex-col md:flex-row gap-6 md:gap-8 justify-center items-center">
           <div className="bg-gray-900/40 p-6 rounded-xl w-full max-w-sm text-center hover:scale-105 transition-transform">
             <h2 className="text-2xl font-bold mb-2 text-purple-400">PRO</h2>
