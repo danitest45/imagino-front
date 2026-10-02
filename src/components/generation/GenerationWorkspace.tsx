@@ -144,7 +144,7 @@ export default function GenerationWorkspace({ kind }: { kind: 'image' | 'video' 
     previousStates.current = Object.fromEntries(jobs.map(j => [j.id, j.status]));
   }, [jobs]);
 
-  return <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 md:px-8">
+  return <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 text-white md:px-8">
     <header className="flex flex-wrap items-center justify-between gap-4">
       <div><p className="text-sm text-purple-300">Imagino · Generation 2.0</p><h1 className="mt-1 text-3xl font-semibold">{kind === 'image' ? 'Image' : 'Video'} studio</h1><p className="mt-2 text-gray-400">Choose a creative tool, describe your idea, and review the credits before creating.</p></div>
       <nav aria-label="Creation type" className="flex gap-2"><Link className={`rounded-xl px-4 py-2 ${kind === 'image' ? 'bg-purple-500/30' : 'bg-white/5'}`} href="/create/image">Image</Link><Link className={`rounded-xl px-4 py-2 ${kind === 'video' ? 'bg-purple-500/30' : 'bg-white/5'}`} href="/create/video">Video</Link></nav>
@@ -189,7 +189,7 @@ export default function GenerationWorkspace({ kind }: { kind: 'image' | 'video' 
         {model && !ready ? <p className="rounded-xl bg-purple-500/10 p-3 text-sm text-purple-100">{model.availability === 'deployment_pending' ? 'Generation is temporarily unavailable. You can explore this catalog preview and prepare your settings; no credits will be reserved.' : 'This model is configured for evaluation. Generations will be enabled after provider access and test spending are approved.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-200">{error}</p> : null}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-5">
-          <p aria-live="polite" className="text-sm text-gray-300">{preparing ? 'Preparing references…' : quote ? `${quote.credits} credits · reserved now, returned on failure` : isAuthenticated ? 'Enter a prompt to calculate credits' : 'Sign in to calculate credits and create'}</p>
+          <p aria-live="polite" className="text-sm text-gray-300">{preparing ? 'Preparing references…' : model?.availability === 'deployment_pending' ? 'Catalog preview · creation unavailable' : quote ? `${quote.credits} credits · reserved now, returned on failure` : isAuthenticated ? 'Enter a prompt to calculate credits' : 'Sign in to calculate credits and create'}</p>
           {isAuthenticated ? <button disabled={!quote || !ready || !!constraintError || busy || preparing} type="submit" className="rounded-xl bg-purple-500 px-6 py-3 font-semibold text-white hover:bg-purple-400 disabled:cursor-not-allowed disabled:opacity-40">{busy ? 'Submitting…' : 'Create'}</button> : <Link href="/login" className="rounded-xl bg-purple-500 px-6 py-3 font-semibold">Sign in</Link>}
         </div>
       </form>
