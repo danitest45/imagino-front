@@ -69,7 +69,7 @@ export default function GenerationWorkspace({ kind }: { kind: 'image' | 'video' 
   }, [isAuthenticated, loadHistory]);
 
   useEffect(() => {
-    if (!isAuthenticated || !selected || model?.availability === 'deployment_pending' || !prompt.trim() || prompt.length > 2000 || constraintError || preparing) return;
+    if (!isAuthenticated || !selected || ['deployment_pending', 'migration_required', 'retired'].includes(model?.availability ?? '') || !prompt.trim() || prompt.length > 2000 || constraintError || preparing) return;
     const controller = new AbortController();
     const timer = setTimeout(() => {
       quoteGeneration(JSON.parse(requestJson), controller.signal).then(value => {
@@ -157,7 +157,7 @@ export default function GenerationWorkspace({ kind }: { kind: 'image' | 'video' 
           className={`w-full rounded-2xl border p-4 text-left transition ${selected === item.id ? 'border-purple-400 bg-purple-500/15' : 'border-white/10 bg-white/[0.03] hover:border-purple-400/50'}`}>
           <span className="flex justify-between gap-2"><strong>{item.displayName}</strong><span className="text-xs text-gray-400">from {item.startingCredits} cr</span></span>
           <span className="mt-2 block text-sm text-gray-400">{item.description}</span>
-          <span className="mt-3 block text-xs text-purple-200">{item.availability === 'synthetic_demo' ? 'Synthetic staging demo' : item.availability === 'ready' ? 'Available' : item.availability === 'deployment_pending' ? 'Catalog preview · unavailable' : item.availability === 'disabled' ? 'Unavailable' : 'Awaiting activation'}</span>
+          <span className="mt-3 block text-xs text-purple-200">{item.availability === 'synthetic_demo' ? 'Synthetic staging demo' : item.availability === 'ready' ? 'Available' : item.availability === 'deployment_pending' ? 'Catalog preview · unavailable' : item.availability === 'migration_required' ? 'Model update required' : item.availability === 'retired' ? 'Model retired' : item.availability === 'disabled' ? 'Unavailable' : 'Awaiting activation'}</span>
         </button>)}
       </aside>
       <form onSubmit={submit} className="space-y-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-6">
@@ -186,7 +186,7 @@ export default function GenerationWorkspace({ kind }: { kind: 'image' | 'video' 
         </div>)}
         {constraintError ? <p role="alert" className="text-sm text-amber-200">{constraintError}</p> : null}
         {model?.availability === 'synthetic_demo' ? <p className="rounded-xl bg-amber-400/10 p-3 text-sm text-amber-100">This tool returns a fixed synthetic test image. It reserves 1 staging credit and returns it when you select the failure test.</p> : null}
-        {model && !ready ? <p className="rounded-xl bg-purple-500/10 p-3 text-sm text-purple-100">{model.availability === 'deployment_pending' ? 'Generation is temporarily unavailable. You can explore this catalog preview and prepare your settings; no credits will be reserved.' : 'This model is configured for evaluation. Generations will be enabled after provider access and test spending are approved.'}</p> : null}
+        {model && !ready ? <p className="rounded-xl bg-purple-500/10 p-3 text-sm text-purple-100">{model.retirementAt ? 'This video tool is unavailable while its underlying model is updated. You can explore the controls; no credits will be reserved.' : model.availability === 'deployment_pending' ? 'Generation is temporarily unavailable. You can explore this catalog preview and prepare your settings; no credits will be reserved.' : 'This model is configured for evaluation. Generations will be enabled after provider access and test spending are approved.'}</p> : null}
         {error ? <p role="alert" className="text-sm text-red-200">{error}</p> : null}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-5">
           <p aria-live="polite" className="text-sm text-gray-300">{preparing ? 'Preparing references…' : model?.availability === 'deployment_pending' ? 'Catalog preview · creation unavailable' : quote ? `${quote.credits} credits · reserved now, returned on failure` : isAuthenticated ? 'Enter a prompt to calculate credits' : 'Sign in to calculate credits and create'}</p>

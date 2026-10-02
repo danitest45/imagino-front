@@ -18,6 +18,7 @@ export interface GenerationModel {
   inputs: { role: string; label: string; maxCount: number }[];
   rules: { whenKey: string; whenValue: string; requireKey: string; allowedValues: string[] }[];
   availability: string;
+  retirementAt?: string | null;
   startingCredits: number;
 }
 export interface GenerationInput { role: string; data: string }

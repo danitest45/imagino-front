@@ -1,5 +1,5 @@
 {
-  "revision": "2026-10-02.1",
+  "revision": "2026-10-02.2",
   "source": "catalog_preview",
   "models": [
     {
@@ -141,10 +141,10 @@
     },
     {
       "id": "veo-fast-20261002",
-      "version": "2026-10-02.1",
+      "version": "2026-10-02.2",
       "displayName": "Fast Video",
       "category": "Motion",
-      "description": "Short clips with native audio. Veo 3.1 Lite.",
+      "description": "Short clips with native audio. Veo 3.1 Lite. Compatibility preview; endpoint retires October 22. Migration required before activation.",
       "mediaType": "video",
       "providerModel": "veo-3.1-lite-generate-preview",
       "capabilities": [
@@ -209,16 +209,17 @@
           ]
         }
       ],
-      "lifecycle": "ACTIVE",
+      "lifecycle": "COMPATIBILITY",
       "availability": "deployment_pending",
-      "startingCredits": 66
+      "startingCredits": 66,
+      "retirementAt": "2026-10-22T00:00:00Z"
     },
     {
       "id": "veo-cinema-20261002",
-      "version": "2026-10-02.1",
+      "version": "2026-10-02.2",
       "displayName": "Cinema Video",
       "category": "Motion",
-      "description": "Cinematic clips with native audio. Veo 3.1.",
+      "description": "Cinematic clips with native audio. Veo 3.1. Compatibility preview; endpoint retires October 22. Migration required before activation.",
       "mediaType": "video",
       "providerModel": "veo-3.1-generate-preview",
       "capabilities": [
@@ -283,9 +284,10 @@
           ]
         }
       ],
-      "lifecycle": "ACTIVE",
+      "lifecycle": "COMPATIBILITY",
       "availability": "deployment_pending",
-      "startingCredits": 506
+      "startingCredits": 506,
+      "retirementAt": "2026-10-22T00:00:00Z"
     },
     {
       "id": "pipeline-demo-20261002",
