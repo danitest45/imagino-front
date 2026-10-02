@@ -1,5 +1,12 @@
 import type { GenerationInput, GenerationModel, GenerationRequest } from '../types/generation';
 
+export function normalizeLegacyGenerationStatus(status: string): string {
+  const value = status.toUpperCase();
+  return ({ CREATED: 'Queued', QUEUED: 'Queued', STARTING: 'Starting', RUNNING: 'Processing',
+    PENDING: 'Processing', PROCESSING: 'Processing', COMPLETED: 'Completed', FAILED: 'Failed',
+    CANCELLED: 'Cancelled' } as Record<string, string>)[value] ?? status;
+}
+
 export function defaultGenerationSettings(model: GenerationModel): Record<string, string | number> {
   return Object.fromEntries(model.fields.map(f => [f.key, f.type === 'integer' ? Number(f.defaultValue) : f.defaultValue]));
 }

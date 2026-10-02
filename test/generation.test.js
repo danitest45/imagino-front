@@ -30,6 +30,13 @@ test('only final generation states terminate processing', () => {
   for (const state of ['Queued', 'Starting', 'Processing']) assert.equal(generation.terminalGeneration(state), false);
   for (const state of ['Completed', 'Failed', 'Cancelled']) assert.equal(generation.terminalGeneration(state), true);
 });
+
+test('legacy history states normalize without modifying stored jobs', () => {
+  assert.equal(generation.normalizeLegacyGenerationStatus('Created'), 'Queued');
+  assert.equal(generation.normalizeLegacyGenerationStatus('RUNNING'), 'Processing');
+  assert.equal(generation.normalizeLegacyGenerationStatus('Pending'), 'Processing');
+  assert.equal(generation.normalizeLegacyGenerationStatus('Completed'), 'Completed');
+});
 test('generation submission uses authenticated API and preserves caller idempotency', async () => {
   const calls = []; const exported = {};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/lib/generation-api.ts', 'utf8'), {

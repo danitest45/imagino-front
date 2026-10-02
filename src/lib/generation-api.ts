@@ -4,7 +4,7 @@ import { apiUrl } from './config';
 import type { GenerationJob, GenerationModel, GenerationQuote, GenerationRequest } from '../types/generation';
 
 export async function generationCatalog(signal?: AbortSignal): Promise<GenerationModel[]> {
-  const response = await apiFetch(apiUrl('/api/generation/catalog'), { signal });
+  const response = await apiFetch('/api/generation/catalog', { signal });
   const catalog = await response.json();
   return catalog.models;
 }

@@ -10,6 +10,7 @@ import type { UserDto, UserProfileUpdate } from '../types/user';
 import { fetchWithAuth } from './auth';
 import { apiFetch, buildProblem } from './api-client';
 import { apiUrl, API_BASE_URL } from './config';
+import { normalizeLegacyGenerationStatus } from './generation';
 import type { Problem } from './errors';
 
 function isProblem(error: unknown): error is Problem {
@@ -537,7 +538,7 @@ export function mapApiToUiJob(j: ImageJobApi): UiJob {
   if (!rawStatus && 'Status' in j && typeof (j as { Status?: unknown }).Status === 'string') {
     rawStatus = (j as { Status?: string }).Status;
   }
-  const normalizedStatus = rawStatus?.toUpperCase();
+  const normalizedStatus = normalizeLegacyGenerationStatus(rawStatus ?? '').toUpperCase();
   const rawUrl = (Array.isArray(j.imageUrls) && j.imageUrls.length > 0)
     ? j.imageUrls[0]
     : j.imageUrl ?? null;
