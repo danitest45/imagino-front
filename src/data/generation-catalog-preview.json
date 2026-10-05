@@ -1,0 +1,331 @@
+{
+  "revision": "2026-10-02.2",
+  "source": "catalog_preview",
+  "models": [
+    {
+      "id": "flux-fast-20261002",
+      "version": "2026-10-02.1",
+      "displayName": "Fast Image",
+      "category": "Explore",
+      "description": "Quick concepts and variations. FLUX.2 klein 4B.",
+      "mediaType": "image",
+      "providerModel": "flux-2-klein-4b",
+      "capabilities": [
+        "textToImage"
+      ],
+      "fields": [
+        {
+          "key": "aspectRatio",
+          "label": "Aspect ratio",
+          "type": "enum",
+          "defaultValue": "1:1",
+          "options": [
+            "1:1",
+            "16:9",
+            "9:16"
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Output size",
+          "type": "enum",
+          "defaultValue": "1MP",
+          "options": [
+            "1MP",
+            "4MP"
+          ]
+        }
+      ],
+      "inputs": [],
+      "rules": [],
+      "lifecycle": "ACTIVE",
+      "availability": "deployment_pending",
+      "startingCredits": 5
+    },
+    {
+      "id": "flux-studio-20261002",
+      "version": "2026-10-02.1",
+      "displayName": "Studio Image",
+      "category": "Create",
+      "description": "Production images and product or character references. FLUX.2 pro, fixed endpoint.",
+      "mediaType": "image",
+      "providerModel": "flux-2-pro",
+      "capabilities": [
+        "textToImage",
+        "imageEditing",
+        "referenceImages"
+      ],
+      "fields": [
+        {
+          "key": "aspectRatio",
+          "label": "Aspect ratio",
+          "type": "enum",
+          "defaultValue": "1:1",
+          "options": [
+            "1:1",
+            "16:9",
+            "9:16"
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Output size",
+          "type": "enum",
+          "defaultValue": "1MP",
+          "options": [
+            "1MP",
+            "4MP"
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "role": "reference",
+          "label": "Reference images",
+          "maxCount": 4
+        }
+      ],
+      "rules": [],
+      "lifecycle": "ACTIVE",
+      "availability": "deployment_pending",
+      "startingCredits": 10
+    },
+    {
+      "id": "gemini-edit-20261002",
+      "version": "2026-10-02.1",
+      "displayName": "Edit & Design",
+      "category": "Refine",
+      "description": "Natural-language edits, references and layouts. Gemini 3.1 Flash Image.",
+      "mediaType": "image",
+      "providerModel": "gemini-3.1-flash-image",
+      "capabilities": [
+        "textToImage",
+        "imageEditing",
+        "referenceImages"
+      ],
+      "fields": [
+        {
+          "key": "aspectRatio",
+          "label": "Aspect ratio",
+          "type": "enum",
+          "defaultValue": "1:1",
+          "options": [
+            "1:1",
+            "16:9",
+            "9:16"
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "type": "enum",
+          "defaultValue": "1K",
+          "options": [
+            "1K",
+            "2K",
+            "4K"
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "role": "reference",
+          "label": "Reference images",
+          "maxCount": 4
+        }
+      ],
+      "rules": [],
+      "lifecycle": "ACTIVE",
+      "availability": "deployment_pending",
+      "startingCredits": 24
+    },
+    {
+      "id": "veo-fast-20261002",
+      "version": "2026-10-02.2",
+      "displayName": "Fast Video",
+      "category": "Motion",
+      "description": "Short clips with native audio. Veo 3.1 Lite. Compatibility preview; endpoint retires October 22. Migration required before activation.",
+      "mediaType": "video",
+      "providerModel": "veo-3.1-lite-generate-preview",
+      "capabilities": [
+        "textToVideo",
+        "imageToVideo",
+        "firstFrame",
+        "lastFrame",
+        "nativeAudio"
+      ],
+      "fields": [
+        {
+          "key": "aspectRatio",
+          "label": "Aspect ratio",
+          "type": "enum",
+          "defaultValue": "16:9",
+          "options": [
+            "16:9",
+            "9:16"
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "type": "enum",
+          "defaultValue": "720p",
+          "options": [
+            "720p",
+            "1080p"
+          ]
+        },
+        {
+          "key": "duration",
+          "label": "Duration (seconds)",
+          "type": "integer",
+          "defaultValue": "4",
+          "options": [
+            "4",
+            "6",
+            "8"
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "role": "firstFrame",
+          "label": "First frame",
+          "maxCount": 1
+        },
+        {
+          "role": "lastFrame",
+          "label": "Last frame",
+          "maxCount": 1
+        }
+      ],
+      "rules": [
+        {
+          "whenKey": "resolution",
+          "whenValue": "1080p",
+          "requireKey": "duration",
+          "allowedValues": [
+            "8"
+          ]
+        }
+      ],
+      "lifecycle": "COMPATIBILITY",
+      "availability": "deployment_pending",
+      "startingCredits": 66,
+      "retirementAt": "2026-10-22T00:00:00Z"
+    },
+    {
+      "id": "veo-cinema-20261002",
+      "version": "2026-10-02.2",
+      "displayName": "Cinema Video",
+      "category": "Motion",
+      "description": "Cinematic clips with native audio. Veo 3.1. Compatibility preview; endpoint retires October 22. Migration required before activation.",
+      "mediaType": "video",
+      "providerModel": "veo-3.1-generate-preview",
+      "capabilities": [
+        "textToVideo",
+        "imageToVideo",
+        "firstFrame",
+        "lastFrame",
+        "nativeAudio"
+      ],
+      "fields": [
+        {
+          "key": "aspectRatio",
+          "label": "Aspect ratio",
+          "type": "enum",
+          "defaultValue": "16:9",
+          "options": [
+            "16:9",
+            "9:16"
+          ]
+        },
+        {
+          "key": "resolution",
+          "label": "Resolution",
+          "type": "enum",
+          "defaultValue": "720p",
+          "options": [
+            "720p",
+            "1080p"
+          ]
+        },
+        {
+          "key": "duration",
+          "label": "Duration (seconds)",
+          "type": "integer",
+          "defaultValue": "4",
+          "options": [
+            "4",
+            "6",
+            "8"
+          ]
+        }
+      ],
+      "inputs": [
+        {
+          "role": "firstFrame",
+          "label": "First frame",
+          "maxCount": 1
+        },
+        {
+          "role": "lastFrame",
+          "label": "Last frame",
+          "maxCount": 1
+        }
+      ],
+      "rules": [
+        {
+          "whenKey": "resolution",
+          "whenValue": "1080p",
+          "requireKey": "duration",
+          "allowedValues": [
+            "8"
+          ]
+        }
+      ],
+      "lifecycle": "COMPATIBILITY",
+      "availability": "deployment_pending",
+      "startingCredits": 506,
+      "retirementAt": "2026-10-22T00:00:00Z"
+    },
+    {
+      "id": "pipeline-demo-20261002",
+      "version": "2026-10-02.1",
+      "displayName": "Pipeline Demo",
+      "category": "Staging",
+      "description": "Synthetic test image. Exercises jobs, credits and storage; no AI model is called.",
+      "mediaType": "image",
+      "providerModel": "synthetic-png-v1",
+      "capabilities": [
+        "textToImage"
+      ],
+      "fields": [
+        {
+          "key": "resolution",
+          "label": "Output size",
+          "type": "enum",
+          "defaultValue": "1MP",
+          "options": [
+            "1MP"
+          ]
+        },
+        {
+          "key": "outcome",
+          "label": "Test outcome",
+          "type": "enum",
+          "defaultValue": "success",
+          "options": [
+            "success",
+            "failure"
+          ]
+        }
+      ],
+      "inputs": [],
+      "rules": [],
+      "lifecycle": "ACTIVE",
+      "availability": "deployment_pending",
+      "startingCredits": 1
+    }
+  ]
+}

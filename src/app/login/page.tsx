@@ -32,7 +32,7 @@ export default function LoginPage() {
       }
       const { token } = await loginUser(email, password);
       auth.login(token);
-      router.push('/images');
+      router.push(process.env.NEXT_PUBLIC_GENERATION_V2_ENABLED === 'true' ? '/create/image' : '/images');
     } catch (err) {
       const problem = err as Problem;
       if (problem.code === 'EMAIL_NOT_VERIFIED') {

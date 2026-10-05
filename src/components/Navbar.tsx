@@ -9,6 +9,10 @@ import { getCurrentUser, getCredits } from '../lib/api';
 import type { UserDto } from '../types/user';
 
 const navLinks = [
+  ...(process.env.NEXT_PUBLIC_GENERATION_V2_ENABLED === 'true' ? [
+    { href: '/create/image', label: 'Image studio' },
+    { href: '/create/video', label: 'Video studio' },
+  ] : []),
   { href: '/images', label: 'Images' },
   { href: '/videos', label: 'Videos' },
   { href: '/pricing', label: 'Pricing' },
@@ -24,6 +28,12 @@ export default function Navbar() {
   const [user, setUser] = useState<UserDto | null>(null);
   const [credits, setCredits] = useState<number | null>(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
+
+  useEffect(() => {
+    const refresh = () => { getCredits().then(setCredits).catch(() => {}); };
+    window.addEventListener('imagino-credits-changed', refresh);
+    return () => window.removeEventListener('imagino-credits-changed', refresh);
+  }, []);
 
   const token = auth?.token ?? null;
   const isAuthenticated = auth?.isAuthenticated ?? false;
