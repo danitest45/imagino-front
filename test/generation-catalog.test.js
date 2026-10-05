@@ -15,7 +15,7 @@ function route(env, fetch) {
   });
   return exported;
 }
-const enabled = { NEXT_PUBLIC_GENERATION_V2_ENABLED: 'true', NEXT_PUBLIC_API_URL: 'https://imagino-api-staging.onrender.com' };
+const enabled = { NEXT_PUBLIC_GENERATION_V2_ENABLED: 'true', NEXT_PUBLIC_API_URL: 'https://imagino-api-ai-staging.onrender.com' };
 
 test('catalog refuses disabled or non-staging targets before contacting a backend', async () => {
   for (const env of [{}, { ...enabled, NEXT_PUBLIC_API_URL: 'https://production.example' }]) {

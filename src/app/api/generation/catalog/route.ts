@@ -4,7 +4,7 @@ import preview from '../../../../data/generation-catalog-preview.json';
 export const dynamic = 'force-dynamic';
 export async function GET() {
   if (process.env.NEXT_PUBLIC_GENERATION_V2_ENABLED !== 'true' ||
-      process.env.NEXT_PUBLIC_API_URL !== 'https://imagino-api-staging.onrender.com') {
+      process.env.NEXT_PUBLIC_API_URL !== 'https://imagino-api-ai-staging.onrender.com') {
     return NextResponse.json({ error: 'Unavailable' }, { status: 404 });
   }
   try {
