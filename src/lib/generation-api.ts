@@ -14,18 +14,18 @@ export async function quoteGeneration(request: GenerationRequest, signal?: Abort
   });
   return response.json();
 }
-export async function createGeneration(request: GenerationRequest, key: string): Promise<GenerationJob> {
+export async function createGeneration(request: GenerationRequest, key: string, signal?: AbortSignal): Promise<GenerationJob> {
   const response = await fetchWithAuth(apiUrl('/api/generation/jobs'), {
-    method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify(request),
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'Idempotency-Key': key }, body: JSON.stringify(request), signal,
   });
   return response.json();
 }
 export async function generationHistory(signal?: AbortSignal): Promise<GenerationJob[]> {
   return (await fetchWithAuth(apiUrl('/api/generation/jobs'), { signal })).json();
 }
-export async function cancelGeneration(id: string): Promise<GenerationJob> {
-  return (await fetchWithAuth(apiUrl(`/api/generation/jobs/${id}/cancel`), { method: 'POST' })).json();
+export async function cancelGeneration(id: string, signal?: AbortSignal): Promise<GenerationJob> {
+  return (await fetchWithAuth(apiUrl(`/api/generation/jobs/${encodeURIComponent(id)}/cancel`), { method: 'POST', signal })).json();
 }
-export async function generationDownload(id: string): Promise<Blob> {
-  return (await fetchWithAuth(apiUrl(`/api/generation/jobs/${id}/download`))).blob();
+export async function generationDownload(id: string, signal?: AbortSignal): Promise<Blob> {
+  return (await fetchWithAuth(apiUrl(`/api/generation/jobs/${encodeURIComponent(id)}/download`), { signal })).blob();
 }
