@@ -1,30 +1,44 @@
-import './globals.css';
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import Navbar from '../components/Navbar';
-import Providers from '../components/Providers';
-
-const inter = Inter({ subsets: ['latin'] });
-
+import "./globals.css";
+import type { Metadata } from "next";
+import localFont from "next/font/local";
+import Navbar from "../components/Navbar";
+import Providers from "../components/Providers";
+import RouteSurface from "../components/RouteSurface";
+const inter = localFont({
+  src: "../../public/fonts/inter-latin.woff2",
+  display: "swap",
+  variable: "--font-inter",
+  weight: "100 900",
+});
 export const metadata: Metadata = {
-  title: 'Imagino.AI',
-  description: 'Image generation with artificial intelligence',
+  title: {
+    default: "Imagino — AI Creative Workspace",
+    template: "%s · Imagino",
+  },
+  description:
+    "Explore campaign visuals from your references. Choose your model, review the cost, and prepare your next variation.",
+  icons: { icon: "/brand/favicon.svg" },
+  robots:
+    process.env.VERCEL_ENV === "preview"
+      ? { index: false, follow: false }
+      : undefined,
 };
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.className}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </head>
-      <body className="bg-gray-950 text-white">
+    <html lang="en" className={inter.variable}>
+      <body>
         <Providers>
+          <a className="skip-link ui-button" href="#main-content">
+            Skip to content
+          </a>
           <Navbar />
-          <div className="pt-16 md:pt-20">{children}</div>
+          <div id="main-content" tabIndex={-1}>
+            <RouteSurface>{children}</RouteSurface>
+          </div>
         </Providers>
       </body>
     </html>

@@ -1,0 +1,35 @@
+{
+  "environment": "Windows Chrome headless, local compiled build, auth HTTP intercepted; not production performance",
+  "results": {
+    "/": {
+      "domContentLoadedMs": 334,
+      "loadMs": 347,
+      "transferBytes": 8240,
+      "resourceCount": 25
+    },
+    "/create/image": {
+      "domContentLoadedMs": 80,
+      "loadMs": 93,
+      "transferBytes": 5006,
+      "resourceCount": 27
+    },
+    "/library": {
+      "domContentLoadedMs": 29,
+      "loadMs": 40,
+      "transferBytes": 3307,
+      "resourceCount": 24
+    },
+    "/login": {
+      "domContentLoadedMs": 34,
+      "loadMs": 43,
+      "transferBytes": 3770,
+      "resourceCount": 24
+    },
+    "/pricing": {
+      "domContentLoadedMs": 46,
+      "loadMs": 53,
+      "transferBytes": 4377,
+      "resourceCount": 22
+    }
+  }
+}

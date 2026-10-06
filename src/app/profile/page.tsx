@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/StudioUI';
 import { AuthShell } from '../../components/account/AuthShell';
 import { AccountSummary } from '../../components/account/AccountSummary';
 import { isAIStaging } from '../../components/account/environment';
+import { toast } from '../../lib/toast';
 
 export default function ProfilePage() {
   const { token } = useAuth();
@@ -47,7 +48,8 @@ function SignedInAccount() {
     void loadCredits();
     const handler = () => { void loadCredits(); };
     window.addEventListener('creditsUpdated', handler);
-    return () => { canceled = true; window.removeEventListener('creditsUpdated', handler); };
+    window.addEventListener('imagino-credits-changed', handler);
+    return () => { canceled = true; window.removeEventListener('creditsUpdated', handler); window.removeEventListener('imagino-credits-changed', handler); };
   }, [retry]);
 
   async function handleLogout() {
@@ -55,7 +57,7 @@ function SignedInAccount() {
     setSigningOut(true);
     setLogoutError('');
     try { await logout(); }
-    catch { setLogoutError('Sign out could not finish. Please try again.'); setSigningOut(false); }
+    catch { toast('Signed out locally. The server could not confirm session revocation.', 'error'); }
   }
 
   return <div className="account-page">

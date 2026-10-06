@@ -1,178 +1,328 @@
-import Link from 'next/link';
-import { ArrowRight, Camera, Palette, ShieldCheck, Sparkles, Wand2, Workflow } from 'lucide-react';
+import Image from "next/image";
+import Link from "next/link";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Check,
+  Frame,
+  SlidersHorizontal,
+  CornerDownRight,
+} from "lucide-react";
+import StudioLink from "../components/StudioLink";
+import "./landing.css";
 
-import ClientGallery from './_components/ClientGallery';
-
-const featureHighlights = [
-  {
-    icon: Wand2,
-    title: 'Instant concepts',
-    description:
-      'Launch branded visuals at production quality using tuned diffusion models built for precision and speed.',
-  },
-  {
-    icon: Palette,
-    title: 'Art-direction ready',
-    description:
-      'Dial in styles, aspect ratios, and reference blends with intuitive controls for every iteration.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Enterprise-grade safety',
-    description:
-      'Stay compliant with audit trails, granular permissions, and private deployment options for global teams.',
-  },
-];
-
-const workflowSteps = [
-  {
-    icon: Sparkles,
-    title: 'Describe your vision',
-    description:
-      'Start with natural language prompts or upload brand references to guide the system from the very first render.',
-  },
-  {
-    icon: Workflow,
-    title: 'Fine-tune in context',
-    description:
-      'Adjust presets, apply saved styles, and collaborate on feedback in real time—without leaving the canvas.',
-  },
-  {
-    icon: Camera,
-    title: 'Deliver with confidence',
-    description:
-      'Publish to the imagino.AI showcase or download ready-to-share files the moment inspiration strikes.',
-  },
-];
-
-const stats = [
-  { label: 'Active creators', value: '18k+' },
-  { label: 'Images generated', value: '4.2M' },
-  { label: 'Customer satisfaction', value: '4.9/5' },
-];
-
-export default function Home() {
+export default function HomePage() {
   return (
-    <main
-      className="relative mx-auto flex min-h-[100dvh] w-full max-w-7xl flex-col gap-16 px-4 pb-24 pt-32 sm:px-6 lg:px-8"
-    >
-      <div className="absolute left-0 right-0 top-20 mx-auto hidden h-[520px] max-w-4xl rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-600/10 to-cyan-400/20 blur-3xl lg:block" />
-
-      <section className="relative grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-        <div className="space-y-6">
-          <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-fuchsia-300">
-            Creative intelligence for teams
-          </span>
-          <h1 className="text-balance text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Imagine, refine, and publish extraordinary visuals in minutes.
-          </h1>
-          <p className="max-w-xl text-pretty text-lg text-gray-300 sm:text-xl">
-            imagino.AI combines next-generation generative models with an intuitive workflow so your ideas move from prompt to polished campaign assets without friction.
+    <main className="landing">
+      <section className="hero page-width" aria-labelledby="hero-title">
+        <div className="hero-copy">
+          <p className="eyebrow">
+            <span className="edition-mark" /> A little reference. A new
+            direction.
           </p>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
-            >
-              Start for free
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            <Link
-              href="/images/replicate"
-              className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-gray-100 transition hover:bg-white/10"
-            >
-              Explore gallery
+          <h1 id="hero-title">
+            Explore campaign visuals from your <span>references.</span>
+          </h1>
+          <p className="hero-description">
+            Bring your idea into focus. Create visual variations, choose an
+            image, and make it the starting point for what comes next.
+          </p>
+          <div className="hero-actions">
+            <StudioLink />
+            <Link href="#how-it-works" className="text-link">
+              See how it works <ArrowDown size={16} />
             </Link>
           </div>
-
-          <div className="grid gap-6 pt-6 sm:grid-cols-3">
-            {stats.map(stat => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 shadow-inner shadow-white/5"
-              >
-                <p className="text-2xl font-semibold text-white sm:text-3xl">{stat.value}</p>
-                <p className="text-sm text-gray-400">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+          <p className="hero-note">
+            AI Creative Workspace <span aria-hidden>·</span> Model and cost,
+            always in view.
+          </p>
         </div>
-
-        <div className="relative flex items-center justify-center">
-          <div className="glow-accent -right-12 top-0 hidden lg:block" />
-          <div className="w-full max-w-xl rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-transparent p-6 backdrop-blur-xl shadow-2xl">
-            <div className="rounded-2xl border border-white/10 bg-black/40 p-6">
-              <h2 className="text-lg font-semibold text-white">A streamlined creation flow</h2>
-              <p className="mt-2 text-sm text-gray-400">
-                Build moodboards, upload brand references, and manage feedback from one collaborative workspace.
-              </p>
-              <div className="mt-6 grid gap-4">
-                {workflowSteps.map(step => (
-                  <div key={step.title} className="flex items-start gap-4 rounded-xl border border-white/5 bg-white/5 p-4">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500/40 via-purple-500/40 to-cyan-400/40 text-white">
-                      <step.icon className="h-5 w-5" />
-                    </span>
-                    <div className="space-y-1">
-                      <p className="text-sm font-semibold text-white">{step.title}</p>
-                      <p className="text-sm text-gray-400">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <ClientGallery />
-
-      <section className="grid gap-8 md:grid-cols-3">
-        {featureHighlights.map(feature => (
-          <div
-            key={feature.title}
-            className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-xl transition hover:border-fuchsia-400/40 hover:bg-white/10"
-          >
-            <div className="absolute inset-0 opacity-0 transition group-hover:opacity-100" aria-hidden>
-              <div className="absolute -right-12 top-16 h-40 w-40 rounded-full bg-fuchsia-500/30 blur-3xl" />
-            </div>
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500/40 via-purple-500/40 to-cyan-400/40 text-white">
-              <feature.icon className="h-6 w-6" />
+        <div className="hero-art">
+          <div className="art-topline">
+            <span>
+              <Frame size={14} /> A study in blue
             </span>
-            <h3 className="mt-6 text-xl font-semibold text-white">{feature.title}</h3>
-            <p className="mt-3 text-sm text-gray-300">{feature.description}</p>
+            <span className="tabular">STUDIO STUDY / 03</span>
           </div>
-        ))}
-      </section>
-
-      <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-purple-900/50 via-purple-900/30 to-cyan-900/40 p-10 shadow-2xl">
-        <div className="absolute -left-10 top-10 h-32 w-32 rounded-full bg-fuchsia-500/40 blur-3xl" aria-hidden />
-        <div className="absolute -right-14 bottom-0 h-40 w-40 rounded-full bg-cyan-400/40 blur-3xl" aria-hidden />
-        <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="max-w-xl space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-fuchsia-200">Built for creative teams</p>
-            <h2 className="text-3xl font-semibold text-white sm:text-4xl">
-              Collaborate in real time, manage versions, and deliver full campaigns in hours—not weeks.
-            </h2>
-            <p className="text-sm text-gray-200">
-              Connect imagino.AI to your existing tools, unlock detailed usage analytics, and access dedicated success engineers.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/pricing"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-gray-900 transition hover:bg-gray-100"
-            >
-              Compare plans
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
-            >
-              Access my account
-            </Link>
-          </div>
+          <figure className="hero-result">
+            <Image
+              src="/brand/campaign.webp"
+              alt="Generated blue bottle on a stone pedestal among green leaves and small white flowers"
+              width={1024}
+              height={1024}
+              sizes="(max-width: 800px) 94vw, 48vw"
+              priority
+            />
+            <figcaption>
+              <span>Generated visual</span>
+              <span>
+                FLUX.2 Pro <ArrowUpRight size={14} />
+              </span>
+            </figcaption>
+          </figure>
+          <figure className="hero-reference">
+            <div className="reference-image">
+              <Image
+                src="/brand/reference.png"
+                alt="Controlled synthetic reference: a simple blue bottle with gold neck and three gold dots"
+                width={160}
+                height={160}
+              />
+            </div>
+            <figcaption>
+              <span className="reference-number">01</span> Controlled reference{" "}
+              <CornerDownRight size={14} />
+            </figcaption>
+          </figure>
+          <p className="asset-disclosure">
+            Synthetic staging demonstration. Real model output; not a customer
+            campaign.
+          </p>
         </div>
       </section>
+      <div className="studio-strip page-width">
+        <span>A place for your next idea.</span>
+        <p>
+          Reference <ArrowRight size={14} /> Create <ArrowRight size={14} />{" "}
+          Choose <ArrowRight size={14} /> Continue
+        </p>
+        <span>Made to keep you in control.</span>
+      </div>
+      <section className="workflow-section page-width" id="how-it-works">
+        <div className="section-heading">
+          <p className="eyebrow">01 / Your creative rhythm</p>
+          <h2>
+            One idea.
+            <br />
+            Room to explore.
+          </h2>
+          <p>
+            Start with something you have.
+            <br />
+            Or something you can imagine.
+          </p>
+        </div>
+        <div className="workflow-steps">
+          {[
+            {
+              n: "01",
+              title: "Bring a starting point",
+              text: "Upload a reference on a compatible model, or describe an idea from scratch.",
+            },
+            {
+              n: "02",
+              title: "Make the choices yours",
+              text: "Choose your model and settings. Review the current credit quote before creating.",
+            },
+            {
+              n: "03",
+              title: "Find the next direction",
+              text: "Inspect the result. Reuse its prompt, or prepare your chosen image as a new reference.",
+            },
+          ].map((step) => (
+            <article key={step.n}>
+              <span className="step-number">{step.n}</span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+              <ArrowUpRight size={20} aria-hidden />
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="control-section page-width">
+        <div className="control-visual">
+          <div className="control-image">
+            <Image
+              src="/brand/bottle.webp"
+              alt="Independent text-to-image study of a translucent blue glass bottle"
+              width={768}
+              height={768}
+              sizes="(max-width:800px) 90vw, 40vw"
+            />
+            <span className="photo-caption">
+              Independent prompt study · FLUX.2 klein 4B
+            </span>
+          </div>
+          <div className="control-caption">
+            <SlidersHorizontal size={19} />
+            <div>
+              <strong>Your brief. Your settings.</strong>
+              <span>Choose the model. Review the quote.</span>
+            </div>
+            <Check size={20} />
+          </div>
+        </div>
+        <div className="control-copy">
+          <p className="eyebrow">02 / Clear before you create</p>
+          <h2>
+            Keep the idea open.
+            <br />
+            Keep the details clear.
+          </h2>
+          <p>
+            The creative part can be exploratory. The next action should be easy
+            to understand.
+          </p>
+          <ul>
+            <li>
+              <Check size={18} />A visible model for every creation.
+            </li>
+            <li>
+              <Check size={18} />
+              Controls that follow its actual capabilities.
+            </li>
+            <li>
+              <Check size={18} />A current credit quote before you commit.
+            </li>
+          </ul>
+          <Link href="/pricing" className="text-link">
+            Understand credits <ArrowRight size={17} />
+          </Link>
+        </div>
+      </section>
+      <section className="continuation page-width">
+        <div>
+          <p className="eyebrow">03 / From one choice to the next</p>
+          <h2>
+            A result can be
+            <br />a beginning.
+          </h2>
+          <p>
+            Your Library brings recent creations together. Open an image,
+            revisit its prompt and settings, or prepare it as a new reference.
+            You decide when to create again.
+          </p>
+          <Link href="/library" className="text-link">
+            Explore the Library <ArrowUpRight size={17} />
+          </Link>
+        </div>
+        <figure>
+          <Image
+            src="/brand/freeform.webp"
+            alt="Independent freeform generation of a red sports car in front of a modern house"
+            width={768}
+            height={768}
+            sizes="(max-width:800px) 90vw, 44vw"
+          />
+          <figcaption>
+            <span>Beyond product studies</span>
+            <span>Freeform generation · FLUX.2 Pro</span>
+          </figcaption>
+        </figure>
+      </section>
+      <section className="models-section page-width" id="models">
+        <div className="models-heading">
+          <p className="eyebrow">Different models. One workspace.</p>
+          <h2>
+            Choose the tool
+            <br />
+            for the idea.
+          </h2>
+          <p>
+            Imagino connects your workflow to models from other makers. Each
+            model brings its own capabilities and limitations.
+          </p>
+        </div>
+        <div className="model-list">
+          <article>
+            <div>
+              <span className="model-initial">F</span>
+              <h3>
+                FLUX.2 klein 4B<small>Black Forest Labs</small>
+              </h3>
+            </div>
+            <p>Prompt-based image exploration.</p>
+            <span className="status-badge">Evaluated in staging</span>
+          </article>
+          <article>
+            <div>
+              <span className="model-initial">F</span>
+              <h3>
+                FLUX.2 Pro<small>Black Forest Labs</small>
+              </h3>
+            </div>
+            <p>Image creation with reference support.</p>
+            <span className="status-badge">Evaluated in staging</span>
+          </article>
+          <p className="model-note">
+            Generation is gated in this Preview. Live availability is shown in
+            the studio. Outputs may change product details; always review the
+            result.
+          </p>
+        </div>
+      </section>
+      <section className="faq-section page-width">
+        <div>
+          <p className="eyebrow">A few useful details</p>
+          <h2>Before you begin.</h2>
+        </div>
+        <div className="faq-list">
+          <details>
+            <summary>How do credits work?</summary>
+            <p>
+              The studio requests a quote for your current prompt, model,
+              references and settings. The server reports whether credits are
+              Reserved, Charged or Refunded.{" "}
+              <Link href="/pricing">Read about costs.</Link>
+            </p>
+          </details>
+          <details>
+            <summary>Will a product stay exactly the same?</summary>
+            <p>
+              Models can change details, proportions, text and labels. Use
+              references to guide exploration, then inspect every result. This
+              Preview does not promise product fidelity.
+            </p>
+          </details>
+          <details>
+            <summary>Can I start without a reference?</summary>
+            <p>
+              Yes. Describe your idea and choose a model that supports creation
+              from a prompt. Product visuals are one starting point; freeform
+              ideas belong here too.
+            </p>
+          </details>
+          <details>
+            <summary>What can I do in this Preview?</summary>
+            <p>
+              Explore the studio and its controls. Paid generation and credit
+              purchases remain disabled. Sign-in availability depends on the
+              staging environment. No subscription offer is being sold here.
+            </p>
+          </details>
+        </div>
+      </section>
+      <section className="final-cta page-width">
+        <p className="eyebrow">Your next direction starts here</p>
+        <h2>
+          Give your idea
+          <br />
+          some room.
+        </h2>
+        <StudioLink />
+        <span>Explore the Working Studio Preview.</span>
+      </section>
+      <footer className="landing-footer page-width">
+        <Link href="/" aria-label="Imagino home">
+          <Image
+            src="/brand/wordmark.svg"
+            width={120}
+            height={31}
+            alt="Imagino"
+          />
+        </Link>
+        <span>AI Creative Workspace</span>
+        <nav aria-label="Footer">
+          <Link href="/create/image">Create</Link>
+          <Link href="/library">Library</Link>
+          <Link href="/pricing">Costs</Link>
+        </nav>
+        <small>Imagino · 2026</small>
+      </footer>
     </main>
   );
 }

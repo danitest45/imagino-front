@@ -15,6 +15,28 @@ function loadAuth(fetch) {
   return exports;
 }
 
+test('an old account response cannot refresh or retry using the new account', async () => {
+  let resolveRequest;
+  const calls = [];
+  const auth = loadAuth((url) => { calls.push(url); return new Promise(resolve => { resolveRequest = resolve; }); });
+  auth.setAccessToken('account-a');
+  const pending = auth.fetchWithAuth('https://api.test/private');
+  auth.setAccessToken('account-b');
+  resolveRequest({ status: 401, ok: false });
+  await assert.rejects(pending, /session changed/);
+  assert.deepEqual(calls, ['https://api.test/private']);
+  assert.equal(auth.getAccessToken(), 'account-b');
+});
+
+test('logout clears the memory token even if the network rejects revocation', async () => {
+  const auth = loadAuth(async () => { throw new Error('offline'); });
+  auth.setAccessToken('account-a');
+  const pending = auth.logoutRequest();
+  assert.equal(auth.getAccessToken(), null);
+  await assert.rejects(pending, /offline/);
+  assert.equal(auth.getAccessToken(), null);
+});
+
 test('concurrent refresh requests share one cookie rotation and keep JWT in memory', async () => {
   let resolveFetch;
   const calls = [];
