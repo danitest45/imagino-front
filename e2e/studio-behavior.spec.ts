@@ -1,5 +1,22 @@
 import { expect, test, type Page } from '@playwright/test';
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
 import { jobs, mockStudio, referencePath, TEST_TOKEN } from './studio-mocks';
+
+async function captureMockEvidence(page: Page, name: string) {
+  const directory = path.resolve(process.env.PLAYWRIGHT_EVIDENCE_DIR || 'evidence/rebrand');
+  await mkdir(directory, { recursive: true });
+  // This label belongs to test evidence, never to the shipped interface.
+  await page.evaluate(() => {
+    const banner = document.createElement('div');
+    banner.id = 'http-mock-evidence-label';
+    banner.textContent = 'HTTP-mocked browser test — local fixture · no real account or generation';
+    banner.style.cssText = 'position:relative;z-index:9999;padding:10px 16px;background:#202421;color:#fff;font:14px/1.4 sans-serif;text-align:center;';
+    document.body.prepend(banner);
+  });
+  try { await page.screenshot({ path: path.join(directory, name), fullPage: true }); }
+  finally { await page.evaluate(() => document.getElementById('http-mock-evidence-label')?.remove()); }
+}
 
 async function openStudio(page: Page) {
   await page.goto('/create/image');
@@ -165,6 +182,7 @@ test('Use as reference downloads the owned result and prepares a new input witho
   const mock = await mockStudio(context, jobs);
   await page.goto('/library');
   await page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true }).click();
+  await captureMockEvidence(page, 'http-mock-reference-before.png');
   await page.getByRole('dialog', { name: 'Your creation', exact: true }).getByRole('button', { name: 'Use as reference', exact: true }).click();
   await expect(page).toHaveURL(/\/create\/image$/);
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
@@ -178,6 +196,7 @@ test('Use as reference downloads the owned result and prepares a new input witho
   await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
   expect(mock.quotes.at(-1)?.body.inputs).toHaveLength(1);
   expect(mock.submissions).toHaveLength(0);
+  await captureMockEvidence(page, 'http-mock-reference-prepared.png');
   expect(mock.unexpectedRequests).toEqual([]);
 });
 
@@ -243,6 +262,106 @@ test('logout clears private Library immediately even when the logout request fai
   await expect(page.getByRole('link', { name: 'Sign in to view Library', exact: true })).toBeVisible();
   expect(mock.historyRequests).toBe(historyBefore);
   expect(mock.logoutRequests).toBe(1);
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.unexpectedRequests).toEqual([]);
+});
+
+test('expired quote cannot submit while its replacement is pending', async ({ page, context }) => {
+  const mock = await mockStudio(context);
+  mock.quoteExpiresInMs = 900;
+  await openStudio(page);
+  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('A scene with a current quote');
+  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  mock.holdQuotes = true;
+  mock.quoteCredits = 18;
+  await expect(page.getByText('The previous quote expired. Calculating the current cost.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect.poll(() => mock.pendingQuotes.length).toBe(1);
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.quotes).toHaveLength(2);
+  mock.quoteExpiresInMs = 60_000;
+  await mock.releaseQuotes();
+  await expect(page.getByRole('button', { name: 'Create image · 18 credits', exact: true })).toBeEnabled();
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.unexpectedRequests).toEqual([]);
+});
+
+test('deployment-pending model cannot quote or submit for an authenticated account', async ({ page, context }) => {
+  const mock = await mockStudio(context);
+  mock.models[0].availability = 'deployment_pending';
+  await openStudio(page);
+  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('This idea must remain an unsent draft');
+  await expect(page.getByText('Generation unavailable', { exact: true })).toBeVisible();
+  await expect(page.getByText('Creation is currently unavailable.', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await page.getByRole('combobox', { name: 'Aspect ratio' }).selectOption('16:9');
+  // Observe beyond the 450 ms quote debounce to catch an accidentally queued request.
+  await page.waitForTimeout(700);
+  expect(mock.quotes).toHaveLength(0);
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.unexpectedRequests).toEqual([]);
+});
+
+test('design review sends no account or generation HTTP and disables sample actions', async ({ page, context }) => {
+  const mock = await mockStudio(context);
+  const apiRequests: string[] = [];
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if (url.pathname.startsWith('/api/')) apiRequests.push(`${request.method()} ${url.pathname}`);
+  });
+  await page.goto('/design-review');
+  await expect(page.getByText('Design preview — sample data', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Reuse prompt & settings', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
+  await page.getByRole('combobox', { name: 'State', exact: true }).selectOption('Reference');
+  await expect(page.getByLabel('Upload Reference images', { exact: true })).toBeDisabled();
+  await page.getByRole('combobox', { name: 'State', exact: true }).selectOption('Queued');
+  await expect(page.getByRole('button', { name: 'Cancel job', exact: true })).toBeDisabled();
+  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Library');
+  await page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true }).click();
+  const detail = page.getByRole('dialog', { name: 'Your creation', exact: true });
+  await expect(detail.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();
+  await expect(detail.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
+  await page.keyboard.press('Escape');
+  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Account');
+  await expect(page.getByRole('heading', { name: 'Sample account', exact: true })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Costs');
+  await expect(page.getByRole('heading', { name: 'Explore now. Purchases are unavailable.', exact: true })).toBeVisible();
+  expect(apiRequests).toEqual([]);
+  expect(mock.quotes).toHaveLength(0);
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.downloads).toHaveLength(0);
+  expect(mock.unexpectedRequests).toEqual([]);
+});
+
+test('mobile navigation supports keyboard activation, Escape focus return and route change at 320 px', async ({ page, context }) => {
+  const mock = await mockStudio(context);
+  mock.authenticated = false;
+  await page.setViewportSize({ width: 320, height: 900 });
+  await page.goto('/');
+  const trigger = page.getByRole('button', { name: 'Open navigation', exact: true });
+  await trigger.focus();
+  await page.keyboard.press('Enter');
+  const menu = page.getByRole('navigation', { name: 'Mobile navigation', exact: true });
+  await expect(menu).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Close navigation', exact: true })).toHaveAttribute('aria-expanded', 'true');
+  await page.keyboard.press('Tab');
+  await expect(menu.getByRole('link', { name: 'How it works', exact: true })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(menu).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await expect(menu.getByRole('link', { name: 'Models', exact: true })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(menu.getByRole('link', { name: 'Costs', exact: true })).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/pricing$/);
+  await expect(page.getByRole('navigation', { name: 'Mobile navigation', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Know what it costs.');
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);
 });
