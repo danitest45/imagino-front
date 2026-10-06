@@ -1,184 +1,85 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import { Pencil } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { useEffect, useRef, useState } from 'react';
 import { getCurrentUser, updateCurrentUserProfile, uploadCurrentUserAvatar } from '../../lib/api';
 import type { UserDto } from '../../types/user';
+import { Button, Input } from '../ui/StudioUI';
+import { isAIStaging } from '../account/environment';
+import { useAuth } from '../../context/AuthContext';
 
 export default function UserInfo() {
   const { token } = useAuth();
+  if (isAIStaging || !token) return null;
+  return <UserInfoContent key={token} />;
+}
+
+function UserInfoContent() {
   const [user, setUser] = useState<UserDto | null>(null);
   const [form, setForm] = useState<UserDto | null>(null);
-  const [editing, setEditing] = useState<'username' | 'phoneNumber' | null>(null);
-  const [visible, setVisible] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => setVisible(true), []);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const fileInput = useRef<HTMLInputElement | null>(null);
+  const alive = useRef(true);
 
   useEffect(() => {
-    async function load() {
-      if (!token) return;
-      try {
-        const data = await getCurrentUser();
-        setUser(data);
-        setForm(data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    load();
-  }, [token]);
+    alive.current = true;
+    let canceled = false;
+    setLoading(true);
+    setError('');
+    getCurrentUser().then(data => { if (!canceled) { setUser(data); setForm(data); } }).catch(() => { if (!canceled) setError('Your profile could not be loaded.'); }).finally(() => { if (!canceled) setLoading(false); });
+    return () => { canceled = true; alive.current = false; };
+  }, [retry]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm((prev) => (prev ? { ...prev, [name]: value } : prev));
-  };
+  async function handleSave(event: React.FormEvent) {
+    event.preventDefault();
+    if (isAIStaging || !form || saving || uploading) return;
+    setSaving(true);
+    setError('');
+    setMessage('');
+    try {
+      const updated = await updateCurrentUserProfile({ username: form.username, phoneNumber: form.phoneNumber });
+      if (alive.current) { setUser(updated); setForm(updated); setMessage('Profile updated.'); window.dispatchEvent(new Event('userUpdated')); }
+    } catch { if (alive.current) setError('Your changes could not be saved. Please try again.'); }
+    finally { if (alive.current) setSaving(false); }
+  }
 
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function handleImageChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (isAIStaging || !file || uploading || saving) return;
+    setUploading(true);
+    setError('');
+    setMessage('');
     try {
       const imageUrl = await uploadCurrentUserAvatar(file);
-      setUser((prev) => (prev ? { ...prev, profileImageUrl: imageUrl } : prev));
-      setForm((prev) => (prev ? { ...prev, profileImageUrl: imageUrl } : prev));
-      window.dispatchEvent(new Event('userUpdated'));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      e.target.value = '';
-    }
-  };
+      if (alive.current) {
+        setUser(previous => previous ? { ...previous, profileImageUrl: imageUrl } : previous);
+        setForm(previous => previous ? { ...previous, profileImageUrl: imageUrl } : previous);
+        setMessage('Profile image updated.');
+        window.dispatchEvent(new Event('userUpdated'));
+      }
+    } catch { if (alive.current) setError('Your profile image could not be updated.'); }
+    finally { if (alive.current) setUploading(false); }
+  }
 
-  const handleSave = async () => {
-    if (!token || !form) return;
-    try {
-      const updated = await updateCurrentUserProfile({
-        username: form.username,
-        phoneNumber: form.phoneNumber,
-      });
-      setUser(updated);
-      setForm(updated);
-      setEditing(null);
-      window.dispatchEvent(new Event('userUpdated'));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  if (loading) return <p role="status">Loading your profile…</p>;
+  if (!user || !form) return <div><p role="alert" className="account-error">{error || 'Profile unavailable.'}</p><Button variant="secondary" onClick={() => setRetry(value => value + 1)}>Retry profile</Button></div>;
 
-  const fields: { key: 'email' | 'username' | 'phoneNumber'; label: string; helper?: string }[] = [
-    { key: 'email', label: 'Email address', helper: 'Read only. Email changes will require a separate verification flow.' },
-    { key: 'username', label: 'Display name', helper: 'Shown on shared creations and community feeds.' },
-    { key: 'phoneNumber', label: 'Phone number', helper: 'Optional. Enables faster support follow-ups.' },
-  ];
-
-  return (
-    <div className={`${visible ? 'opacity-100' : 'opacity-0'} space-y-10 transition-opacity duration-300`}>
-      {user && (
-        <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/10 via-white/5 to-white/0 p-6 shadow-[0_35px_80px_-50px_rgba(168,85,247,0.6)] backdrop-blur xl:p-8">
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-fuchsia-500/20 via-purple-500/20 to-cyan-400/20 blur-3xl" aria-hidden />
-          <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:text-left">
-            <div className="relative">
-              <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/20 bg-black/40 p-1 shadow-inner shadow-purple-500/30">
-                {(form?.profileImageUrl || user.profileImageUrl) ? (
-                  <img
-                    src={form?.profileImageUrl || user.profileImageUrl || ''}
-                    alt="Profile avatar"
-                    className="h-full w-full rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-purple-500/40 to-fuchsia-500/40 text-2xl font-semibold text-white">
-                    {(user.username ?? 'U').slice(0, 1).toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="absolute -bottom-2 right-2 inline-flex items-center gap-1 rounded-full border border-white/20 bg-black/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.25em] text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
-              >
-                <Pencil className="h-3.5 w-3.5" /> Edit
-              </button>
-              <input
-                type="file"
-                accept="image/*"
-                ref={fileInputRef}
-                className="hidden"
-                onChange={handleImageChange}
-              />
-            </div>
-            <div className="space-y-3">
-              <div>
-                <h2 className="text-2xl font-semibold text-white">{user.username ?? 'imagino.AI creator'}</h2>
-                <p className="text-sm text-gray-300">{user.email}</p>
-              </div>
-              <p className="max-w-xl text-sm leading-relaxed text-gray-300">
-                Personalize your presence across the imagino.AI ecosystem. Your details sync across web, mobile, and future device experiences.
-              </p>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {user && (
-        <section className="grid gap-6 md:grid-cols-2">
-          {fields.map(field => (
-            <div key={field.key} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40 p-5 shadow-inner shadow-purple-500/10 transition hover:border-fuchsia-400/40">
-              <div className="absolute -right-12 top-1/2 h-32 w-32 -translate-y-1/2 rounded-full bg-gradient-to-br from-fuchsia-500/10 via-purple-500/10 to-cyan-400/10 blur-3xl" aria-hidden />
-              <div className="relative flex items-start justify-between gap-3">
-                <div className="flex-1 space-y-3">
-                  <label className="text-xs font-semibold uppercase tracking-[0.3em] text-gray-400" htmlFor={field.key}>
-                    {field.label}
-                  </label>
-                  {field.key !== 'email' && editing === field.key ? (
-                    <input
-                      id={field.key}
-                      name={field.key}
-                      value={form?.[field.key] ?? ''}
-                      onChange={handleChange}
-                      className="w-full rounded-xl border border-white/20 bg-black/60 px-4 py-3 text-sm text-white shadow-sm focus:border-fuchsia-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/30"
-                    />
-                  ) : (
-                    <p className="text-sm text-white/90">{user[field.key] ?? '—'}</p>
-                  )}
-                  {field.helper && <p className="text-xs text-gray-400">{field.helper}</p>}
-                </div>
-                {field.key !== 'email' && <button
-                  type="button"
-                  onClick={() => {
-                    if (field.key !== 'email') setEditing(editing === field.key ? null : field.key);
-                  }}
-                  className="relative inline-flex h-9 items-center justify-center rounded-full border border-white/15 bg-white/5 px-3 text-xs font-semibold uppercase tracking-[0.3em] text-gray-200 transition hover:border-fuchsia-400/40 hover:text-white"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                </button>}
-              </div>
-            </div>
-          ))}
-        </section>
-      )}
-
-      {editing && (
-        <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-end">
-          <button
-            type="button"
-            onClick={() => {
-              setForm(user);
-              setEditing(null);
-            }}
-            className="inline-flex items-center justify-center rounded-full border border-white/15 bg-transparent px-5 py-2 text-sm font-semibold text-gray-300 transition hover:border-white/25 hover:text-white"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 px-6 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/30 transition hover:shadow-purple-500/50"
-          >
-            Save changes
-          </button>
-        </div>
-      )}
+  return <form className="account-profile-form" onSubmit={handleSave}>
+    <div className="account-profile-avatar">
+      {user.profileImageUrl && <img src={user.profileImageUrl} alt="Your profile image" width={72} height={72} />}
+      <Button type="button" variant="secondary" disabled={uploading || saving} loading={uploading} onClick={() => fileInput.current?.click()}>Change profile image</Button>
+      <input aria-label="Profile image" type="file" accept="image/*" ref={fileInput} hidden onChange={handleImageChange} />
     </div>
-  );
+    <div className="account-field"><label htmlFor="profile-email">Email</label><Input id="profile-email" value={user.email || ''} readOnly /></div>
+    <div className="account-field"><label htmlFor="profile-name">Display name</label><Input id="profile-name" value={form.username || ''} onChange={event => setForm({ ...form, username: event.target.value })} disabled={saving || uploading} /></div>
+    <div className="account-field"><label htmlFor="profile-phone">Phone number</label><Input id="profile-phone" type="tel" value={form.phoneNumber || ''} onChange={event => setForm({ ...form, phoneNumber: event.target.value })} disabled={saving || uploading} /></div>
+    {error && <p role="alert" className="account-error">{error}</p>}
+    {message && <p role="status" className="account-success">{message}</p>}
+    <div className="account-actions"><Button type="submit" loading={saving} disabled={saving || uploading}>Save changes</Button><Button type="button" variant="secondary" disabled={saving || uploading} onClick={() => setForm(user)}>Reset changes</Button></div>
+  </form>;
 }

@@ -1,0 +1,41 @@
+
+> imagino-front@0.1.0 test
+> node --test
+
+✔ an old account response cannot refresh or retry using the new account (101.6963ms)
+✔ logout clears the memory token even if the network rejects revocation (16.6328ms)
+✔ concurrent refresh requests share one cookie rotation and keep JWT in memory (13.0607ms)
+✔ logout waits for cookie rotation and revokes the rotated session (11.1507ms)
+✔ concurrent logout requests share one revocation and block new refreshes (11.127ms)
+✔ adds numbers correctly (1.0169ms)
+✔ checkout sends only selected plan with authenticated fetch (76.1554ms)
+✔ portal posts no client economic settings (11.3557ms)
+✔ server billing state is fetched without session_id authority (13.9108ms)
+✔ unsafe Checkout destination rejected: http://checkout.stripe.com/x (11.5687ms)
+✔ unsafe Checkout destination rejected: https://checkout.stripe.com.evil.test/x (9.4553ms)
+✔ unsafe Checkout destination rejected: https://evil.test/x (9.6515ms)
+✔ unsafe Checkout destination rejected: https://user@checkout.stripe.com/x (8.5804ms)
+✔ catalog refuses disabled or non-staging targets before contacting a backend (68.2707ms)
+✔ healthy catalog preserves live capabilities and availability without caching (10.1094ms)
+✔ HTTP failure and network timeout expose only an explicitly unavailable preview (20.0688ms)
+✔ catalog field types control defaults without provider-specific UI branches (1.3171ms)
+✔ video capability combinations fail before submission (0.7175ms)
+✔ only final generation states terminate processing (0.2728ms)
+✔ legacy history states normalize without modifying stored jobs (0.2584ms)
+✔ generation submission uses authenticated API and preserves caller idempotency (19.5965ms)
+✔ media proxy rejects private and arbitrary hosts before making a request (5.6549ms)
+✔ media proxy rejects private DNS answers, including IPv6 and mapped IPv4 (0.5708ms)
+✔ proxy pins the checked DNS result and refuses redirects (20.0342ms)
+✔ proxy aborts when an allowed host resolves to a private address (12.0197ms)
+✔ proxy permits only the exact configured staging host over HTTPS (0.225ms)
+✔ proxy rejects invalid MIME, declared oversized content and streaming overflow (28.6147ms)
+✔ proxy accepts a bounded image response and preserves its MIME (11.6235ms)
+✔ both isolated branches refuse production, wrong API, wrong bucket and missing feature gate (8.2568ms)
+ℹ tests 29
+ℹ suites 0
+ℹ pass 29
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 662.7278

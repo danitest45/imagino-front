@@ -1,0 +1,20 @@
+
+> imagino-front@0.1.0 test:browser
+> playwright test --output=evidence/theme/test-results-opera --grep first visit|System follows|dialog select|controlled numeric|changing System|touch can
+
+
+Running 7 tests using 1 worker
+
+(node:84940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84940) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\theme-controls.spec.ts:56:7 › first visit resolves System light before the first rendered frame, without hydration errors (2.6s)
+  ok 2 e2e\theme-controls.spec.ts:56:7 › first visit resolves System dark before the first rendered frame, without hydration errors (2.3s)
+  ok 3 e2e\theme-controls.spec.ts:86:5 › System follows OS changes; manual overrides remain selected until returning to System (3.9s)
+  ok 4 e2e\theme-controls.spec.ts:243:5 › controlled numeric and enum selects preserve request types and never submit their form (6.2s)
+  ok 5 e2e\theme-controls.spec.ts:338:5 › dialog select is in the top layer and Escape closes the popup before the parent (4.6s)
+  ok 6 e2e\theme-controls.spec.ts:373:5 › changing System theme while a popup is open preserves focus, selection and popup validity (5.8s)
+  ok 7 e2e\theme-controls.spec.ts:411:7 › touch controls › touch can open, choose and dismiss selectors and Appearance without generation (4.0s)
+
+  7 passed (37.7s)

@@ -1,0 +1,30 @@
+{
+  "checkedAt": "2026-10-06T01:47:19.199Z",
+  "origin": "https://imagino-front-8abfqqcmp-danitest45s-projects.vercel.app",
+  "api": "https://imagino-api-ai-staging.onrender.com",
+  "preflight": {
+    "status": 204,
+    "allowOrigin": null,
+    "allowCredentials": null,
+    "accepted": false
+  },
+  "routes": [
+    {
+      "route": "/",
+      "status": 302,
+      "location": "https://vercel.com/sso-api",
+      "noindex": false,
+      "workingStudioHeadline": false,
+      "reviewControls": false
+    },
+    {
+      "route": "/design-review",
+      "status": 302,
+      "location": "https://vercel.com/sso-api",
+      "noindex": false,
+      "workingStudioHeadline": false,
+      "reviewControls": false
+    }
+  ],
+  "scope": "Unauthenticated read-only requests. No remote authenticated E2E or browser-download PASS is implied."
+}

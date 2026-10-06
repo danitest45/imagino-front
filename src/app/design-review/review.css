@@ -1,0 +1,91 @@
+.review-controls {
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-tint);
+  padding: 20px max(24px, calc((100vw - 1344px) / 2));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+}
+.review-controls p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+.review-selectors {
+  display: flex;
+  gap: 12px;
+}
+.review-selectors label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  width: 160px;
+}
+.review-selectors .ui-select {
+  font-size: 13px;
+}
+.review-component-page {
+  max-width: 1344px;
+  margin: auto;
+  padding: 48px 24px;
+}
+.review-component-page h1 {
+  font-size: 40px;
+  letter-spacing: -0.05em;
+  font-weight: 550;
+  margin: 8px 0 32px;
+}
+.review-component-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.review-component-grid > .surface {
+  padding: 28px;
+}
+.review-component-grid h2 {
+  font-size: 20px;
+  font-weight: 550;
+  margin-bottom: 20px;
+}
+.review-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.review-component-grid label {
+  display: grid;
+  gap: 8px;
+  margin-block: 16px;
+  font-size: 14px;
+}
+.review-error {
+  color: var(--danger);
+  font-size: 13px;
+}
+.review-skeleton {
+  height: 60px;
+  margin-block: 24px;
+}
+.review-component-grid .ui-tooltip {
+  margin-left: 12px;
+}
+@media (max-width: 600px) {
+  .review-controls {
+    padding: 16px;
+  }
+  .review-selectors {
+    width: 100%;
+  }
+  .review-selectors label {
+    width: 50%;
+  }
+  .review-component-grid {
+    grid-template-columns: 1fr;
+  }
+  .review-component-page {
+    padding: 32px 16px;
+  }
+}

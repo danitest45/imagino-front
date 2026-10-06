@@ -50,14 +50,16 @@ export async function fetchWithAuth(
   init: AuthRequestInit = {},
 ): Promise<Response> {
   const { skipProblem, ...restInit } = init;
+  const epoch = authEpoch;
   const headers = new Headers(restInit.headers);
   if (accessToken) {
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
   let res = await fetch(input, { ...restInit, headers, credentials: 'include' });
-  if (res.status === 401) {
+  if (epoch !== authEpoch) throw new Error('Your session changed. Please try again.');
+  if (res.status === 401 && !restInit.signal?.aborted) {
     const refreshed = await refreshAccessToken();
-    if (refreshed) {
+    if (refreshed && epoch === authEpoch && !restInit.signal?.aborted) {
       const retryHeaders = new Headers(restInit.headers);
       if (accessToken) {
         retryHeaders.set('Authorization', `Bearer ${accessToken}`);
@@ -69,6 +71,7 @@ export async function fetchWithAuth(
       });
     }
   }
+  if (epoch !== authEpoch) throw new Error('Your session changed. Please try again.');
   if (!res.ok && !skipProblem) {
     throw await buildProblem(res);
   }

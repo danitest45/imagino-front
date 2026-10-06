@@ -44,9 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = async () => {
-    await logoutRequest();
     setToken(null);
     setIsAuthenticated(false);
+    await logoutRequest();
   };
 
   return (

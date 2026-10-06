@@ -36,6 +36,11 @@ yarn-error.log*
 
 # vercel
 .vercel
+/.npm-cache
+/test-results
+/playwright-report
+/.playwright-browsers
+/evidence/theme/test-results-*/
 
 # typescript
 *.tsbuildinfo

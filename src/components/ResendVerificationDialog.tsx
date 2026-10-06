@@ -1,57 +1,35 @@
 'use client';
-import { useState } from 'react';
-import { resendVerification } from '../lib/api';
-import { toast } from '../lib/toast';
-import { Problem, mapProblemToUI } from '../lib/errors';
 
-interface Props {
-  open: boolean;
-  email: string | null;
-  onClose: () => void;
-}
+import { useRef, useState } from 'react';
+import { resendVerification } from '../lib/api';
+import { Problem, mapProblemToUI } from '../lib/errors';
+import { Button, Dialog } from './ui/StudioUI';
+import { isAIStaging } from './account/environment';
+import './account/account.css';
+
+interface Props { open: boolean; email: string | null; onClose: () => void }
 
 export default function ResendVerificationDialog({ open, email, onClose }: Props) {
   const [loading, setLoading] = useState(false);
-  if (!open) return null;
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const pending = useRef(false);
 
   async function handleResend() {
-    if (!email) return;
+    if (isAIStaging || !email || pending.current) return;
+    pending.current = true;
     setLoading(true);
-    try {
-      await resendVerification(email);
-      toast('Verification link resent.');
-      onClose();
-    } catch (err) {
-      const action = mapProblemToUI(err as Problem);
-      toast(action.message);
-    } finally {
-      setLoading(false);
-    }
+    setError('');
+    setMessage('');
+    try { await resendVerification(email); setMessage('Verification requested. Check your inbox.'); }
+    catch (err) { setError(mapProblemToUI(err as Problem).message); }
+    finally { pending.current = false; setLoading(false); }
   }
 
-  return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
-      <div className="bg-gray-800 p-6 rounded-xl max-w-sm w-full text-center">
-        <h2 className="text-lg font-semibold text-white mb-2">Confirm your email</h2>
-        <p className="text-gray-300 text-sm mb-4">
-          We sent a link to {email}. Didn&apos;t get it?
-        </p>
-        <div className="flex gap-2 justify-center">
-          <button
-            onClick={handleResend}
-            disabled={loading}
-            className="px-4 py-2 bg-purple-600 rounded text-white hover:bg-purple-500 disabled:opacity-50"
-          >
-            {loading ? 'Sending...' : 'Resend'}
-          </button>
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-700 rounded text-white hover:bg-gray-600"
-          >
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <Dialog open={open} onClose={onClose} title="Confirm your email">
+    {isAIStaging ? <p>Verification emails are unavailable in this Preview.</p> : <p>Confirm your email before signing in. You can request another verification link.</p>}
+    {error && <p role="alert" className="account-error">{error}</p>}
+    {message && <p role="status" className="account-success">{message}</p>}
+    <div className="account-actions">{!isAIStaging && <Button onClick={handleResend} disabled={loading || !email} loading={loading}>Resend verification</Button>}<Button variant="secondary" onClick={onClose}>Close</Button></div>
+  </Dialog>;
 }

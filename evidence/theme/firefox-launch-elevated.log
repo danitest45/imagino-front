@@ -1,0 +1,42 @@
+2026-10-06T01:25:05.484Z pw:browser <launching> C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-working-studio\.playwright-browsers\firefox-1495\firefox\firefox.exe -no-remote -headless -profile C:\Users\USER\AppData\Local\Temp\playwright_firefoxdev_profile-2qP6op -juggler-pipe -silent
+2026-10-06T01:25:05.498Z pw:browser <launched> pid=64464
+2026-10-06T01:25:05.591Z pw:browser [pid=64464][err] *** You are running in headless mode.
+2026-10-06T01:25:05.690Z pw:browser [pid=64464][err] JavaScript warning: resource://services-settings/Utils.sys.mjs, line 116: unreachable code after return statement
+2026-10-06T01:25:05.693Z pw:browser [pid=64464][out] console.warn: services.settings: Ignoring preference override of remote settings server
+2026-10-06T01:25:05.693Z pw:browser [pid=64464][out] console.warn: services.settings: Allow by setting MOZ_REMOTE_SETTINGS_DEVTOOLS=1 in the environment
+2026-10-06T01:25:06.004Z pw:browser [pid=64464][out] 
+2026-10-06T01:25:06.004Z pw:browser [pid=64464][out] Juggler listening to the pipe
+2026-10-06T01:25:06.148Z pw:browser [pid=64464][err] [WARN  rkv::backend::impl_safe::environment] `load_ratio()` is irrelevant for this storage backend.
+2026-10-06T01:25:06.292Z pw:browser [pid=64464][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=7.74192) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+2026-10-06T01:25:06.640Z pw:browser [pid=64464][err] JavaScript error: chrome://juggler/content/Helper.js, line 82: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIWebProgress.removeProgressListener]
+2026-10-06T01:25:07.544Z pw:browser [pid=64464][out] console.error: services.settings: 
+2026-10-06T01:25:07.545Z pw:browser [pid=64464][out]   Message: EmptyDatabaseError: "main/nimbus-desktop-experiments" has not been synced yet
+2026-10-06T01:25:07.545Z pw:browser [pid=64464][out]   Stack:
+2026-10-06T01:25:07.545Z pw:browser [pid=64464][out]     EmptyDatabaseError@resource://services-settings/Database.sys.mjs:19:5
+2026-10-06T01:25:07.545Z pw:browser [pid=64464][out] list@resource://services-settings/Database.sys.mjs:96:13
+2026-10-06T01:25:07.545Z pw:browser [pid=64464][out] 
+LOCAL_FIREFOX_SMOKE_OK 142.0.1
+2026-10-06T01:25:07.713Z pw:browser [pid=64464] <gracefully close start>
+2026-10-06T01:25:07.751Z pw:browser [pid=64464][err] JavaScript error: chrome://juggler/content/Helper.js, line 82: NS_ERROR_FAILURE: Component returned failure code: 0x80004005 (NS_ERROR_FAILURE) [nsIWebProgress.removeProgressListener]
+2026-10-06T01:25:08.077Z pw:browser [pid=64464][out] console.error: services.settings: 
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out]   Message: EmptyDatabaseError: "main/nimbus-secure-experiments" has not been synced yet
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out]   Stack:
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out]     EmptyDatabaseError@resource://services-settings/Database.sys.mjs:19:5
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] list@resource://services-settings/Database.sys.mjs:96:13
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] ssi_onQuitApplicationGranted@resource:///modules/sessionstore/SessionStore.sys.mjs:2824:19
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] ssi_observe@resource:///modules/sessionstore/SessionStore.sys.mjs:1548:14
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] observe/browserHandler<@chrome://juggler/content/components/Juggler.js:143:16
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] Browser.close@chrome://juggler/content/protocol/BrowserHandler.js:155:10
+2026-10-06T01:25:08.078Z pw:browser [pid=64464][out] 
+2026-10-06T01:25:08.141Z pw:browser [pid=64464][out] console.warn: services.settings: #fetchAttachment: Forcing fallbackToDump to false due to Utils.LOAD_DUMPS being false
+2026-10-06T01:25:08.142Z pw:browser [pid=64464][err] JavaScript error: chrome://global/content/elements/browser-custom-element.mjs, line 718: TypeError: can't access property "inRDMPane", this.browsingContext is null
+2026-10-06T01:25:08.149Z pw:browser [pid=64464][out] console.error: (new NotFoundError("Could not find fa0fc42c-d91d-fca7-34eb-806ff46062dc in cache or dump", "resource://services-settings/Attachments.sys.mjs", 48))
+2026-10-06T01:25:08.149Z pw:browser [pid=64464][out] console.warn: "Unable to find the attachment for" "fa0fc42c-d91d-fca7-34eb-806ff46062dc"
+2026-10-06T01:25:08.152Z pw:browser [pid=64464][err] JavaScript error: chrome://global/content/elements/browser-custom-element.mjs, line 718: TypeError: can't access property "inRDMPane", this.browsingContext is null
+2026-10-06T01:25:08.190Z pw:browser [pid=64464][out] console.error: "Error in processing browser-idle-startup for BuiltInThemes.ensureBuiltInThemes"
+2026-10-06T01:25:08.190Z pw:browser [pid=64464][out] console.error: (new Error("Phase \"quit-application\" is finished, it is too late to register completion condition \"maybeInstallBuiltinAddon: firefox-compact-light@mozilla.org\"", "resource://gre/modules/AsyncShutdown.sys.mjs", 718))
+2026-10-06T01:25:08.247Z pw:browser [pid=64464][err] [WARN  remote_settings::config] Invalid Custom URL: 
+2026-10-06T01:25:08.426Z pw:browser [pid=64464] <process did exit: exitCode=0, signal=null>
+2026-10-06T01:25:08.427Z pw:browser [pid=64464] starting temporary directories cleanup
+2026-10-06T01:25:08.443Z pw:browser [pid=64464] finished temporary directories cleanup
+2026-10-06T01:25:08.443Z pw:browser [pid=64464] <gracefully close end>

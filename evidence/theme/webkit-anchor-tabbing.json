@@ -1,0 +1,16 @@
+{
+  "scope": "Local minimal HTML; no app, account, API or provider requests",
+  "engine": "WebKit",
+  "version": "26.0",
+  "implicitAnchorAfterTab": {
+    "tag": "INPUT",
+    "text": "",
+    "tabIndex": 0
+  },
+  "explicitTabIndexZeroAfterTab": {
+    "tag": "A",
+    "text": "How it works",
+    "tabIndex": 0
+  },
+  "conclusion": "This engine skips implicit anchor tab stops. Explicit tabIndex=0 preserves mobile navigation link access without changing test assertions."
+}

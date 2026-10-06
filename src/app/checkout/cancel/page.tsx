@@ -1,13 +1,8 @@
 import Link from 'next/link';
+import { AuthShell, UnavailableAccountAction } from '../../../components/account/AuthShell';
+import { isAIStaging } from '../../../components/account/environment';
 
 export default function CheckoutCancelPage() {
-  return (
-    <div className="min-h-[100dvh] mt-24 px-4 py-10 bg-gradient-to-br from-gray-900 via-gray-800 to-purple-900 text-gray-100 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-4">Payment canceled or not completed. Please try again.</h1>
-      <Link href="/pricing" className="text-purple-400 hover:underline">
-        Back to plans
-      </Link>
-    </div>
-  );
+  if (isAIStaging) return <UnavailableAccountAction title="Purchases are unavailable here." description="This Preview does not offer a payment checkout." />;
+  return <AuthShell title="Checkout was not completed." intro="You can return to costs or check your subscription in your account."><div className="account-actions"><Link href="/pricing" className="ui-button primary">Back to costs</Link><Link href="/profile" className="ui-button secondary">Open account</Link></div></AuthShell>;
 }
-

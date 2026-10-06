@@ -1,0 +1,27 @@
+
+> imagino-front@0.1.0 test:browser
+> playwright test
+
+
+Running 14 tests using 1 worker
+
+(node:29784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:29784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 e2e\studio-behavior.spec.ts:27:5 › current quote is invalidated by prompt, settings and reference changes (5.4s)
+  ok  2 e2e\studio-behavior.spec.ts:71:5 › upload rejects unsupported files and prepares a valid public local reference (1.6s)
+  ok  3 e2e\studio-behavior.spec.ts:90:5 › model change preserves references and settings until the user confirms (1.9s)
+  ok  4 e2e\studio-behavior.spec.ts:123:5 › duplicate click is blocked and ambiguous submission replays the exact body and key (1.6s)
+  ok  5 e2e\studio-behavior.spec.ts:151:5 › Library filters loaded jobs and restores keyboard focus after detail Escape (702ms)
+  ok  6 e2e\studio-behavior.spec.ts:181:5 › Use as reference downloads the owned result and prepares a new input without generating (1.8s)
+  ok  7 e2e\studio-behavior.spec.ts:203:5 › Reuse restores prompt and supported settings but does not invent original references (1.5s)
+  ok  8 e2e\studio-behavior.spec.ts:219:5 › failed reference download preserves the current prompt and settings (722ms)
+  ok  9 e2e\studio-behavior.spec.ts:234:5 › Library shows distinct empty, unavailable and signed-out states (657ms)
+  ok 10 e2e\studio-behavior.spec.ts:249:5 › logout clears private Library immediately even when the logout request fails (725ms)
+  ok 11 e2e\studio-behavior.spec.ts:269:5 › expired quote cannot submit while its replacement is pending (2.4s)
+  ok 12 e2e\studio-behavior.spec.ts:289:5 › deployment-pending model cannot quote or submit for an authenticated account (1.4s)
+  ok 13 e2e\studio-behavior.spec.ts:305:5 › design review sends no account or generation HTTP and disables sample actions (799ms)
+  ok 14 e2e\studio-behavior.spec.ts:339:5 › mobile navigation supports keyboard activation, Escape focus return and route change at 320 px (596ms)
+
+  14 passed (24.1s)

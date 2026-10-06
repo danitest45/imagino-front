@@ -1,0 +1,508 @@
+{
+  "method": "WCAG relative luminance for actual semantic token pairs; text threshold 4.5:1, UI boundaries/focus 3:1. Disabled text included voluntarily. These token checks supplement rendered axe and browser review.",
+  "source": "src/app/globals.css",
+  "themes": {
+    "light": [
+      {
+        "foreground": "foreground",
+        "foregroundColor": "#202421",
+        "background": "background",
+        "backgroundColor": "#f6f4ee",
+        "ratio": 14.29,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "foreground",
+        "foregroundColor": "#202421",
+        "background": "surface",
+        "backgroundColor": "#ffffff",
+        "ratio": 15.72,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#59635e",
+        "background": "surface",
+        "backgroundColor": "#ffffff",
+        "ratio": 6.23,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#59635e",
+        "background": "surface-tint",
+        "backgroundColor": "#e8ede5",
+        "ratio": 5.24,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "placeholder",
+        "foregroundColor": "#66706a",
+        "background": "surface",
+        "backgroundColor": "#ffffff",
+        "ratio": 5.13,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "accent",
+        "foregroundColor": "#166a63",
+        "background": "elevated",
+        "backgroundColor": "#ffffff",
+        "ratio": 6.41,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#ffffff",
+        "background": "accent-button",
+        "backgroundColor": "#166a63",
+        "ratio": 6.41,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#ffffff",
+        "background": "accent-hover",
+        "backgroundColor": "#10554f",
+        "ratio": 8.63,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#ffffff",
+        "background": "accent-pressed",
+        "backgroundColor": "#0c443e",
+        "ratio": 10.98,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "selected",
+        "backgroundColor": "#e7efeb",
+        "ratio": 7.37,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#59635e",
+        "background": "selected",
+        "backgroundColor": "#e7efeb",
+        "ratio": 5.32,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "disabled-text",
+        "foregroundColor": "#59635e",
+        "background": "disabled",
+        "backgroundColor": "#e1e5df",
+        "ratio": 4.89,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "success",
+        "foregroundColor": "#245b40",
+        "background": "success-soft",
+        "backgroundColor": "#edf6ef",
+        "ratio": 7.19,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "warning",
+        "foregroundColor": "#795016",
+        "background": "warning-soft",
+        "backgroundColor": "#f8efd9",
+        "ratio": 6.17,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "danger",
+        "foregroundColor": "#9c3434",
+        "background": "danger-soft",
+        "backgroundColor": "#fff0ee",
+        "ratio": 6.41,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "info",
+        "foregroundColor": "#10554f",
+        "background": "info-soft",
+        "backgroundColor": "#e7efeb",
+        "ratio": 7.37,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "sample-text",
+        "foregroundColor": "#405039",
+        "background": "sample-background",
+        "backgroundColor": "#e8eddf",
+        "ratio": 7.26,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "tooltip-text",
+        "foregroundColor": "#ffffff",
+        "background": "tooltip-bg",
+        "backgroundColor": "#202421",
+        "ratio": 15.72,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "toast-text",
+        "foregroundColor": "#202421",
+        "background": "toast-bg",
+        "backgroundColor": "#ffffff",
+        "ratio": 15.72,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "selection-text",
+        "foregroundColor": "#202421",
+        "background": "selection",
+        "backgroundColor": "#c7dfd8",
+        "ratio": 11.21,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#858f87",
+        "background": "surface",
+        "backgroundColor": "#ffffff",
+        "ratio": 3.35,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#858f87",
+        "background": "elevated",
+        "backgroundColor": "#ffffff",
+        "ratio": 3.35,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#858f87",
+        "background": "background",
+        "backgroundColor": "#f6f4ee",
+        "ratio": 3.04,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "focus",
+        "foregroundColor": "#166a63",
+        "background": "elevated",
+        "backgroundColor": "#ffffff",
+        "ratio": 6.41,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "open",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "selected",
+        "backgroundColor": "#e7efeb",
+        "ratio": 7.37,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "hover",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "hover",
+        "backgroundColor": "#edf2ee",
+        "ratio": 7.61,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "pressed",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "pressed",
+        "backgroundColor": "#dbe7df",
+        "ratio": 6.78,
+        "minimum": 4.5,
+        "pass": true
+      }
+    ],
+    "dark": [
+      {
+        "foreground": "foreground",
+        "foregroundColor": "#e9efea",
+        "background": "background",
+        "backgroundColor": "#121513",
+        "ratio": 15.76,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "foreground",
+        "foregroundColor": "#e9efea",
+        "background": "surface",
+        "backgroundColor": "#1a201c",
+        "ratio": 14.2,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#adb9b0",
+        "background": "surface",
+        "backgroundColor": "#1a201c",
+        "ratio": 8.16,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#adb9b0",
+        "background": "surface-tint",
+        "backgroundColor": "#222e26",
+        "ratio": 6.96,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "placeholder",
+        "foregroundColor": "#a0afa5",
+        "background": "surface",
+        "backgroundColor": "#1a201c",
+        "ratio": 7.24,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "accent",
+        "foregroundColor": "#79c7b5",
+        "background": "elevated",
+        "backgroundColor": "#222a25",
+        "ratio": 7.47,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#10241e",
+        "background": "accent-button",
+        "backgroundColor": "#79c7b5",
+        "ratio": 8.24,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#10241e",
+        "background": "accent-hover",
+        "backgroundColor": "#91d9c7",
+        "ratio": 10.02,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "on-accent",
+        "foregroundColor": "#10241e",
+        "background": "accent-pressed",
+        "backgroundColor": "#67b7a4",
+        "ratio": 6.87,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "selected",
+        "backgroundColor": "#304a40",
+        "ratio": 6.85,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "muted",
+        "foregroundColor": "#adb9b0",
+        "background": "selected",
+        "backgroundColor": "#304a40",
+        "ratio": 4.75,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "disabled-text",
+        "foregroundColor": "#a0afa5",
+        "background": "disabled",
+        "backgroundColor": "#29322c",
+        "ratio": 5.78,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "success",
+        "foregroundColor": "#a4d4b4",
+        "background": "success-soft",
+        "backgroundColor": "#213a2a",
+        "ratio": 7.43,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "warning",
+        "foregroundColor": "#e8cd91",
+        "background": "warning-soft",
+        "backgroundColor": "#3b3220",
+        "ratio": 8.16,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "danger",
+        "foregroundColor": "#efaaa1",
+        "background": "danger-soft",
+        "backgroundColor": "#402925",
+        "ratio": 7,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "info",
+        "foregroundColor": "#addccb",
+        "background": "info-soft",
+        "backgroundColor": "#243c32",
+        "ratio": 7.85,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "sample-text",
+        "foregroundColor": "#c4d7bd",
+        "background": "sample-background",
+        "backgroundColor": "#273429",
+        "ratio": 8.58,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "tooltip-text",
+        "foregroundColor": "#1a201c",
+        "background": "tooltip-bg",
+        "backgroundColor": "#e9efea",
+        "ratio": 14.2,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "toast-text",
+        "foregroundColor": "#e9efea",
+        "background": "toast-bg",
+        "backgroundColor": "#222a25",
+        "ratio": 12.62,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "selection-text",
+        "foregroundColor": "#eff7f1",
+        "background": "selection",
+        "backgroundColor": "#315a4c",
+        "ratio": 7.13,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#75837a",
+        "background": "surface",
+        "backgroundColor": "#1a201c",
+        "ratio": 4.17,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#75837a",
+        "background": "elevated",
+        "backgroundColor": "#222a25",
+        "ratio": 3.71,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "control-border",
+        "foregroundColor": "#75837a",
+        "background": "background",
+        "backgroundColor": "#121513",
+        "ratio": 4.63,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "foreground": "focus",
+        "foregroundColor": "#8de1cb",
+        "background": "elevated",
+        "backgroundColor": "#222a25",
+        "ratio": 9.65,
+        "minimum": 3,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "open",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "selected",
+        "backgroundColor": "#304a40",
+        "ratio": 6.85,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "hover",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "hover",
+        "backgroundColor": "#283a31",
+        "ratio": 8.57,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "pressed",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "pressed",
+        "backgroundColor": "#344b3e",
+        "ratio": 6.71,
+        "minimum": 4.5,
+        "pass": true
+      }
+    ]
+  }
+}

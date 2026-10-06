@@ -1,0 +1,16 @@
+[
+  {
+    "env": "preview",
+    "status": 200,
+    "noindex": true,
+    "containsSampleData": false,
+    "containsReviewControls": true
+  },
+  {
+    "env": "production",
+    "status": 404,
+    "noindex": true,
+    "containsSampleData": false,
+    "containsReviewControls": false
+  }
+]
