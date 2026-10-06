@@ -79,4 +79,12 @@ Compiled local Chrome timings (HTTP auth intercepted): landing DOMContentLoaded/
 2. Separately authorize the exact new origin in AIStaging; then perform remote session/history/reference/download smoke tests without paid generation.
 3. Obtain explicit approval for any future payment activation, paid generation, backend change or production promotion. None is implied by this PR.
 
-Deployment URL, final commit and read-only remote checks are recorded below after deployment.
+## Published Preview and remote observations
+
+- [Draft PR #88](https://github.com/danitest45/imagino-front/pull/88), stacked on the verified base above.
+- [Preview](https://imagino-front-mcy70revp-danitest45s-projects.vercel.app) and [design review](https://imagino-front-mcy70revp-danitest45s-projects.vercel.app/design-review).
+- Vercel deployment `dpl_GeQELCN3KUPm64yLrmmyUzGWmocs`: **READY**, Preview target, implementation commit `8f0d5d80299e2d6e531614c4afc3c6f2b7da9818`. Vercel completed the build in 54s, on the existing Node 22.x project setting. [Build log](evidence/rebrand/vercel-build.log). Subsequent evidence/documentation changes do not modify application source.
+- The four public configuration variables were created only for `feat/imagino-working-studio`, target `preview`. Production and the original staging branch/alias were not modified.
+- At 2026-10-06 00:35 UTC (2026-10-05 local), an unauthenticated OPTIONS to the existing login endpoint with the new exact origin returned **204 without Access-Control-Allow-Origin**. This origin is not authorized for browser authentication. [Sanitized observations](evidence/rebrand/remote-preview.json).
+- Unauthenticated GET requests to the landing and design review returned **302 to Vercel SSO**. The existing deployment protection remains active. Automatic approval review rejected the remote browser navigation because of the SSO access boundary; no protected content was inspected, no bypass link was created, and no access setting was changed. Local compiled visual/keyboard checks passed; remote visual inspection behind SSO is not claimed.
+- No provider generation request was sent. Remote authenticated E2E and browser download remain pending as described above.
