@@ -1,0 +1,33 @@
+.ui-dialog.model-picker-dialog[data-imagino-dialog] { width: min(720px, calc(100vw - 32px)); max-width: min(720px, calc(100vw - 32px)); }
+.model-picker { min-width: 0; }
+.model-picker-search { position: relative; display: flex; align-items: center; margin-top: 18px; }
+.model-picker-search > svg { position: absolute; left: 12px; color: var(--muted); pointer-events: none; }
+.model-picker-search input { width: 100%; padding-left: 39px; min-height: 44px; }
+.model-picker-groups { display: grid; gap: 22px; margin-top: 24px; }
+.model-picker-group h3 { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.model-picker-group > ul { display: grid; gap: 10px; list-style: none; padding: 0; margin: 0; }
+.model-picker-card { border: 1px solid var(--control-border); border-radius: 12px; padding: 16px; background: var(--surface); min-width: 0; }
+.model-picker-card.is-selected { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); background: var(--selected); }
+.model-picker-card-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.model-picker-card-heading h4 { font-size: 16px; font-weight: 600; line-height: 1.4; }
+.model-picker-native { font-size: 11px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; margin-top: 3px; }
+.model-picker-selected { display: inline-flex; align-items: center; gap: 4px; color: var(--accent); font-size: 11px; white-space: nowrap; }
+.model-picker-description { font-size: 12px; line-height: 1.65; margin-top: 10px; color: var(--muted); }
+.model-picker-capabilities { display: flex; gap: 5px; flex-wrap: wrap; list-style: none; padding: 0; margin: 12px 0 0; }
+.model-picker-capabilities li { font-size: 10px; padding: 3px 7px; color: var(--foreground); background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 5px; }
+.model-picker-card-footer { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-top: 16px; }
+.model-picker-pricing { display: grid; gap: 4px; min-width: 0; }
+.model-picker-pricing strong { font-size: 12px; font-weight: 550; }
+.model-picker-pricing span { font-size: 11px; color: var(--muted); }
+.model-picker-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+.model-picker-actions .ui-button { min-height: 44px; padding: 8px 12px; font-size: 12px; }
+.model-picker-footnote { font-size: 11px; line-height: 1.6; color: var(--muted); margin-top: 20px; }
+@media (max-width: 520px) {
+  .model-picker-card { padding: 14px; }
+  .model-picker-card-footer { flex-wrap: wrap; align-items: start; }
+  .model-picker-actions { margin-left: auto; }
+}
+@media (forced-colors: active) {
+  .model-picker-card.is-selected { border: 2px solid Highlight; box-shadow: none; }
+  .model-picker-selected { color: Highlight; }
+}

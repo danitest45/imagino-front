@@ -5,6 +5,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { themePreference } from "../lib/theme";
+import { useOverlayContainer } from "./ui/OverlayHost";
 import "./appearance.css";
 
 const subscribe = () => () => {};
@@ -20,14 +21,29 @@ export default function Appearance() {
   const preference = themePreference(theme);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | undefined>();
   const [open, setOpen] = useState(false);
+  const inheritedContainer = useOverlayContainer();
   const trigger = useRef<HTMLButtonElement>(null);
+  const deferredTouch = useRef(false);
   const SelectedIcon = options.find(option => option.value === preference)?.Icon ?? Monitor;
+  function handleOpenChange(next: boolean) {
+    if (next) setPortalContainer(trigger.current?.closest<HTMLElement>("[data-imagino-dialog], dialog[open]") ?? inheritedContainer ?? undefined);
+    setOpen(next);
+  }
   return (
-    <DropdownMenu.Root modal={false} open={open} onOpenChange={next => {
-      if (next) setPortalContainer(trigger.current?.closest<HTMLDialogElement>("dialog[open]") ?? undefined);
-      setOpen(next);
-    }}>
-      <DropdownMenu.Trigger asChild disabled={!mounted}>
+    <DropdownMenu.Root modal={false} open={open} onOpenChange={handleOpenChange}>
+      <DropdownMenu.Trigger asChild disabled={!mounted}
+        onPointerDown={event => {
+          deferredTouch.current = event.pointerType === "touch";
+          // Open touch menus after release, as Select does. Otherwise WebKit's
+          // synthetic click can move focus to the parent modal and dismiss them.
+          if (deferredTouch.current) event.preventDefault();
+        }}
+        onPointerCancel={() => { deferredTouch.current = false; }}
+        onClick={() => {
+          if (!deferredTouch.current) return;
+          deferredTouch.current = false;
+          handleOpenChange(!open);
+        }}>
         <button type="button" className="appearance-trigger" aria-label="Appearance"
           ref={trigger}>
           {mounted ? <SelectedIcon size={18} aria-hidden /> : <span className="appearance-icon-placeholder" aria-hidden />}

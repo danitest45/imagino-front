@@ -1,0 +1,697 @@
+{
+  "browser": "155.0.8059.39",
+  "scope": "Local sample fixtures only; no account, API, generation, provider, or payment calls.",
+  "denied": [],
+  "errors": [],
+  "checks": [
+    {
+      "name": "light-image-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-video-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-assets-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-image-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-video-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-assets-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-empty-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-error-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-queued-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-refunded-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-alternate-settings-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-picker-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 16,
+          "y": 16,
+          "width": 358,
+          "height": 812
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-drawer-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 304,
+          "height": 844
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-image-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-video-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-assets-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-image-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-video-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-assets-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-empty-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-error-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-queued-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-refunded-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-alternate-settings-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-picker-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 323,
+          "y": 35.046875,
+          "width": 720,
+          "height": 929.90625
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "light-image-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-video-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-assets-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-image-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-video-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "light-assets-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-image-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-video-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-320",
+      "width": 320,
+      "scrollWidth": 320,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-image-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-video-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-empty-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-error-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-queued-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-refunded-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-alternate-settings-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-picker-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 16,
+          "y": 16,
+          "width": 358,
+          "height": 812
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-drawer-390",
+      "width": 390,
+      "scrollWidth": 390,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 0,
+          "y": 0,
+          "width": 304,
+          "height": 844
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-image-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-video-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-image-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-video-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-empty-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-error-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-queued-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-refunded-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-alternate-settings-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-picker-1366",
+      "width": 1366,
+      "scrollWidth": 1366,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 323,
+          "y": 35.046875,
+          "width": 720,
+          "height": 929.90625
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "dark-image-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-video-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-1440",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-image-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-video-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "dark-assets-1920",
+      "width": 1920,
+      "scrollWidth": 1920,
+      "theme": "dark",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": false,
+      "violations": []
+    },
+    {
+      "name": "forced-colors-picker-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [
+        {
+          "x": 24,
+          "y": 46.046875,
+          "width": 720,
+          "height": 931.90625
+        }
+      ],
+      "audited": true,
+      "violations": []
+    },
+    {
+      "name": "200-percent-zoom-768",
+      "width": 768,
+      "scrollWidth": 768,
+      "theme": "light",
+      "brokenImages": [],
+      "dialogs": [],
+      "audited": true,
+      "violations": []
+    }
+  ]
+}

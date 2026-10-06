@@ -22,12 +22,17 @@ import type { GenerationJob, GenerationModel } from "../../types/generation";
 import catalog from "../../data/generation-catalog-preview.json";
 import { toast } from "../../lib/toast";
 import Appearance from "../../components/Appearance";
+import AppShell from "../../components/shell/AppShell";
 import "./review.css";
 
 const models = catalog.models
   .filter((m) => m.mediaType === "image")
-  .slice(0, 2)
+  .filter((m) => m.id !== "pipeline-demo-20261002")
   .map((m) => ({ ...m, availability: "ready" })) as GenerationModel[];
+// Availability here is an explicit visual fixture, never the production catalog.
+const videoModels = catalog.models
+  .filter((model) => model.mediaType === "video")
+  .map((model) => ({ ...model, availability: "migration_required" })) as GenerationModel[];
 const prompt =
   "A blue bottle on a stone pedestal, surrounded by botanical leaves and delicate white flowers. Soft natural light, a quiet editorial composition.";
 const jobs: GenerationJob[] = [
@@ -76,15 +81,32 @@ const jobs: GenerationJob[] = [
     createdAt: "2026-10-03T12:00:00Z",
   },
 ];
+const videoJob: GenerationJob = {
+  id: "sample-video-refunded",
+  modelId: videoModels[0].id,
+  displayName: videoModels[0].displayName,
+  mediaType: "video",
+  status: "Failed",
+  creditState: "Refunded",
+  credits: 20,
+  prompt: "Sample video history: a slow move around a blue bottle in natural light.",
+  settings: { aspectRatio: "16:9", duration: "4", resolution: "720p" },
+  outputUrl: null,
+  errorCode: "provider_error",
+  createdAt: "2026-10-02T12:00:00Z",
+};
 const screens = [
-  "Create",
-  "Library",
+  "Image",
+  "Video",
+  "Assets",
   "Account",
   "Costs",
   "Components",
 ] as const;
 const states = [
   "Result",
+  "Model picker",
+  "Alternate settings",
   "Empty",
   "Reference",
   "Queued",
@@ -109,7 +131,7 @@ const longOptions = [
   { value: "long-label", label: "A deliberately long option label that remains readable on a narrow screen without hiding its meaning" },
 ];
 export default function DesignReview() {
-  const [screen, setScreen] = useState<(typeof screens)[number]>("Create");
+  const [screen, setScreen] = useState<(typeof screens)[number]>("Image");
   const [state, setState] = useState<(typeof states)[number]>("Result");
   const [dialog, setDialog] = useState(false);
   const [dialogTrigger, setDialogTrigger] = useState<HTMLButtonElement | null>(null);
@@ -118,6 +140,9 @@ export default function DesignReview() {
   const [dialogOption, setDialogOption] = useState("studio");
   const [edgeOption, setEdgeOption] = useState("option-1");
   const [sampleFilter, setSampleFilter] = useState("");
+  const isVideo = screen === "Video";
+  const currentModels = isVideo ? videoModels : models;
+  const selectedModel = isVideo ? videoModels[0] : state === "Alternate settings" ? models[2] : models[1];
   const hasResult = ![
     "Empty",
     "Reference",
@@ -153,20 +178,25 @@ export default function DesignReview() {
             : null,
           outputUrl: status === "Completed" ? jobs[0].outputUrl : null,
         },
+        ...jobs.slice(1),
       ]
     : [];
   const fixture: StudioPreview = {
     models:
       state === "Unavailable"
-        ? models.map((m) => ({ ...m, availability: "approval_required" }))
-        : models,
-    modelId: models[1].id,
+        ? currentModels.map((m) => ({ ...m, availability: "disabled" }))
+        : currentModels,
+    modelId: selectedModel.id,
     authenticated: state !== "Signed out",
     prompt: state === "Empty" ? "" : prompt,
-    inputs: ["Result", "Reference"].includes(state)
+    inputs: !isVideo && ["Result", "Reference"].includes(state)
       ? [{ role: "reference", data: "/brand/reference.png" }]
       : [],
-    jobs: resultJobs,
+    jobs: isVideo ? [] : resultJobs,
+    selectedJobId: resultJobs[0]?.id,
+    modelPickerOpen: state === "Model picker",
+    onKindChange: (kind) => setScreen(kind === "image" ? "Image" : "Video"),
+    onOpenAssets: () => setScreen("Assets"),
     loading: state === "Loading",
     error:
       state === "No balance"
@@ -174,7 +204,7 @@ export default function DesignReview() {
         : state === "Error"
           ? "The API could not be reached. No generation was confirmed; review your history before trying again."
           : undefined,
-    quote: ["Reference", "Result"].includes(state)
+    quote: !isVideo && ["Reference", "Result"].includes(state)
       ? {
           quoteId: "sample-quote",
           credits: 15,
@@ -184,7 +214,11 @@ export default function DesignReview() {
       : undefined,
   };
   return (
-    <>
+    <AppShell preview={{
+      active: screen === "Video" ? "video" : screen === "Assets" ? "assets" : ["Account", "Costs"].includes(screen) ? "account" : "image",
+      credits: state === "No balance" ? 0 : 80,
+      onNavigate: (destination) => setScreen(destination === "image" ? "Image" : destination === "video" ? "Video" : destination === "assets" ? "Assets" : "Account"),
+    }}>
       <section className="review-controls" aria-label="Design review controls">
         <div>
           <span className="status-badge warning">
@@ -216,14 +250,14 @@ export default function DesignReview() {
           </label>
         </div>
       </section>
-      {screen === "Create" && (
+      {(screen === "Image" || screen === "Video") && (
         <GenerationWorkspace
-          key={`create-${state}`}
-          kind="image"
+          key={`${screen}-${state}`}
+          kind={isVideo ? "video" : "image"}
           preview={fixture}
         />
       )}
-      {screen === "Library" && (
+      {screen === "Assets" && (
         <GenerationLibrary
           key={`library-${state}`}
           preview={{
@@ -231,8 +265,10 @@ export default function DesignReview() {
               state === "Empty"
                 ? []
                 : state === "Refunded"
-                  ? [...jobs, ...resultJobs]
-                  : jobs,
+                  ? [...resultJobs, videoJob]
+                  : [...jobs, videoJob],
+            models,
+            onCreate: () => setScreen("Image"),
             authenticated: state !== "Signed out",
             loading: state === "Loading",
             error:
@@ -357,6 +393,6 @@ export default function DesignReview() {
           </Dialog>
         </main>
       )}
-    </>
+    </AppShell>
   );
 }

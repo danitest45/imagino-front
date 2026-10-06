@@ -1,7 +1,7 @@
 .review-controls {
   border-bottom: 1px solid var(--border);
   background: var(--surface-tint);
-  padding: 20px max(24px, calc((100vw - 1344px) / 2));
+  padding: 20px 24px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;

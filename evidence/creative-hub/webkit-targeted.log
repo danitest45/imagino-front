@@ -1,0 +1,11 @@
+
+Running 2 tests using 1 worker
+
+(node:74804) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:74804) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 e2e\theme-controls.spec.ts:337:5 › dialog select is in the top layer and Escape closes the popup before the parent (4.1s)
+  ok 2 e2e\theme-controls.spec.ts:410:7 › touch controls › touch can open, choose and dismiss selectors and Appearance without generation (3.0s)
+
+  2 passed (8.9s)

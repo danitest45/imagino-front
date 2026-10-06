@@ -1,10 +1,15 @@
-.studio-page { max-width: 1680px; margin: 0 auto; padding: 40px 40px 64px; color: var(--foreground); }
+.studio-page { max-width: 1800px; margin: 0 auto; padding: 28px 28px 48px; color: var(--foreground); }
 .studio-page-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; margin-bottom: 32px; }
 .studio-page-heading h1 { font-size: clamp(26px, 2.5vw, 38px); line-height: 1.2; letter-spacing: -.035em; font-weight: 550; margin: 8px 0 12px; }
 .studio-page-heading p { font-size: 15px; }
 .studio-page-heading .eyebrow { font-size: 11px; }
-.studio-layout { display: grid; grid-template-columns: 352px minmax(0, 1fr); align-items: start; gap: 28px; }
+.studio-layout { display: grid; grid-template-columns: 360px minmax(0, 1fr); align-items: start; gap: 24px; }
 .studio-controls { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; min-width: 0; }
+@media (min-width: 1120px) {
+  .creative-workspace .studio-controls { position: sticky; top: 24px; display: flex; flex-direction: column; max-height: max(560px, calc(100dvh - 192px)); }
+  .creative-workspace .studio-control-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 3px; margin: -3px; scrollbar-gutter: stable; }
+  .creative-workspace .studio-create-action { flex-shrink: 0; background: var(--surface); }
+}
 .studio-control-fields { border: 0; padding: 0; margin: 0; min-width: 0; }
 .studio-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 16px; }
 .studio-section-heading h2 { font-size: 17px; font-weight: 600; }
@@ -89,6 +94,7 @@
 .studio-recents-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 28px 0 16px; }
 .studio-recents-heading h2 { font-size: 14px; font-weight: 550; }
 .studio-recents-heading a { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); min-height: 44px; }
+.studio-recents-heading > button { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--accent); min-height: 44px; }
 .studio-recents { display: flex; gap: 14px; overflow-x: auto; padding: 4px 3px 10px; }
 .studio-asset { display: block; width: 100%; overflow: hidden; border: 1px solid var(--border); border-radius: 12px; text-align: left; background: var(--surface); }
 .studio-asset:hover { border-color: var(--accent); }

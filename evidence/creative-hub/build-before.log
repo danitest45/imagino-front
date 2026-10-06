@@ -1,0 +1,64 @@
+
+> imagino-front@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.27
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 15.9s
+   Linting and checking validity of types ...
+
+./src/app/images/[slug]/page.tsx
+647:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1178:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ImageCard.tsx
+36:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ImageCardModal.tsx
+121:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/profile/UserInfo.tsx
+74:32  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/20) ...
+   Generating static pages (5/20) 
+   Generating static pages (10/20) 
+   Generating static pages (15/20) 
+ ✓ Generating static pages (20/20)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    2.23 kB         114 kB
+├ ○ /_not-found                            995 B         104 kB
+├ ƒ /api/generation/catalog                127 B         103 kB
+├ ƒ /api/images/optimize                   127 B         103 kB
+├ ○ /checkout/cancel                       179 B         106 kB
+├ ○ /checkout/success                    3.76 kB         110 kB
+├ ○ /confirm-email                       2.99 kB         147 kB
+├ ƒ /create/[kind]                         179 B         158 kB
+├ ƒ /design-review                       8.41 kB         174 kB
+├ ○ /forgot-password                        3 kB         147 kB
+├ ○ /google-auth                         1.72 kB         104 kB
+├ ○ /images                               1.7 kB         108 kB
+├ ƒ /images/[slug]                       12.8 kB         156 kB
+├ ○ /library                             2.68 kB         153 kB
+├ ○ /login                                3.8 kB         147 kB
+├ ○ /pricing                             2.71 kB         143 kB
+├ ○ /profile                             4.34 kB         148 kB
+├ ○ /register                            3.01 kB         147 kB
+├ ○ /reset-password                      3.17 kB         147 kB
+├ ○ /verify                               3.3 kB         147 kB
+└ ○ /videos                               4.2 kB         110 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/493-3a7ee7f79f79ae9a.js       46.5 kB
+  ├ chunks/4bd1b696-c023c6e3521b1417.js  54.2 kB
+  └ other shared chunks (total)          2.04 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

@@ -1,0 +1,17 @@
+.ui-dialog-overlay { position: fixed; inset: 0; z-index: 70; background: var(--overlay); }
+.ui-dialog[data-imagino-dialog] {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;
+  z-index: 71; width: min(600px, calc(100vw - 32px)); max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 32px); overscroll-behavior: contain;
+  overflow: visible; padding: 0;
+}
+.ui-dialog-scroll { max-height: inherit; overflow-y: auto; overscroll-behavior: contain; border-radius: inherit; padding: 24px; min-width: 0; }
+/* The drawer keeps its existing full-height flex layout and outer padding. */
+.app-shell-drawer > .ui-dialog-scroll { display: flex; flex: 1; min-height: 0; flex-direction: column; padding: 0; }
+.ui-dialog.ui-dialog-wide[data-imagino-dialog] { width: min(1040px, calc(100vw - 32px)); max-width: min(1040px, calc(100vw - 32px)); }
+.ui-dialog-description { color: var(--muted); line-height: 1.6; margin: 0 0 20px; font-size: 14px; }
+@media (max-width: 520px) { .ui-dialog-scroll { padding: 16px; } .app-shell-drawer > .ui-dialog-scroll { padding: 0; } }
+@media (forced-colors: active) {
+  .ui-dialog-overlay { background: Canvas; opacity: .8; }
+  .ui-dialog[data-imagino-dialog] { border-color: CanvasText; }
+}
