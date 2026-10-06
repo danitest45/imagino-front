@@ -1,0 +1,58 @@
+[
+  {
+    "theme": "light",
+    "surface": "Create",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "surface": "Library",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "surface": "Account",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "surface": "Costs",
+    "violations": []
+  },
+  {
+    "theme": "light",
+    "surface": "Components",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "surface": "Create",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "surface": "Library",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "surface": "Account",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "surface": "Costs",
+    "violations": []
+  },
+  {
+    "theme": "dark",
+    "surface": "Components",
+    "violations": []
+  },
+  {
+    "fallbackDark": {
+      "background": "rgb(18, 21, 19)",
+      "colorScheme": "dark"
+    }
+  }
+]

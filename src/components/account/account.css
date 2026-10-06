@@ -19,8 +19,8 @@
 .account-link, .account-inline-link { color: var(--accent); font-weight: 550; text-decoration: underline; text-underline-offset: 4px; }
 .account-inline-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; }
 .account-form-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; align-items: center; font-size: 14px; }
-.account-error, .account-card .account-error { color: #9a2e27; background: #fff0ed; border: 1px solid #dda39b; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; line-height: 1.55; }
-.account-success { padding: 16px; border: 1px solid #8ab8a2; border-radius: 8px; background: #edf6ef; color: #245b40; }
+.account-error, .account-card .account-error { color: var(--danger); background: var(--danger-soft); border: 1px solid var(--danger-border); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; line-height: 1.55; }
+.account-success, .account-card .account-success { padding: 16px; border: 1px solid var(--success-border); border-radius: 8px; background: var(--success-soft); color: var(--success); }
 .account-notice { background: var(--background); border-left: 3px solid var(--accent); padding: 16px 20px; margin: 24px 0; font-size: 14px; }
 .account-notice p { margin: 8px 0 0; }
 .account-divider { display: flex; gap: 16px; align-items: center; font-size: 12px; color: var(--muted); margin: 24px 0; }

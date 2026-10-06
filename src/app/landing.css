@@ -90,7 +90,7 @@
   margin: 0 0 0 30px;
   border-radius: 8px;
   overflow: hidden;
-  background: #e3e6dc;
+  background: var(--canvas);
 }
 .hero-result > img {
   display: block;
@@ -101,7 +101,7 @@
   display: flex;
   justify-content: space-between;
   padding: 12px 16px;
-  background: white;
+  background: var(--surface);
   font-size: 12px;
 }
 .hero-result figcaption span:last-child {
@@ -116,15 +116,15 @@
   bottom: 18px;
   left: -24px;
   margin: 0;
-  background: white;
+  background: var(--surface);
   padding: 8px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 12px 24px #20242114;
+  box-shadow: var(--shadow);
   transform: rotate(-4deg);
 }
 .reference-image {
-  background: #f4f1e9;
+  background: var(--canvas);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -232,7 +232,7 @@
 }
 .control-visual {
   padding: 24px;
-  background: #e9ede5;
+  background: var(--surface-tint);
   border-radius: 12px;
 }
 .control-image {
@@ -249,8 +249,8 @@
   left: 16px;
   right: 16px;
   font-size: 10px;
-  background: #ffffffec;
-  color: #3b443e;
+  background: var(--caption-bg);
+  color: var(--caption-text);
   width: fit-content;
   padding: 5px 8px;
   border-radius: 4px;
@@ -298,7 +298,7 @@
 .continuation {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
-  background: #e8ede5;
+  background: var(--surface-tint);
   border-radius: 12px;
   align-items: center;
   gap: 8%;
@@ -358,7 +358,7 @@
   width: 42px;
   height: 42px;
   border: 1px solid var(--border);
-  background: white;
+  background: var(--surface);
   display: grid;
   place-items: center;
   font-size: 24px;

@@ -1,6 +1,6 @@
 .review-controls {
   border-bottom: 1px solid var(--border);
-  background: #eceee5;
+  background: var(--surface-tint);
   padding: 20px max(24px, calc((100vw - 1344px) / 2));
   display: flex;
   flex-wrap: wrap;
