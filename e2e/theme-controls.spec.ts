@@ -36,6 +36,13 @@ async function reviewComponents(page: Page) {
   await expect(page.getByRole('combobox', { name: 'Example select', exact: true })).toBeVisible();
 }
 
+async function readyStudio(page: Page) {
+  await page.goto('/create/image');
+  // Auth initializes before the token-keyed workspace is stable for editing.
+  await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Account', exact: true })).toBeVisible();
+}
+
 function collectRuntimeErrors(page: Page) {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
@@ -197,7 +204,7 @@ test('stored dark preference is applied on the first rendered reload frame over 
 test('theme changes preserve prompt, references, quote, selected result and scroll without creation or requote', async ({ page, context }) => {
   const mock = await mockStudio(context, jobs);
   await page.emulateMedia({ colorScheme: 'light' });
-  await page.goto('/create/image');
+  await readyStudio(page);
   await page.getByRole('textbox', { name: 'Describe your idea', exact: true }).fill('Keep this unsent working draft');
   await chooseOption(page, 'Aspect ratio', '16:9');
   await page.getByRole('button', { name: 'With a reference', exact: true }).click();
@@ -211,7 +218,7 @@ test('theme changes preserve prompt, references, quote, selected result and scro
   const body = JSON.stringify(mock.quotes.at(-1)?.body);
   await page.evaluate(() => {
     (window as Window & { __originalPrompt?: Element | null }).__originalPrompt = document.getElementById('generation-prompt');
-    window.scrollTo(0, 250);
+    window.scrollTo({ top: 250, behavior: 'instant' });
   });
   const scroll = await page.evaluate(() => scrollY);
   await page.emulateMedia({ colorScheme: 'dark' });
@@ -236,7 +243,7 @@ test('theme changes preserve prompt, references, quote, selected result and scro
 test('controlled numeric and enum selects preserve request types and never submit their form', async ({ page, context }) => {
   const mock = await mockStudio(context);
   mock.models[0].fields.push({ key: 'steps', label: 'Steps', type: 'integer', defaultValue: '4', options: ['4', '8'] });
-  await page.goto('/create/image');
+  await readyStudio(page);
   await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Check controlled schema settings');
   await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
   await chooseOption(page, 'Steps', '8');
@@ -256,7 +263,7 @@ test('controlled numeric and enum selects preserve request types and never submi
 test('select placeholder, disabled item, arrows, Home/End, typeahead and Escape are operable', async ({ page, context }) => {
   const mock = await mockStudio(context);
   await reviewComponents(page);
-  const trigger = page.getByRole('combobox', { name: 'Example select', exact: true });
+  const trigger = page.getByRole('combobox', { name: 'Example select', exact: true, includeHidden: true });
   await expect(trigger).toHaveText('Choose an option');
   await expect(page.getByRole('combobox', { name: 'Empty options', exact: true })).toBeDisabled();
   await expect(page.getByRole('combobox', { name: 'Disabled select', exact: true })).toBeDisabled();
@@ -345,6 +352,17 @@ test('dialog select is in the top layer and Escape closes the popup before the p
   await expect(page.getByRole('listbox')).toHaveCount(0);
   await expect(dialog).toBeVisible();
   await expect(trigger).toBeFocused();
+  const dialogAppearance = dialog.getByRole('button', { name: 'Appearance', exact: true });
+  await dialogAppearance.click();
+  await expect(dialog.getByRole('menu', { name: 'Appearance', exact: true })).toBeVisible();
+  await dialog.getByRole('menuitemradio', { name: 'Dark', exact: true }).click();
+  await expectTheme(page, 'dark', 'dark');
+  await expect(dialog).toBeVisible();
+  await dialogAppearance.click();
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('menu')).toHaveCount(0);
+  await expect(dialog).toBeVisible();
+  await expect(dialogAppearance).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(opener).toBeFocused();

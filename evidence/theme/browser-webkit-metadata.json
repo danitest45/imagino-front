@@ -1,0 +1,8 @@
+{
+  "engine": "webkit",
+  "browserVersion": "26.0",
+  "playwrightVersion": "1.56.1",
+  "platform": "win32",
+  "browserSource": "Official Playwright-installed browser",
+  "scope": "Version captured from a real browser launch; suites use compiled localhost app with external and API HTTP mocks."
+}

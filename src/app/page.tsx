@@ -10,6 +10,7 @@ import {
   CornerDownRight,
 } from "lucide-react";
 import StudioLink from "../components/StudioLink";
+import BrandMark from "../components/BrandMark";
 import "./landing.css";
 
 export default function HomePage() {
@@ -307,13 +308,8 @@ export default function HomePage() {
         <span>Explore the Working Studio Preview.</span>
       </section>
       <footer className="landing-footer page-width">
-        <Link href="/" aria-label="Imagino home">
-          <Image
-            src="/brand/wordmark.svg"
-            width={120}
-            height={31}
-            alt="Imagino"
-          />
+        <Link href="/" className="brand" aria-label="Imagino home">
+          <BrandMark />
         </Link>
         <span>AI Creative Workspace</span>
         <nav aria-label="Footer">

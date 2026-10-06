@@ -1,0 +1,26 @@
+2026-10-06T01:24:06.025Z pw:browser <launching> C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-working-studio\.playwright-browsers\firefox-1495\firefox\firefox.exe -no-remote -headless -profile C:\Users\USER\AppData\Local\Temp\playwright_firefoxdev_profile-oucZUV -juggler-pipe -silent
+2026-10-06T01:24:06.040Z pw:browser <launched> pid=60552
+2026-10-06T01:24:06.106Z pw:browser [pid=60552][err] *** You are running in headless mode.
+2026-10-06T01:24:06.488Z pw:browser [pid=60552][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=4.64805) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+2026-10-06T01:24:26.021Z pw:browser [pid=60552] <gracefully close start>
+2026-10-06T01:24:26.022Z pw:browser [pid=60552] <kill>
+2026-10-06T01:24:26.022Z pw:browser [pid=60552] <will force kill>
+2026-10-06T01:24:26.111Z pw:browser [pid=60552] taskkill stderr: ERRO: Acesso negado
+
+
+2026-10-06T01:24:56.028Z pw:browser [pid=60552] <kill>
+2026-10-06T01:24:56.028Z pw:browser [pid=60552] <will force kill>
+2026-10-06T01:24:56.098Z pw:browser [pid=60552] taskkill stderr: ERRO: Acesso negado
+
+
+2026-10-06T01:25:04.627Z pw:browser [pid=60552] <process did exit: exitCode=4294967295, signal=null>
+2026-10-06T01:25:04.628Z pw:browser [pid=60552] starting temporary directories cleanup
+2026-10-06T01:25:04.630Z pw:browser [pid=60552] finished temporary directories cleanup
+2026-10-06T01:25:04.630Z pw:browser [pid=60552] <gracefully close end>
+browserType.launch: Timeout 20000ms exceeded.
+Call log:
+  - <launching> C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-working-studio\.playwright-browsers\firefox-1495\firefox\firefox.exe -no-remote -headless -profile C:\Users\USER\AppData\Local\Temp\playwright_firefoxdev_profile-oucZUV -juggler-pipe -silent
+  - <launched> pid=60552
+  - [pid=60552][err] *** You are running in headless mode.
+  - [pid=60552][out] Crash Annotation GraphicsCriticalError: |[0][GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt (t=4.64805) [GFX1-]: RenderCompositorSWGL failed mapping default framebuffer, no dt
+

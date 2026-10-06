@@ -15,7 +15,8 @@ async function main() {
     return { route, status: response.status, location: response.headers.get('location')?.split('?')[0] || null, noindex: /name="robots"[^>]+noindex/.test(html), workingStudioHeadline: html.includes('Explore campaign visuals from your references'), reviewControls: html.includes('Design review controls') };
   }));
   const result = { checkedAt: new Date().toISOString(), origin, api, preflight: { status: preflight.status, allowOrigin: preflight.headers.get('access-control-allow-origin'), allowCredentials: preflight.headers.get('access-control-allow-credentials'), accepted: preflight.headers.get('access-control-allow-origin') === origin }, routes, scope: 'Unauthenticated read-only requests. No remote authenticated E2E or browser-download PASS is implied.' };
-  fs.writeFileSync(path.resolve(__dirname, '../evidence/rebrand/remote-preview.json'), JSON.stringify(result, null, 2) + '\n');
+  const output = process.argv[3] || 'evidence/rebrand/remote-preview.json';
+  fs.writeFileSync(path.resolve(__dirname, '..', output), JSON.stringify(result, null, 2) + '\n');
   console.log(JSON.stringify(result, null, 2));
 }
 main().catch(error => { console.error(error.message); process.exitCode = 1; });

@@ -1,5 +1,62 @@
 # Working Studio validation
 
+## Current pass: System appearance, dark theme and controls
+
+Continued the approved Working Studio on `feat/imagino-working-studio` and draft PR #88. The starting checkout and remote were clean at `a9be10fb1004262a658013c3df13042f480cc900`; its difference from published implementation `8f0d5d80299e2d6e531614c4afc3c6f2b7da9818` was documentation/evidence only. The base remains `codex/imagino-ai-revival-v2`, unchanged. No redesign or integration expansion.
+
+Appearance is in the shared header, signed in or out, including the isolated design-review path. System is the default and remains the selected radio choice when it resolves to either light or dark. Manual Light/Dark overrides, same-origin tab synchronization, navigation/reload/logout persistence, invalid/unavailable storage, system changes while open and first rendered frame are covered by compiled browser tests. Preference and resolved theme are separate; only the benign preference is stored. Theme changes keep the app mounted and preserve prompt, prepared reference, settings, quote, result and scroll without submitting or requoting.
+
+The light identity is preserved. Dark uses complete semantic tokens, readable wordmark geometry and unchanged image pixels. Radix Select replaces the visible rebrand native selects, including schema settings and Library filters. Appearance uses a radio menu. Menus have selected/focus/disabled states, touch/keyboard navigation, long-label wrapping and viewport collision handling. Native-dialog portals stay inside the top layer; popup Escape returns to its trigger before a second Escape closes the dialog. Background inert state is restored, and scrollable option groups remain keyboard focusable. See [design decisions](DESIGN_SYSTEM.md) and [manual review](evidence/theme/manual-review.md).
+
+### Final compiled checks
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| `npm ci --offline --no-audit --no-fund --cache ./.npm-cache` | PASS, 388 packages from lockfile | [Install](evidence/theme/npm-ci.log) |
+| `npm test` | PASS, 29 existing tests | [Unit tests](evidence/theme/unit-tests.log) |
+| `npm exec tsc -- --noEmit` | PASS, no diagnostics | [Typecheck](evidence/theme/typecheck.log) |
+| `npm run lint` | PASS, zero errors; 5 pre-existing legacy image warnings | [Lint](evidence/theme/lint.log) |
+| `npm run build` with branch-scoped Preview variables | PASS, compiled production build | [Build](evidence/theme/build.log) |
+| `npm run test:browser`, Chrome 154.0.8037.98 | PASS, 31/31 | [Log](evidence/theme/browser-chromium.log), [JSON](evidence/theme/browser-chromium.json) |
+| Same full suite, Firefox 142.0.1 | PASS, 31/31 | [Log](evidence/theme/browser-firefox.log), [JSON](evidence/theme/browser-firefox.json) |
+| Same full suite, WebKit 26.0 | PASS, 31/31 | [Log](evidence/theme/browser-webkit.log), [JSON](evidence/theme/browser-webkit.json) |
+| Installed Opera GX executable, Chromium 152.0.7977.120 | PASS, 7/7 targeted smoke cases | [Log](evidence/theme/browser-opera.log), [JSON](evidence/theme/browser-opera.json) |
+| `node scripts/capture-theme.cjs` | PASS, 108 captures / 74 axe audits, no overflow, broken images, page errors or axe violations | [Visual results](evidence/theme/chromium/visual-results.json) |
+| `node scripts/capture-model-picker.cjs` | PASS, 4 additional captures / 4 axe audits, desktop/mobile in both themes | [Model picker results](evidence/theme/chromium/model-picker-results.json) |
+| `node scripts/capture-forced-colors.cjs` | PASS, 4 captures / 4 axe audits, visible focused labels and focus return | [Forced colors results](evidence/theme/chromium/forced-colors-results.json) |
+| Token contrast | PASS, 54 pairs, including open/hover/pressed placeholders | [Ratios](evidence/theme-css/contrast.json) |
+
+The original 14 browser behaviors are preserved, with 17 additional theme/control cases. All API/proxy requests are intercepted before execution; fixtures do not represent remote sessions. Assertions include quote invalidation/expiry, ambiguous idempotent retry, reference preparation, ownership/download handling, logout privacy and disabled provider state. No real or shared generation was executed. Firefox and Opera needed elevated local process launch because the sandbox could not start their installed browser processes; no site protection was changed.
+
+### Visual coverage and corrections
+
+Equivalent landing, Create and Library views cover 1920×1080, 1366×768, 768×1024, 390×844 and 320×900 in both themes. Empty/reference/result, login, Account, Costs, components, closed/open Select, long/edge lists, Appearance, native modal, Library filters/detail, error/loading/disabled, tooltip, toast, 200% text, reduced motion, forced colors and legacy shared shells are recorded in the [screenshot index](evidence/theme/README.md). Audit flags in JSON state exactly which captures ran axe. Manual visual and keyboard review supplements automation; no WCAG certification or screen-reader certification is claimed.
+
+Verification corrected real issues before final capture: low contrast on an open placeholder, focusable content hidden behind the modal Select, unfocusable long-list scroll region, and WebKit-specific mobile-link/dialog-opener focus. No accessibility rules or assertions were disabled. Test fixes wait for auth/model readiness and a settled instant scroll; screenshot capture now proves a popup stays open before and after its viewport capture instead of resizing it away with full-page mode.
+
+Final manual inspection found a forced-colors text-backplate problem that axe did not report. A last CSS-only change inside `@media (forced-colors: active)` uses Canvas/CanvasText with a Highlight focus outline. The application was rebuilt and all four affected Select/Appearance preference states were recaptured, audited and checked for real focus return. The full engine suites preceded only this isolated forced-colors CSS change. Their normal-theme code and behavior are unchanged. There are **114 unique final screenshots and 82 audited states** including these supplements; two forced-color Select screenshots replace the original matrix images.
+
+### Dependencies and bundle impact
+
+Added exact MIT runtime packages `next-themes@0.4.6`, `@radix-ui/react-select@2.3.8` and `@radix-ui/react-dropdown-menu@2.1.25`; React 19 compatibility and package licenses were checked. [Notices](THIRD_PARTY_UI_NOTICES.md) are included. `playwright-core@1.56.1` is a development override to align axe and the existing Playwright test dependency. Next 15.5.27, React 19.1.0 and Tailwind 4 were not migrated. Node is 24.11.1 locally; the existing Vercel project Node 22.x setting is unchanged.
+
+| Route First Load JS | Previous rebrand | This pass | Difference |
+| --- | --- | --- | --- |
+| Landing | 114 kB | 114 kB | 0 kB |
+| Create | 125 kB | 158 kB | +33 kB |
+| Library | 120 kB | 153 kB | +33 kB |
+| Login | 116 kB | 147 kB | +31 kB |
+| Costs | 111 kB | 143 kB | +32 kB |
+| Shared by all routes | 103 kB | 103 kB | 0 kB |
+
+Values are the Next build report, not transferred-byte measurements. The added UI runtime provides the requested accessible controls and theme behavior; no dashboard template was added.
+
+### Environment boundaries
+
+The final local checks establish frontend behavior. Vercel SSO protection and the rebrand origin's API CORS limitation remain outside this pass; remote authentication and authenticated browser download are **not PASS**. No bypass, backend/Render/Atlas/R2/CORS/SSO/Stripe/OAuth/provider/balance/price change, production promotion, merge or DNS edit was performed. Preview-only/noindex/design-review guards remain intact. Deployment coordinates are recorded after publishing below and on the same draft PR.
+
+## Original rebrand evidence (preserved)
+
 Validated 2026-10-05. Frontend-only rebrand, built from `codex/imagino-ai-revival-v2` at `c57f923d533ce92b92525a2e9f963958dd0c8b0a`. The base checkout was clean and its remote SHA matched before implementation. Work is isolated on `feat/imagino-working-studio`; implementation agents used separate worktrees and one integrator reviewed the combined result. No merge or production promotion.
 
 ## Implemented

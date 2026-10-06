@@ -1,0 +1,107 @@
+{
+  "environment": "Chromium/Chrome forced-colors emulation; local compiled design-review Components fixture; all API/external HTTP rejected; no real session or generation. Visual inspection supplements axe because forced-color text backplates are browser-rendered.",
+  "checks": [
+    {
+      "name": "light-forced-colors-select",
+      "theme": "light",
+      "forcedColorsActive": true,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "popup": {
+        "x": 724,
+        "y": 454,
+        "width": 440,
+        "height": 132
+      },
+      "clipped": false,
+      "focusInside": true,
+      "focusedRole": "option",
+      "focusedText": "Studio Image",
+      "foreground": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "outline": "rgb(55, 0, 110)",
+      "forcedColorAdjust": "auto",
+      "focusReturned": true,
+      "violations": []
+    },
+    {
+      "name": "light-forced-colors-appearance",
+      "theme": "light",
+      "forcedColorsActive": true,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "popup": {
+        "x": 1012,
+        "y": 72,
+        "width": 210,
+        "height": 218.375
+      },
+      "clipped": false,
+      "focusInside": true,
+      "focusedRole": "menuitemradio",
+      "focusedText": "Light",
+      "foreground": "rgb(55, 0, 110)",
+      "background": "rgb(255, 255, 255)",
+      "outline": "rgb(55, 0, 110)",
+      "forcedColorAdjust": "auto",
+      "focusReturned": true,
+      "violations": []
+    },
+    {
+      "name": "dark-forced-colors-select",
+      "theme": "dark",
+      "forcedColorsActive": true,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "popup": {
+        "x": 724,
+        "y": 454,
+        "width": 440,
+        "height": 132
+      },
+      "clipped": false,
+      "focusInside": true,
+      "focusedRole": "option",
+      "focusedText": "Studio Image",
+      "foreground": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "outline": "rgb(55, 0, 110)",
+      "forcedColorAdjust": "auto",
+      "focusReturned": true,
+      "violations": []
+    },
+    {
+      "name": "dark-forced-colors-appearance",
+      "theme": "dark",
+      "forcedColorsActive": true,
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "popup": {
+        "x": 1012,
+        "y": 72,
+        "width": 210,
+        "height": 218.375
+      },
+      "clipped": false,
+      "focusInside": true,
+      "focusedRole": "menuitemradio",
+      "focusedText": "Light",
+      "foreground": "rgb(0, 0, 0)",
+      "background": "rgb(255, 255, 255)",
+      "outline": "rgb(55, 0, 110)",
+      "forcedColorAdjust": "auto",
+      "focusReturned": true,
+      "violations": []
+    }
+  ],
+  "errors": [],
+  "rejectedRequests": []
+}

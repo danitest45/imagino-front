@@ -2,8 +2,8 @@
 
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
-import { useId, useRef, useState, type ButtonHTMLAttributes } from "react";
-import { useOverlayContainer } from "./OverlayHost";
+import { useCallback, useId, useRef, useState, type ButtonHTMLAttributes } from "react";
+import { inertOutsidePopup, useOverlayContainer } from "./OverlayHost";
 import "./select.css";
 
 export interface SelectOption<Value extends string = string> {
@@ -42,6 +42,11 @@ export function Select<Value extends string = string>({
 }: SelectProps<Value>) {
   const generatedId = useId();
   const trigger = useRef<HTMLButtonElement>(null);
+  const restoreBackground = useRef<(() => void) | null>(null);
+  const popupRef = useCallback((element: HTMLDivElement | null) => {
+    restoreBackground.current?.();
+    restoreBackground.current = element ? inertOutsidePopup(element) : null;
+  }, []);
   const inheritedContainer = useOverlayContainer();
   const [container, setContainer] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -76,6 +81,7 @@ export function Select<Value extends string = string>({
     </SelectPrimitive.Trigger>
     <SelectPrimitive.Portal container={container ?? undefined}>
       <SelectPrimitive.Content
+        ref={popupRef}
         className="studio-select-content"
         data-imagino-popup="select"
         position="popper"
@@ -90,11 +96,13 @@ export function Select<Value extends string = string>({
         }}
         onCloseAutoFocus={event => {
           event.preventDefault();
+          restoreBackground.current?.();
+          restoreBackground.current = null;
           trigger.current?.focus({ preventScroll: true });
         }}
       >
         <SelectPrimitive.ScrollUpButton className="studio-select-scroll" aria-hidden><ChevronUp size={16} /></SelectPrimitive.ScrollUpButton>
-        <SelectPrimitive.Viewport className="studio-select-viewport">
+        <SelectPrimitive.Viewport className="studio-select-viewport" tabIndex={0} role="group" aria-label="Options">
           {options.map(option => <SelectPrimitive.Item className="studio-select-option" key={option.value} value={encode(option.value)} disabled={option.disabled} textValue={option.label}>
             <SelectPrimitive.ItemIndicator className="studio-select-indicator"><Check size={16} aria-hidden /></SelectPrimitive.ItemIndicator>
             <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>

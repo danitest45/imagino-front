@@ -1,0 +1,8 @@
+{
+  "engine": "opera",
+  "actualBrowser": "Installed Opera GX opera.exe",
+  "reportedChromiumVersion": "152.0.7977.120",
+  "playwright": "1.56.1",
+  "platform": "win32",
+  "scope": "Seven smoke cases against compiled localhost:3110 with all API and proxy HTTP intercepted; this used the Opera executable, not Chrome"
+}

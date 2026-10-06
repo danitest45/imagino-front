@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import Navbar from "../components/Navbar";
 import Providers from "../components/Providers";
 import RouteSurface from "../components/RouteSurface";
+import { THEME_BOOTSTRAP } from "../lib/theme";
 const inter = localFont({
   src: "../../public/fonts/inter-latin.woff2",
   display: "swap",
@@ -29,7 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head><script id="imagino-theme-init" dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} /></head>
       <body>
         <Providers>
           <a className="skip-link ui-button" href="#main-content">

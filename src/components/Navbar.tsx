@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, ArrowUpRight, UserRound, LogOut } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { getCredits } from "../lib/api";
 import { IconButton } from "./ui/StudioUI";
 import { toast } from "../lib/toast";
+import Appearance from "./Appearance";
+import BrandMark from "./BrandMark";
 export default function Navbar() {
   const { token, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
@@ -61,7 +62,7 @@ export default function Navbar() {
     <header
       className="site-header"
       onKeyDown={(event) => {
-        if (event.key === "Escape") {
+        if (event.key === "Escape" && !event.defaultPrevented && mobileOpen && !(event.target as HTMLElement).closest('[role="menu"], [role="listbox"]')) {
           setMobileOpen(false);
           menu.current?.focus();
         }
@@ -69,13 +70,7 @@ export default function Navbar() {
     >
       <div className="nav-inner">
         <Link href="/" className="brand" aria-label="Imagino home">
-          <Image
-            src="/brand/wordmark.svg"
-            width={133}
-            height={34}
-            alt="Imagino"
-            priority
-          />
+          <BrandMark />
         </Link>
         <nav
           aria-label="Main navigation"
@@ -95,6 +90,7 @@ export default function Navbar() {
           <span className="app-nav-label">AI CREATIVE WORKSPACE</span>
         )}
         <div className="nav-utilities">
+          <Appearance />
           {isAuthenticated && !reviewing ? (
             <>
               <Link href="/profile" className="credit-link">
@@ -162,12 +158,13 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              tabIndex={0}
               onClick={() => setMobileOpen(false)}
             >
               {link.label}
             </Link>
           ))}
-          <Link href="/create/image" className="ui-button">
+          <Link href="/create/image" className="ui-button" tabIndex={0}>
             Explore the studio
           </Link>
         </nav>

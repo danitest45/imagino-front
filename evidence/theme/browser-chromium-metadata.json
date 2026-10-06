@@ -1,0 +1,8 @@
+{
+  "engine": "chromium",
+  "actualBrowser": "Installed Google Chrome",
+  "version": "154.0.8037.98",
+  "playwright": "1.56.1",
+  "platform": "win32",
+  "scope": "Compiled localhost:3110; API and proxy HTTP intercepted"
+}

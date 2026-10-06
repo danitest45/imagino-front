@@ -218,6 +218,39 @@
         "ratio": 6.41,
         "minimum": 3,
         "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "open",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "selected",
+        "backgroundColor": "#e7efeb",
+        "ratio": 7.37,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "hover",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "hover",
+        "backgroundColor": "#edf2ee",
+        "ratio": 7.61,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "pressed",
+        "foreground": "selected-text",
+        "foregroundColor": "#10554f",
+        "background": "pressed",
+        "backgroundColor": "#dbe7df",
+        "ratio": 6.78,
+        "minimum": 4.5,
+        "pass": true
       }
     ],
     "dark": [
@@ -435,6 +468,39 @@
         "backgroundColor": "#222a25",
         "ratio": 9.65,
         "minimum": 3,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "open",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "selected",
+        "backgroundColor": "#304a40",
+        "ratio": 6.85,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "hover",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "hover",
+        "backgroundColor": "#283a31",
+        "ratio": 8.57,
+        "minimum": 4.5,
+        "pass": true
+      },
+      {
+        "component": "Select placeholder",
+        "state": "pressed",
+        "foreground": "selected-text",
+        "foregroundColor": "#b6e3d3",
+        "background": "pressed",
+        "backgroundColor": "#344b3e",
+        "ratio": 6.71,
+        "minimum": 4.5,
         "pass": true
       }
     ]

@@ -116,27 +116,30 @@ export function Dialog({
   onClose,
   title,
   children,
+  returnFocusTo,
 }: {
   open: boolean;
   onClose: () => void;
   title: string;
   children: ReactNode;
+  /** Explicit trigger for browsers that do not focus buttons on pointer activation. */
+  returnFocusTo?: HTMLElement | null;
 }) {
   const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const titleId = useId();
   useEffect(() => {
     const element = dialog;
     if (!open || !element) return;
-    const previous = document.activeElement as HTMLElement | null;
+    const previous = returnFocusTo ?? document.activeElement as HTMLElement | null;
     if (!element.open) element.showModal();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       element.close();
       document.body.style.overflow = previousOverflow;
-      previous?.focus();
+      if (previous?.isConnected) previous.focus({ preventScroll: true });
     };
-  }, [open, dialog]);
+  }, [open, dialog, returnFocusTo]);
   return (
     <dialog
       ref={setDialog}

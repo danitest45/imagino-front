@@ -45,7 +45,14 @@ async function main() {
       }
       await document.fonts.ready;
     });
-    await page.screenshot({ path: path.join(output, `${name}.png`), fullPage: true });
+    const popupRole = name.includes('appearance-open') ? 'menu' : /select-(open|long|edge|dialog)|library-filter-open|forced-colors-select/.test(name) ? 'listbox' : null;
+    const popup = popupRole ? page.getByRole(popupRole) : null;
+    if (popup) await popup.waitFor({ state: 'visible' });
+    const overlay = !!popup || /tooltip|toast/.test(name) || await page.locator('dialog[open]').count() > 0;
+    // fullPage can resize the viewport, which correctly dismisses a Radix popup.
+    // Overlay evidence therefore uses the actual viewport and proves it stayed open.
+    await page.screenshot({ path: path.join(output, `${name}.png`), fullPage: !overlay });
+    if (popup && !await popup.isVisible()) throw new Error(`${name}: popup closed while capturing; screenshot is not valid overlay evidence.`);
     const metrics = await page.evaluate(() => ({
       width: innerWidth, height: innerHeight, scrollWidth: document.documentElement.scrollWidth,
       preference: document.documentElement.dataset.themePreference, theme: document.documentElement.dataset.theme,
@@ -59,7 +66,7 @@ async function main() {
       }),
     }));
     const violations = axe ? (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa']).analyze()).violations.map(value => ({ id: value.id, impact: value.impact, description: value.description, nodes: value.nodes.map(node => ({ target: node.target, summary: node.failureSummary })) })) : [];
-    checks.push({ name, ...metrics, accessibilityAudited: axe, violations });
+    checks.push({ name, ...metrics, screenshotMode: overlay ? 'viewport' : 'full-page', accessibilityAudited: axe, violations });
     console.log(name, JSON.stringify({ overflow: metrics.scrollWidth > metrics.width, broken: metrics.brokenImages.length, accessibilityAudited: axe, violations: violations.length }));
   }
   for (const theme of ['light', 'dark']) {

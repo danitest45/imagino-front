@@ -21,6 +21,7 @@ import {
 import type { GenerationJob, GenerationModel } from "../../types/generation";
 import catalog from "../../data/generation-catalog-preview.json";
 import { toast } from "../../lib/toast";
+import Appearance from "../../components/Appearance";
 import "./review.css";
 
 const models = catalog.models
@@ -111,6 +112,7 @@ export default function DesignReview() {
   const [screen, setScreen] = useState<(typeof screens)[number]>("Create");
   const [state, setState] = useState<(typeof states)[number]>("Result");
   const [dialog, setDialog] = useState(false);
+  const [dialogTrigger, setDialogTrigger] = useState<HTMLButtonElement | null>(null);
   const [example, setExample] = useState<string | undefined>();
   const [longOption, setLongOption] = useState("option-1");
   const [dialogOption, setDialogOption] = useState("studio");
@@ -325,7 +327,7 @@ export default function DesignReview() {
             </div>
             <div className="surface">
               <h2>Overlays & focus</h2>
-              <Button variant="secondary" onClick={() => setDialog(true)}>
+              <Button variant="secondary" onClick={(event) => { setDialogTrigger(event.currentTarget); setDialog(true); }}>
                 Open sample dialog
               </Button>
               <Tooltip label="Helpful context">
@@ -340,6 +342,7 @@ export default function DesignReview() {
           </section>
           <div className="select-review-edge"><label className="select-review-field">Edge select<Select aria-label="Edge select" value={edgeOption} onValueChange={setEdgeOption} options={longOptions} /></label><p className="select-review-note">Review collision handling and long option labels near the viewport edge.</p></div>
           <Dialog
+            returnFocusTo={dialogTrigger}
             open={dialog}
             onClose={() => setDialog(false)}
             title="A clear next step"
@@ -349,6 +352,7 @@ export default function DesignReview() {
               the studio.
             </p>
             <label className="select-review-field select-review-group">Dialog select<Select aria-label="Dialog select" value={dialogOption} onValueChange={setDialogOption} options={sampleOptions} /></label>
+            <div className="review-row"><Appearance /></div>
             <Button onClick={() => setDialog(false)}>Done</Button>
           </Dialog>
         </main>

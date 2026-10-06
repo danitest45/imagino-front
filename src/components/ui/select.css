@@ -25,6 +25,9 @@
 .studio-select-trigger:active:not(:disabled) { background: var(--pressed); }
 .studio-select-trigger:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 .studio-select-trigger[data-placeholder] { color: var(--placeholder); }
+.studio-select-trigger[data-placeholder]:hover:not(:disabled),
+.studio-select-trigger[data-placeholder]:active:not(:disabled),
+.studio-select-trigger[data-placeholder][data-state="open"] { color: var(--selected-text); }
 .studio-select-trigger[aria-invalid="true"] { border-color: var(--danger); }
 .studio-select-trigger:disabled { background: var(--disabled); color: var(--disabled-text); border-color: var(--disabled-border); cursor: not-allowed; opacity: 1; }
 .studio-select-chevron { display: inline-flex; align-items: center; flex-shrink: 0; color: var(--muted); }
@@ -72,7 +75,7 @@
 @media (forced-colors: active) {
   .studio-select-trigger.ui-select, .studio-select-content { border-color: ButtonText; background: Canvas; color: CanvasText; box-shadow: none; }
   .studio-select-option[data-state="checked"] { outline: 1px solid ButtonText; outline-offset: -2px; }
-  .studio-select-option[data-highlighted] { background: Highlight; color: HighlightText; box-shadow: none; outline: 2px solid Highlight; }
+  .studio-select-option[data-highlighted] { background: Canvas; color: CanvasText; box-shadow: none; outline: 2px solid Highlight; }
   .studio-select-trigger:disabled, .studio-select-option[data-disabled] { color: GrayText; border-color: GrayText; }
   .studio-select-indicator { color: currentColor; }
 }

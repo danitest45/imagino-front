@@ -39,6 +39,8 @@ yarn-error.log*
 /.npm-cache
 /test-results
 /playwright-report
+/.playwright-browsers
+/evidence/theme/test-results-*/
 
 # typescript
 *.tsbuildinfo
