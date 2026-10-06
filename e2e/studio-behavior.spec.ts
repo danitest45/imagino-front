@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 import { jobs, mockStudio, referencePath, TEST_TOKEN } from './studio-mocks';
+import { chooseOption } from './select-helpers';
 
 async function captureMockEvidence(page: Page, name: string) {
   const directory = path.resolve(process.env.PLAYWRIGHT_EVIDENCE_DIR || 'evidence/rebrand');
@@ -41,7 +42,7 @@ test('current quote is invalidated by prompt, settings and reference changes', a
   await expect(page.getByRole('button', { name: 'Create image · 21 credits', exact: true })).toBeEnabled();
 
   mock.quoteCredits = 23;
-  await page.getByRole('combobox', { name: 'Aspect ratio' }).selectOption('16:9');
+  await chooseOption(page, 'Aspect ratio', '16:9');
   await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.quotes.at(-1)?.body.settings.aspectRatio).toBe('16:9');
@@ -91,7 +92,7 @@ test('model change preserves references and settings until the user confirms', a
   const mock = await mockStudio(context);
   await openStudio(page);
   await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Keep this creative direction');
-  await page.getByRole('combobox', { name: 'Aspect ratio' }).selectOption('4:3');
+  await chooseOption(page, 'Aspect ratio', '4:3');
   await page.getByRole('button', { name: 'With a reference', exact: true }).click();
   await page.getByLabel('Upload Reference image', { exact: true }).setInputFiles(referencePath);
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
@@ -102,7 +103,7 @@ test('model change preserves references and settings until the user confirms', a
   await confirmation.getByRole('button', { name: 'Keep current model', exact: true }).click();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toBeVisible();
-  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveValue('4:3');
+  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('4:3');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Where do you want to take it?' })).toHaveValue('Keep this creative direction');
 
@@ -111,7 +112,7 @@ test('model change preserves references and settings until the user confirms', a
   await confirmation.getByRole('button', { name: 'Change model', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Model Prompt Image', exact: true })).toBeVisible();
   await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue('Keep this creative direction');
-  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveValue('1:1');
+  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('1:1');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'With a reference', exact: true })).toBeDisabled();
   await expect.poll(() => mock.quotes.at(-1)?.body.modelId).toBe('test-prompt');
@@ -157,10 +158,10 @@ test('Library filters loaded jobs and restores keyboard focus after detail Escap
   await page.getByRole('searchbox', { name: 'Search loaded creations' }).fill('bottle');
   await expect(cards).toHaveCount(1);
   await page.getByRole('searchbox', { name: 'Search loaded creations' }).fill('');
-  await page.getByRole('combobox', { name: 'Model', exact: true }).selectOption('test-prompt');
+  await chooseOption(page, 'Model', 'Prompt Image');
   await expect(cards).toHaveCount(1);
   await expect(cards).toHaveAccessibleName(/Prompt Image/);
-  await page.getByRole('combobox', { name: 'Status', exact: true }).selectOption('Failed');
+  await chooseOption(page, 'Status', 'Failed');
   await expect(page.getByRole('heading', { name: 'No creations match these filters.' })).toBeVisible();
   await page.getByRole('button', { name: 'Clear filters', exact: true }).click();
   await expect(cards).toHaveCount(3);
@@ -207,7 +208,7 @@ test('Reuse restores prompt and supported settings but does not invent original 
   await page.getByRole('dialog', { name: 'Your creation', exact: true }).getByRole('button', { name: 'Reuse prompt & settings', exact: true }).click();
   await expect(page).toHaveURL(/\/create\/image$/);
   await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue(jobs[0].prompt);
-  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveValue('4:3');
+  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('4:3');
   await expect(page.getByText('Prompt and supported settings restored. Original reference files are not included.', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
   expect(mock.quotes.at(-1)?.body.inputs).toEqual([]);
@@ -221,11 +222,11 @@ test('failed reference download preserves the current prompt and settings', asyn
   mock.failDownloads = true;
   await openStudio(page);
   await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Keep this unsent draft');
-  await page.getByRole('combobox', { name: 'Aspect ratio' }).selectOption('16:9');
+  await chooseOption(page, 'Aspect ratio', '16:9');
   await page.getByRole('region', { name: 'Creation result' }).getByRole('button', { name: 'Use as reference', exact: true }).click();
   await expect(page.getByRole('form', { name: 'Create image controls' }).getByRole('alert')).toContainText('Reference could not be prepared.');
   await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue('Keep this unsent draft');
-  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveValue('16:9');
+  await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('16:9');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toHaveCount(0);
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);
@@ -294,7 +295,7 @@ test('deployment-pending model cannot quote or submit for an authenticated accou
   await expect(page.getByText('Generation unavailable', { exact: true })).toBeVisible();
   await expect(page.getByText('Creation is currently unavailable.', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
-  await page.getByRole('combobox', { name: 'Aspect ratio' }).selectOption('16:9');
+  await chooseOption(page, 'Aspect ratio', '16:9');
   // Observe beyond the 450 ms quote debounce to catch an accidentally queued request.
   await page.waitForTimeout(700);
   expect(mock.quotes).toHaveLength(0);
@@ -315,19 +316,19 @@ test('design review sends no account or generation HTTP and disables sample acti
   await expect(page.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Reuse prompt & settings', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
-  await page.getByRole('combobox', { name: 'State', exact: true }).selectOption('Reference');
+  await chooseOption(page, 'State', 'Reference');
   await expect(page.getByLabel('Upload Reference images', { exact: true })).toBeDisabled();
-  await page.getByRole('combobox', { name: 'State', exact: true }).selectOption('Queued');
+  await chooseOption(page, 'State', 'Queued');
   await expect(page.getByRole('button', { name: 'Cancel job', exact: true })).toBeDisabled();
-  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Library');
+  await chooseOption(page, 'Surface', 'Library');
   await page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true }).click();
   const detail = page.getByRole('dialog', { name: 'Your creation', exact: true });
   await expect(detail.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();
   await expect(detail.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
   await page.keyboard.press('Escape');
-  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Account');
+  await chooseOption(page, 'Surface', 'Account');
   await expect(page.getByRole('heading', { name: 'Sample account', exact: true })).toBeVisible();
-  await page.getByRole('combobox', { name: 'Surface', exact: true }).selectOption('Costs');
+  await chooseOption(page, 'Surface', 'Costs');
   await expect(page.getByRole('heading', { name: 'Explore now. Purchases are unavailable.', exact: true })).toBeVisible();
   expect(apiRequests).toEqual([]);
   expect(mock.quotes).toHaveLength(0);
