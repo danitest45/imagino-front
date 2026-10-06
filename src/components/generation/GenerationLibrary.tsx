@@ -24,7 +24,7 @@ export default function GenerationLibrary({ preview }: { preview?: LibraryPrevie
 function Library({ preview, authenticated }: { preview?: LibraryPreview; authenticated: boolean }) {
   const router = useRouter();
   const [jobs, setJobs] = useState<GenerationJob[]>(preview?.jobs.slice(0, 30) ?? []);
-  const [loading, setLoading] = useState(preview?.loading ?? authenticated);
+  const [loading, setLoading] = useState(preview ? !!preview.loading : authenticated);
   const [error, setError] = useState<string | null>(preview?.error ?? null);
   const [revision, setRevision] = useState(0);
   const [query, setQuery] = useState('');
