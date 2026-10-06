@@ -39,6 +39,7 @@ import {
 import GenerationResult from "./GenerationResult";
 import { AssetCard, modelAvailability } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
+import { Select } from "../ui/StudioUI";
 import "./studio.css";
 
 /** Explicit presentation-only fixture. Supplying it suppresses ALL API requests,
@@ -641,7 +642,7 @@ function Workspace({
               </h2>
               <span className="studio-step">01 / INPUT</span>
             </div>
-            <div className="studio-intent" aria-label="Starting point">
+            <div className="studio-intent" role="group" aria-label="Starting point">
               <button
                 type="button"
                 aria-pressed={intent === "prompt"}
@@ -775,6 +776,7 @@ function Workspace({
               disabled={!loaded || !models.length}
               aria-labelledby="model-label current-model"
               aria-haspopup="dialog"
+              aria-expanded={modelPicker}
             >
               <span>
                 <strong id="current-model">
@@ -790,28 +792,25 @@ function Workspace({
             {model ? (
               <div className="studio-settings">
                 {model.fields.map((field) => (
-                  <label key={field.key}>
-                    <span>{field.label}</span>
-                    <select
-                      className="ui-select"
+                  <label key={field.key} htmlFor={`generation-setting-${field.key}`}>
+                    <span id={`generation-setting-${field.key}-label`}>{field.label}</span>
+                    <Select
+                      id={`generation-setting-${field.key}`}
+                      aria-labelledby={`generation-setting-${field.key}-label`}
                       value={String(settings[field.key] ?? field.defaultValue)}
-                      onChange={(e) => {
+                      disabled={busy || preparing}
+                      onValueChange={(value) => {
                         setSettings((previous) => ({
                           ...previous,
                           [field.key]:
                             field.type === "integer"
-                              ? Number(e.target.value)
-                              : e.target.value,
+                              ? Number(value)
+                              : value,
                         }));
                         setError(null);
                       }}
-                    >
-                      {field.options.map((value) => (
-                        <option key={value} value={value}>
-                          {value}
-                        </option>
-                      ))}
-                    </select>
+                      options={field.options.map(value => ({ value, label: value }))}
+                    />
                   </label>
                 ))}
               </div>
@@ -1023,6 +1022,7 @@ function Workspace({
                 type="button"
                 key={item.id}
                 className={`studio-model-option${selected === item.id ? " is-selected" : ""}`}
+                aria-pressed={selected === item.id}
                 onClick={() => choose(item)}
               >
                 <span>

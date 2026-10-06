@@ -2,14 +2,16 @@
 import {
   useEffect,
   useId,
-  useRef,
+  useState,
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
-  type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
   type ReactNode,
 } from "react";
 import { Loader2, X } from "lucide-react";
+import { OverlayHost, hasOpenPopup } from "./OverlayHost";
+export { Select } from "./Select";
+export type { SelectProps, SelectOption } from "./Select";
 export function Button({
   variant = "primary",
   loading = false,
@@ -61,12 +63,6 @@ export function Textarea({
   ...props
 }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return <textarea {...props} className={`ui-textarea ${className}`} />;
-}
-export function Select({
-  className = "",
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select {...props} className={`ui-select ${className}`} />;
 }
 export function StatusBadge({
   children,
@@ -126,13 +122,13 @@ export function Dialog({
   title: string;
   children: ReactNode;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const titleId = useId();
   useEffect(() => {
-    const element = dialog.current;
+    const element = dialog;
     if (!open || !element) return;
     const previous = document.activeElement as HTMLElement | null;
-    element.showModal();
+    if (!element.open) element.showModal();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -140,14 +136,15 @@ export function Dialog({
       document.body.style.overflow = previousOverflow;
       previous?.focus();
     };
-  }, [open]);
+  }, [open, dialog]);
   return (
     <dialog
-      ref={dialog}
+      ref={setDialog}
       className="ui-dialog"
       aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
+        if (hasOpenPopup(event.currentTarget)) return;
         onClose();
       }}
       onClick={(event) => {
@@ -164,7 +161,7 @@ export function Dialog({
       }}
     >
       {open && (
-        <>
+        <OverlayHost container={dialog}>
           <header className="ui-dialog-heading">
             <h2 id={titleId}>{title}</h2>
             <IconButton label="Close dialog" onClick={onClose}>
@@ -172,7 +169,7 @@ export function Dialog({
             </IconButton>
           </header>
           {children}
-        </>
+        </OverlayHost>
       )}
     </dialog>
   );

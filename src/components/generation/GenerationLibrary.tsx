@@ -11,6 +11,7 @@ import type { GenerationJob } from "../../types/generation";
 import { AssetCard } from "./GenerationPresentation";
 import GenerationResult from "./GenerationResult";
 import StudioDialog from "./StudioDialog";
+import { Select } from "../ui/StudioUI";
 import "./studio.css";
 
 /** Local review data only: supplying this fixture suppresses all API requests/actions. */
@@ -53,8 +54,8 @@ function Library({
   const [error, setError] = useState<string | null>(preview?.error ?? null);
   const [revision, setRevision] = useState(0);
   const [query, setQuery] = useState("");
-  const [model, setModel] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [model, setModel] = useState("");
+  const [status, setStatus] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const scope = useRef<AbortController | null>(null);
   const previousStates = useRef<Record<string, string>>({});
@@ -108,8 +109,8 @@ function Library({
   );
   const filtered = jobs.filter(
     (job) =>
-      (model === "all" || job.modelId === model) &&
-      (status === "all" || job.status === status) &&
+      (model === "" || job.modelId === model) &&
+      (status === "" || job.status === status) &&
       `${job.prompt} ${job.displayName} ${job.status}`
         .toLocaleLowerCase("en-US")
         .includes(query.trim().toLocaleLowerCase("en-US")),
@@ -134,8 +135,8 @@ function Library({
   }
   function clearFilters() {
     setQuery("");
-    setModel("all");
-    setStatus("all");
+    setModel("");
+    setStatus("");
   }
   return (
     <main className="studio-page library-page">
@@ -185,40 +186,32 @@ function Library({
                 placeholder="Search prompts or models"
               />
             </label>
-            <label>
-              <span>Model</span>
-              <select
-                className="ui-select"
+            <label htmlFor="library-model-filter">
+              <span id="library-model-label">Model</span>
+              <Select
+                id="library-model-filter"
+                aria-labelledby="library-model-label"
                 value={model}
-                onChange={(event) => setModel(event.target.value)}
-              >
-                <option value="all">All models</option>
-                {models.map(([id, name]) => (
-                  <option key={id} value={id}>
-                    {name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={setModel}
+                options={[{ value: "", label: "All models" }, ...models.map(([id, name]) => ({ value: id, label: name }))]}
+              />
             </label>
-            <label>
-              <span>Status</span>
-              <select
-                className="ui-select"
+            <label htmlFor="library-status-filter">
+              <span id="library-status-label">Status</span>
+              <Select
+                id="library-status-filter"
+                aria-labelledby="library-status-label"
                 value={status}
-                onChange={(event) => setStatus(event.target.value)}
-              >
-                <option value="all">All statuses</option>
-                {[
+                onValueChange={setStatus}
+                options={[{ value: "", label: "All statuses" }, ...[
                   "Queued",
                   "Starting",
                   "Processing",
                   "Completed",
                   "Failed",
                   "Cancelled",
-                ].map((value) => (
-                  <option key={value}>{value}</option>
-                ))}
-              </select>
+                ].map((value) => ({ value, label: value }))]}
+              />
             </label>
           </section>
           <div className="library-scope">

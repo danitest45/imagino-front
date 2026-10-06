@@ -98,10 +98,24 @@ const states = [
   "Signed out",
   "Error",
 ] as const;
+const sampleOptions = [
+  { value: "studio", label: "Studio Image" },
+  { value: "fast", label: "Fast Image" },
+  { value: "unavailable", label: "Unavailable model", disabled: true },
+] as const;
+const longOptions = [
+  ...Array.from({ length: 24 }, (_, index) => ({ value: `option-${index + 1}`, label: `Option ${String(index + 1).padStart(2, "0")}` })),
+  { value: "long-label", label: "A deliberately long option label that remains readable on a narrow screen without hiding its meaning" },
+];
 export default function DesignReview() {
   const [screen, setScreen] = useState<(typeof screens)[number]>("Create");
   const [state, setState] = useState<(typeof states)[number]>("Result");
   const [dialog, setDialog] = useState(false);
+  const [example, setExample] = useState<string | undefined>();
+  const [longOption, setLongOption] = useState("option-1");
+  const [dialogOption, setDialogOption] = useState("studio");
+  const [edgeOption, setEdgeOption] = useState("option-1");
+  const [sampleFilter, setSampleFilter] = useState("");
   const hasResult = ![
     "Empty",
     "Reference",
@@ -185,24 +199,18 @@ export default function DesignReview() {
             <Select
               aria-label="Surface"
               value={screen}
-              onChange={(e) => setScreen(e.target.value as typeof screen)}
-            >
-              {screens.map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </Select>
+              onValueChange={setScreen}
+              options={screens.map(value => ({ value, label: value }))}
+            />
           </label>
           <label>
             State
             <Select
               aria-label="State"
               value={state}
-              onChange={(e) => setState(e.target.value as typeof state)}
-            >
-              {states.map((value) => (
-                <option key={value}>{value}</option>
-              ))}
-            </Select>
+              onValueChange={setState}
+              options={states.map(value => ({ value, label: value }))}
+            />
           </label>
         </div>
       </section>
@@ -274,10 +282,8 @@ export default function DesignReview() {
                 <Textarea placeholder="Describe a new direction…" />
               </label>
               <label>
-                Model
-                <Select>
-                  <option>Studio Image</option>
-                </Select>
+                Example select
+                <Select aria-label="Example select" value={example} onValueChange={setExample} options={sampleOptions} placeholder="Choose an option" />
               </label>
               <label>
                 Error state
@@ -291,6 +297,15 @@ export default function DesignReview() {
               <p id="sample-error" className="review-error">
                 Sample validation message.
               </p>
+            </div>
+            <div className="surface">
+              <h2>Selection states</h2>
+              <div className="select-review-group">
+                <label className="select-review-field">Long options<Select aria-label="Long options" value={longOption} onValueChange={setLongOption} options={longOptions} /></label>
+                <label className="select-review-field">All options<Select aria-label="All options" value={sampleFilter} onValueChange={setSampleFilter} options={[{ value: "", label: "All models" }, ...sampleOptions]} /></label>
+                <label className="select-review-field">Empty options<Select aria-label="Empty options" onValueChange={() => {}} options={[]} /></label>
+                <label className="select-review-field">Disabled select<Select aria-label="Disabled select" value="studio" onValueChange={() => {}} options={sampleOptions} disabled /></label>
+              </div>
             </div>
             <div className="surface">
               <h2>States</h2>
@@ -323,6 +338,7 @@ export default function DesignReview() {
               </p>
             </div>
           </section>
+          <div className="select-review-edge"><label className="select-review-field">Edge select<Select aria-label="Edge select" value={edgeOption} onValueChange={setEdgeOption} options={longOptions} /></label><p className="select-review-note">Review collision handling and long option labels near the viewport edge.</p></div>
           <Dialog
             open={dialog}
             onClose={() => setDialog(false)}
@@ -332,6 +348,7 @@ export default function DesignReview() {
               This sample dialog uses the same focus and dismissal behavior as
               the studio.
             </p>
+            <label className="select-review-field select-review-group">Dialog select<Select aria-label="Dialog select" value={dialogOption} onValueChange={setDialogOption} options={sampleOptions} /></label>
             <Button onClick={() => setDialog(false)}>Done</Button>
           </Dialog>
         </main>

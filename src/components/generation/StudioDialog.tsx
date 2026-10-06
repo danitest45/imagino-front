@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { OverlayHost, hasOpenPopup } from "../ui/OverlayHost";
 
 /** Native modal supplies focus containment, Escape handling and focus restoration. */
 export default function StudioDialog({
@@ -17,31 +18,32 @@ export default function StudioDialog({
   children: ReactNode;
   wide?: boolean;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
   const id = useId();
   useEffect(() => {
-    const element = dialog.current;
+    const element = dialog;
     if (!element) return;
     if (open && !element.open) element.showModal();
     else if (!open && element.open) element.close();
     return () => {
       if (element.open) element.close();
     };
-  }, [open]);
+  }, [open, dialog]);
   return (
     <dialog
-      ref={dialog}
+      ref={setDialog}
       className={`studio-dialog${wide ? " studio-dialog-wide" : ""}`}
       aria-labelledby={id}
       onCancel={(event) => {
         event.preventDefault();
+        if (hasOpenPopup(event.currentTarget)) return;
         onClose();
       }}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="studio-dialog-inner">
+      <OverlayHost container={dialog}><div className="studio-dialog-inner">
         <div className="studio-dialog-heading">
           <h2 id={id}>{title}</h2>
           <button
@@ -54,7 +56,7 @@ export default function StudioDialog({
           </button>
         </div>
         {open ? children : null}
-      </div>
+      </div></OverlayHost>
     </dialog>
   );
 }
