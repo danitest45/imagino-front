@@ -59,6 +59,7 @@ function Workspace({ kind, preview, authenticated }: { kind: 'image' | 'video'; 
   const [quoteRevision, setQuoteRevision] = useState(0);
   const [modelPicker, setModelPicker] = useState(false);
   const [pendingModel, setPendingModel] = useState<GenerationModel | null>(null);
+  const [pendingReuse, setPendingReuse] = useState<GenerationJob | null>(null);
   const [clearReferences, setClearReferences] = useState(false);
   const [pendingReference, setPendingReference] = useState<GenerationJob | null>(null);
   const [ambiguousSubmit, setAmbiguousSubmit] = useState(false);
@@ -203,6 +204,14 @@ function Workspace({ kind, preview, authenticated }: { kind: 'image' | 'video'; 
   }
   function reuse(job: GenerationJob) {
     if (preview || busy || preparing) return;
+    if (inputs.length || (model && JSON.stringify(settings) !== JSON.stringify(defaultGenerationSettings(model)))) {
+      setPendingReuse(job);
+      return;
+    }
+    restoreJob(job);
+  }
+  function restoreJob(job: GenerationJob) {
+    if (preview || busy || preparing) return;
     const original = models.find(m => m.id === job.modelId);
     if (!original) { setError('The original model is not in the current catalog. Your form is unchanged.'); return; }
     selectedRef.current = original.id;
@@ -219,6 +228,7 @@ function Workspace({ kind, preview, authenticated }: { kind: 'image' | 'video'; 
     setQuoted(null);
     setError(null);
     setNotice('Prompt and supported settings restored. Original reference files are not included.');
+    setPendingReuse(null);
     document.getElementById('generation-prompt')?.focus();
   }
   // Cross-route reuse carries only an opaque ID/action. Reload the owned job first.
@@ -281,8 +291,8 @@ function Workspace({ kind, preview, authenticated }: { kind: 'image' | 'video'; 
     if (!controller.signal.aborted) { setJobs(previous => previous.map(j => j.id === id ? job : j)); window.dispatchEvent(new Event('imagino-credits-changed')); }
   }
   useEffect(() => {
-    if (!preview && jobs.some(j => previousStates.current[j.id] && previousStates.current[j.id] !== j.status && terminalGeneration(j.status))) window.dispatchEvent(new Event('imagino-credits-changed'));
-    previousStates.current = Object.fromEntries(jobs.map(j => [j.id, j.status]));
+    if (!preview && jobs.some(j => previousStates.current[j.id] && previousStates.current[j.id] !== `${j.status}:${j.creditState}` && terminalGeneration(j.status))) window.dispatchEvent(new Event('imagino-credits-changed'));
+    previousStates.current = Object.fromEntries(jobs.map(j => [j.id, `${j.status}:${j.creditState}`]));
   }, [jobs, preview]);
 
   return <main className="studio-page">
@@ -326,6 +336,7 @@ function Workspace({ kind, preview, authenticated }: { kind: 'image' | 'video'; 
     </div>
     <StudioDialog open={modelPicker} onClose={() => { setModelPicker(false); setPendingReference(null); }} title={pendingReference ? 'Choose a reference-capable model' : 'Choose your model'}><p className="studio-help">One workspace, different ways to create. Availability and starting costs come from the catalog.</p><div className="studio-model-options">{models.filter(item => !pendingReference || item.inputs.some(input => input.role === 'reference')).map(item => <button type="button" key={item.id} className={`studio-model-option${selected === item.id ? ' is-selected' : ''}`} onClick={() => choose(item)}><span><strong>{item.displayName}</strong>{selected === item.id ? <Check size={18} /> : null}</span><p>{item.description}</p><span className="studio-model-option-meta">{modelAvailability(item)}<span>From {item.startingCredits} cr</span></span></button>)}</div>{pendingReference && !models.some(item => item.inputs.some(input => input.role === 'reference')) ? <p className="studio-notice">No reference-capable image model is in the current catalog.</p> : null}</StudioDialog>
     <StudioDialog open={!!pendingModel} onClose={() => setPendingModel(null)} title="Change model?"><p>Switching to {pendingModel?.displayName} will remove current references and reset model settings. Your prompt will stay.</p><div className="studio-dialog-actions"><button type="button" className="ui-button secondary" onClick={() => setPendingModel(null)}>Keep current model</button><button type="button" className="ui-button" onClick={() => { if (pendingModel) changeModel(pendingModel); }}>Change model</button></div></StudioDialog>
+    <StudioDialog open={!!pendingReuse} onClose={() => setPendingReuse(null)} title="Replace your current setup?"><p>Reusing this creation replaces your prompt and settings and removes current reference inputs. Original reference files are not included in job history.</p><div className="studio-dialog-actions"><button type="button" className="ui-button secondary" onClick={() => setPendingReuse(null)}>Keep current setup</button><button type="button" className="ui-button" onClick={() => { if (pendingReuse) restoreJob(pendingReuse); }}>Reuse this setup</button></div></StudioDialog>
     <StudioDialog open={clearReferences} onClose={() => setClearReferences(false)} title="Start from a prompt?"><p>This removes the reference inputs from the current form. Your prompt and model settings will stay.</p><div className="studio-dialog-actions"><button type="button" className="ui-button secondary" onClick={() => setClearReferences(false)}>Keep references</button><button type="button" className="ui-button" onClick={() => { setInputs([]); setIntent('prompt'); setQuoted(null); setReferenceSource(null); setClearReferences(false); }}>Remove references</button></div></StudioDialog>
   </main>;
 }

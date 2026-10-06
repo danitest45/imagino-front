@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { cancelGeneration, generationHistory } from '../../lib/generation-api';
-import { generationError } from '../../lib/generation';
+import { generationError, terminalGeneration } from '../../lib/generation';
 import type { GenerationJob } from '../../types/generation';
 import { AssetCard } from './GenerationPresentation';
 import GenerationResult from './GenerationResult';
@@ -32,6 +32,7 @@ function Library({ preview, authenticated }: { preview?: LibraryPreview; authent
   const [status, setStatus] = useState('all');
   const [selected, setSelected] = useState<string | null>(null);
   const scope = useRef<AbortController | null>(null);
+  const previousStates = useRef<Record<string, string>>({});
   useEffect(() => {
     if (preview || !authenticated) return;
     const controller = new AbortController();
@@ -50,6 +51,10 @@ function Library({ preview, authenticated }: { preview?: LibraryPreview; authent
     void poll();
     return () => { controller.abort(); clearTimeout(timer); };
   }, [preview, authenticated, revision]);
+  useEffect(() => {
+    if (!preview && jobs.some(job => previousStates.current[job.id] && previousStates.current[job.id] !== `${job.status}:${job.creditState}` && terminalGeneration(job.status))) window.dispatchEvent(new Event('imagino-credits-changed'));
+    previousStates.current = Object.fromEntries(jobs.map(job => [job.id, `${job.status}:${job.creditState}`]));
+  }, [jobs, preview]);
   const models = useMemo(() => Array.from(new Map(jobs.map(job => [job.modelId, job.displayName]))), [jobs]);
   const filtered = jobs.filter(job => (model === 'all' || job.modelId === model) && (status === 'all' || job.status === status) && `${job.prompt} ${job.displayName} ${job.status}`.toLocaleLowerCase('en-US').includes(query.trim().toLocaleLowerCase('en-US')));
   const selectedJob = jobs.find(job => job.id === selected);
