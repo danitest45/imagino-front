@@ -18,6 +18,8 @@ Before images are the approved Working Studio evidence already committed at the 
 | Dark Image, desktop | [Before](../theme/chromium/dark-create-result-1366.png) | [After](screenshots/dark-image-1366.png) |
 | Light Image, mobile | [Before](../theme/chromium/light-create-result-390.png) | [After](screenshots/light-image-390.png) |
 | Dark Image, mobile | [Before](../theme/chromium/dark-create-result-390.png) | [After](screenshots/dark-image-390.png) |
+| Light Library → Assets | [Before](../theme/chromium/light-library-1366.png) | [After](screenshots/light-assets-1366.png) |
+| Dark Library → Assets | [Before](../theme/chromium/dark-library-1366.png) | [After](screenshots/dark-assets-1366.png) |
 
 Additional review surfaces: [Video unavailable](screenshots/dark-video-1366.png), [model picker desktop](screenshots/light-picker-1366.png), [model picker mobile](screenshots/dark-picker-390.png), [Assets desktop](screenshots/light-assets-1366.png), [Assets mobile](screenshots/dark-assets-390.png), [empty](screenshots/light-empty-1366.png), [error](screenshots/dark-error-390.png), [alternate settings](screenshots/light-alternate-settings-1366.png), [drawer](screenshots/light-drawer-390.png).
 
@@ -53,6 +55,10 @@ Sources: [before build](build-before.log), [after build](build-after.log). Model
 
 ## Deployment and access boundary
 
-The Preview uses the existing Vercel project, with the same four public staging values scoped only to `feat/imagino-creative-hub-core` and target `preview`. Its guard rejects production, a different API/media host or disabled Generation V2. Published deployment identity and read-only access observations are recorded alongside this report when deployment completes.
+Published [Draft PR #89](https://github.com/danitest45/imagino-front/pull/89) targets `feat/imagino-working-studio`. [Preview](https://imagino-front-e4cijk1s2-danitest45s-projects.vercel.app) / [Design review](https://imagino-front-e4cijk1s2-danitest45s-projects.vercel.app/design-review) is **READY**, deployment `dpl_ZvMpzdgrkjv1dxCY2wfGeeDzjVek`, implementation SHA `2b954d7ed5702e66ed1ef59a9dfdef864168bb18`. The [stable branch alias](https://imagino-front-git-feat-imagino-crea-9cdb36-danitest45s-projects.vercel.app/design-review) follows subsequent branch deployments. The publication record is followed only by documentation/evidence commits; application source remains the verified implementation.
+
+The Preview uses the existing Vercel project, with the same four public staging values scoped only to `feat/imagino-creative-hub-core` and target `preview`. Its guard rejects production, a different API/media host or disabled Generation V2. The first push preceded creation of Vercel's branch-scoped settings; the replacement deployment after configuration is READY. See [deployment identity](deployment.json).
+
+[Read-only remote postflight](remote-preview.json), 2026-10-06: landing and `/design-review` return 302 to Vercel SSO. Exact-origin staging API preflight returns 204 without `Access-Control-Allow-Origin`. These are existing access boundaries, not an authenticated application smoke test. The local compiled UI, behavior and accessibility evidence above remains separately verified.
 
 Backend CORS and Vercel SSO are preserved. A new Preview origin is not automatically allowed to perform authenticated backend calls. No Render, Atlas, R2, Stripe, provider key, economic pricing, OAuth, production or backend changes; no paid generation.
