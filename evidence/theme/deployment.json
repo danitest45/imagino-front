@@ -1,0 +1,16 @@
+{
+  "id": "dpl_H9Yer7EmhJJMq7YVGKShgJnAVdj2",
+  "project": "imagino-front",
+  "environment": "preview",
+  "readyState": "READY",
+  "url": "https://imagino-front-8abfqqcmp-danitest45s-projects.vercel.app",
+  "branch": "feat/imagino-working-studio",
+  "implementationSha": "f4127f4ac0fdbbbea310fcf43ccadc27dc7a3f7e",
+  "baseBranch": "codex/imagino-ai-revival-v2",
+  "baseSha": "c57f923d533ce92b92525a2e9f963958dd0c8b0a",
+  "aliases": [
+    "imagino-front-git-feat-imagino-work-16a0f7-danitest45s-projects.vercel.app"
+  ],
+  "productionPromotion": false,
+  "scope": "Vercel build/deployment status only. Protected remote UI and authenticated download were not validated."
+}

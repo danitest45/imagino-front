@@ -55,6 +55,15 @@ Values are the Next build report, not transferred-byte measurements. The added U
 
 The final local checks establish frontend behavior. Vercel SSO protection and the rebrand origin's API CORS limitation remain outside this pass; remote authentication and authenticated browser download are **not PASS**. No bypass, backend/Render/Atlas/R2/CORS/SSO/Stripe/OAuth/provider/balance/price change, production promotion, merge or DNS edit was performed. Preview-only/noindex/design-review guards remain intact. Deployment coordinates are recorded after publishing below and on the same draft PR.
 
+### Theme Preview publication
+
+- Implementation: `f4127f4ac0fdbbbea310fcf43ccadc27dc7a3f7e`.
+- Vercel deployment: `dpl_H9Yer7EmhJJMq7YVGKShgJnAVdj2`, **READY**, Preview target; [build log](evidence/theme/vercel-build.log), [manifest](evidence/theme/deployment.json).
+- [Immutable Preview](https://imagino-front-8abfqqcmp-danitest45s-projects.vercel.app) and [design review](https://imagino-front-8abfqqcmp-danitest45s-projects.vercel.app/design-review).
+- Existing branch alias: [Working Studio Preview](https://imagino-front-git-feat-imagino-work-16a0f7-danitest45s-projects.vercel.app). The base branch and its separate alias were not changed.
+- Read-only postflight: landing and design-review return 302 to Vercel SSO; redirects were not followed. The exact new origin's API preflight returns 204 without Access-Control-Allow-Origin or Allow-Credentials. [Observed responses](evidence/theme/remote-preview.json). Protected content/noindex cannot be observed through those redirect responses; local compiled checks establish the frontend behavior.
+- The follow-up commit recording this publication changes documentation/evidence only. The application source remains exactly the implementation SHA above. PR #88 remains draft on its original base; no merge or production release.
+
 ## Original rebrand evidence (preserved)
 
 Validated 2026-10-05. Frontend-only rebrand, built from `codex/imagino-ai-revival-v2` at `c57f923d533ce92b92525a2e9f963958dd0c8b0a`. The base checkout was clean and its remote SHA matched before implementation. Work is isolated on `feat/imagino-working-studio`; implementation agents used separate worktrees and one integrator reviewed the combined result. No merge or production promotion.
