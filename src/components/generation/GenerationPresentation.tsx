@@ -6,6 +6,7 @@ import type { GenerationJob, GenerationModel } from "../../types/generation";
 import { terminalGeneration } from "../../lib/generation";
 import { assetMediaFilters, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
 import "./assets.css";
+import { usePrivateMedia } from "../../lib/use-private-media";
 
 export function AssetMediaFilter({ jobs, value, onChange }: {
   jobs: GenerationJob[];
@@ -57,13 +58,12 @@ export function jobDate(value: string) {
 export function jobImageSource(
   job: GenerationJob,
   preview = false,
-  width = 1024,
 ) {
   if (job.status !== "Completed" || job.mediaType !== "image" || !job.outputUrl)
     return null;
   if (preview)
     return job.outputUrl.startsWith("/brand/") ? job.outputUrl : null;
-  return `/api/images/optimize?url=${encodeURIComponent(job.outputUrl)}&width=${width}`;
+  return null; // Owner media is fetched with Authorization by usePrivateMedia.
 }
 
 export function JobStatus({ job }: { job: GenerationJob }) {
@@ -90,7 +90,8 @@ export function AssetCard({
   selected?: boolean;
   compact?: boolean;
 }) {
-  const src = jobImageSource(job, preview, 512);
+  const media = usePrivateMedia(job, !preview && job.mediaType === 'image', true);
+  const src = preview ? jobImageSource(job, true) : media.url;
   return (
     <button
       type="button"
@@ -99,7 +100,7 @@ export function AssetCard({
       aria-label={`Open ${job.displayName}, ${job.status}, ${jobDate(job.createdAt)}`}
       aria-pressed={compact ? selected : undefined}
     >
-      <span className="studio-asset-image">
+      <span className="studio-asset-image" ref={media.ref}>
         {src ? (
           <Image
             src={src}

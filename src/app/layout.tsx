@@ -5,6 +5,7 @@ import Navbar from "../components/Navbar";
 import Providers from "../components/Providers";
 import RouteSurface from "../components/RouteSurface";
 import { THEME_BOOTSTRAP } from "../lib/theme";
+import { publicSite } from "../lib/public-site";
 const inter = localFont({
   src: "../../public/fonts/inter-latin.woff2",
   display: "swap",
@@ -19,10 +20,11 @@ export const metadata: Metadata = {
   description:
     "Explore campaign visuals from your references. Choose your model, review the cost, and prepare your next variation.",
   icons: { icon: "/brand/favicon.svg" },
+  metadataBase: publicSite(),
+  openGraph: { title: "Imagino — AI Creative Workspace", description: "Create and organize AI visuals in your private workspace.", type: 'website' },
+  twitter: { card: 'summary', title: "Imagino — AI Creative Workspace" },
   robots:
-    process.env.VERCEL_ENV === "preview"
-      ? { index: false, follow: false }
-      : undefined,
+    publicSite() ? { index: true, follow: true } : { index: false, follow: false },
 };
 export default function RootLayout({
   children,

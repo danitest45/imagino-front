@@ -7,6 +7,7 @@ let authEpoch = 0;
 export function setAccessToken(token: string | null) {
   accessToken = token;
   authEpoch += 1;
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('imagino-session-change'));
 }
 
 export function getAccessToken(): string | null {

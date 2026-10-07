@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-07",
+  "npmRuntimeVulnerabilities": 0,
+  "paidProviderPosts": 0,
+  "readiness": "BLOCKED",
+  "previewBuild": "PASS",
+  "unitTests": {
+    "passed": 41,
+    "failed": 0
+  },
+  "npmFullAuditDevelopmentHigh": 5,
+  "lint": {
+    "warnings": 5,
+    "errors": 0
+  },
+  "chromium": {
+    "newNoindexBaselineTest": "PASS",
+    "newPrivateMediaLogoutTest": "PASS",
+    "failed": 0,
+    "externalRequests": "mocked",
+    "passed": 62
+  }
+}

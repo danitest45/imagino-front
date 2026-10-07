@@ -1,0 +1,9 @@
+{
+  "referenceDate": "2026-10-07",
+  "base": "feat/imagino-creative-hub-core",
+  "baseSha": "109c9dbbb8bbde55b93436949c1db961590ab570",
+  "branch": "feat/imagino-launch-readiness",
+  "dependencyPr": "https://github.com/danitest45/imagino-front/pull/89",
+  "worktree": "work/imagino-front-launch-readiness",
+  "paidCallsAuthorized": false
+}

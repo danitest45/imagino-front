@@ -58,3 +58,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Launch runner output; keep concise sanitized summaries in docs.
+/launch-*.log
+/launch-*.json

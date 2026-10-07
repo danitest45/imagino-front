@@ -1,0 +1,29 @@
+{
+  "scope": "single local Chromium navigation, mocked API; not production latency/LCP",
+  "measurements": [
+    {
+      "path": "/",
+      "ttfbMs": 13.799999952316284,
+      "domContentLoadedMs": 175.19999998807907,
+      "scriptRequests": 15,
+      "scriptTransferBytes": 181856
+    },
+    {
+      "path": "/create/image",
+      "ttfbMs": 19.400000035762787,
+      "domContentLoadedMs": 104,
+      "scriptRequests": 21,
+      "scriptTransferBytes": 211824
+    },
+    {
+      "path": "/library",
+      "ttfbMs": 10.399999976158142,
+      "domContentLoadedMs": 62,
+      "scriptRequests": 18,
+      "scriptTransferBytes": 195341
+    }
+  ],
+  "historyRequests": 2,
+  "mediaReads": 5,
+  "providerPosts": 0
+}
