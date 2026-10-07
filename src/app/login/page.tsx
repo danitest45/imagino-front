@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useRef, useState } from 'react';
+import { useContext, useRef, useState, useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { loginUser } from '../../lib/api';
@@ -11,6 +11,8 @@ import { Button } from '../../components/ui/StudioUI';
 import { AuthShell } from '../../components/account/AuthShell';
 import { EmailField, PasswordField } from '../../components/account/AuthFields';
 import { isAIStaging } from '../../components/account/environment';
+
+const subscribeHydration = () => () => {};
 import ResendVerificationDialog from '../../components/ResendVerificationDialog';
 
 export default function LoginPage() {
@@ -22,10 +24,11 @@ export default function LoginPage() {
   const pending = useRef(false);
   const router = useRouter();
   const auth = useContext(AuthContext);
+  const hydrated = useSyncExternalStore(subscribeHydration, () => true, () => false);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    if (!auth || pending.current) return;
+    if (!auth || !hydrated || pending.current) return;
     pending.current = true;
     setLoading(true);
     setError('');
@@ -47,10 +50,10 @@ export default function LoginPage() {
     <AuthShell title="Back to your next idea." intro="Sign in to open your studio and recent generations.">
       {error && <p role="alert" className="account-error">{error}</p>}
       <form onSubmit={handleSubmit} className="account-form">
-        <EmailField value={email} onChange={setEmail} disabled={loading} />
-        <PasswordField value={password} onChange={setPassword} disabled={loading} />
+        <EmailField value={email} onChange={setEmail} disabled={loading || !hydrated} />
+        <PasswordField value={password} onChange={setPassword} disabled={loading || !hydrated} />
         {!isAIStaging && <div className="account-form-meta"><Link className="account-link" href="/forgot-password">Forgot password?</Link></div>}
-        <Button type="submit" loading={loading} disabled={loading} className="account-full-width">{loading ? 'Signing in…' : 'Sign in'}</Button>
+        <Button type="submit" loading={loading} disabled={loading || !hydrated} className="account-full-width">{loading ? 'Signing in…' : 'Sign in'}</Button>
       </form>
       {isAIStaging ? <div className="account-notice"><strong>Existing Preview accounts only</strong><p>Registration, Google sign in and password recovery are unavailable in this environment.</p></div> : <>
         <div className="account-divider">or</div>

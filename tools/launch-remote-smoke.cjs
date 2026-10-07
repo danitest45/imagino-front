@@ -9,7 +9,7 @@ const api = 'https://imagino-api-ai-staging.onrender.com';
 if (!root || process.env.IMAGINO_PREVIEW_SHARE_AUTHORIZED !== 'true') throw new Error('Explicit Preview share authorization and workspace root required.');
 let stage = 'protected-preview-access', browser, context, token;
 const result = { scope: 'real protected launch Preview and AI staging; existing synthetic assets only', providerPosts: 0, jobCreates: 0, blockedWrites: 0, blockedExternal: 0, checks: {} };
-const mediaRequests = [], loginResponses = [];
+const mediaRequests = [], loginResponses = [], httpStatuses = [];
 const escaped = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 async function main() {
   const credentials = JSON.parse(readFileSync(join(root, 'private/generation-v2-credentials.json'), 'utf8'));
@@ -21,6 +21,10 @@ async function main() {
   context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, acceptDownloads: true, serviceWorkers: 'block' });
   await context.route('**/*', async route => {
     const request = route.request(), url = new URL(request.url());
+    if (url.origin === api && url.pathname === '/api/auth/login' && request.method() === 'POST') {
+      const body = request.postDataJSON();
+      result.checks.loginPayload = { emailMatches: body.email === owner.Email, passwordMatches: body.password === credentials.password };
+    }
     if (![preview, api].includes(url.origin)) { result.blockedExternal++; return route.abort(); }
     if (url.origin === api && !['GET', 'HEAD', 'OPTIONS'].includes(request.method()) &&
         !(request.method() === 'POST' && /^\/api\/(auth\/(login|refresh|logout)|generation\/quote)$/.test(url.pathname))) {
@@ -39,16 +43,19 @@ async function main() {
   });
   page.on('response', response => {
     const url = new URL(response.url());
+    if (url.origin === api) httpStatuses.push({ path: url.pathname.startsWith('/api/generation/jobs/') ? '/api/generation/job' : url.pathname, status: response.status() });
     if (url.origin === api && url.pathname === '/api/auth/login' && response.status() === 200)
       loginResponses.push(response.json().then(data => { token = data.token; }));
   });
   await page.goto(accessUrl.href, { waitUntil: 'domcontentloaded', timeout: 60000 });
   await page.goto(preview + '/login', { waitUntil: 'domcontentloaded' });
-  stage = 'real-browser-login';
+  stage = 'real-browser-login-fields';
   await page.getByRole('textbox', { name: 'Email', exact: true }).fill(owner.Email);
   await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+  stage = 'real-browser-login-submit';
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Image studio', exact: true })).toBeVisible();
+  stage = 'real-browser-login-proof-and-history';
   await Promise.all(loginResponses); if (!token) throw new Error('Application session absent.');
   result.checks.login = true;
   const auth = { Authorization: 'Bearer ' + token, Origin: preview };
@@ -120,7 +127,11 @@ async function main() {
   writeFileSync('launch-remote-browser-gate.json', JSON.stringify(result, null, 2));
   console.log(JSON.stringify({ status: 'PASS', ...result }));
 }
-main().catch(() => { console.error('Remote Preview gate BLOCKED at ' + stage + '; secret-bearing errors suppressed.'); process.exitCode = 1; })
+main().catch(error => {
+  const line = /launch-remote-smoke\.cjs:(\d+):/.exec(error.stack ?? '')?.[1];
+  writeFileSync('launch-remote-browser-failure.json', JSON.stringify({ stage, errorType: error.name, scriptLine: line, httpStatuses, loginPayload: result.checks.loginPayload, blockedWrites: result.blockedWrites, blockedExternal: result.blockedExternal }, null, 2));
+  console.error('Remote Preview gate BLOCKED at ' + stage + '; type=' + error.name + '; line=' + line + '; secret-bearing errors suppressed.'); process.exitCode = 1;
+})
   .finally(async () => {
     if (token && context) await context.request.post(api + '/api/auth/logout', { headers: { Origin: preview } }).catch(() => {});
     token = null; if (browser) await browser.close();
