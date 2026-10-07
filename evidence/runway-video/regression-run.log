@@ -45,7 +45,7 @@ Running 34 tests using 1 worker
   ok 34 e2e\studio-behavior.spec.ts:337:5 › mobile navigation supports keyboard activation, Escape focus return and route change at 320 px (737ms)
 
 
-  1) e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work 
+  1) e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work
 
     Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
 
@@ -83,5 +83,5 @@ Running 34 tests using 1 worker
     ────────────────────────────────────────────────────────────────────────────────────────────────
 
   1 failed
-    e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work 
+    e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work
   33 passed (1.2m)
