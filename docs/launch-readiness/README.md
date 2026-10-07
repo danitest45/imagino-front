@@ -1,5 +1,5 @@
 # Frontend launch readiness
-2026-10-07. TECHNICAL LAUNCH READINESS = BLOCKED until final backend staging deployment/private-image migration and public-access removal.
+2026-10-07. TECHNICAL LAUNCH READINESS = BLOCKED until historical staging public access is removed and complete remote browser/capacity gates pass. Launch backend is live; eight Completed owner images were copied privately with matching hashes, without deleting originals or changing credits.
 
 Stacked on Creative Hub [PR #89](https://github.com/danitest45/imagino-front/pull/89), base `109c9dbbb8bbde55b93436949c1db961590ab570`; exact branch `feat/imagino-launch-readiness`. Backend contracts and the 14 operational deliverables live in [backend launch docs](https://github.com/danitest45/imagino-api/tree/feat/imagino-launch-readiness/docs/launch-readiness).
 
@@ -7,7 +7,7 @@ Private images/video now fetch owner bytes with Authorization and cache:no-store
 
 Preview is noindex. Robots disallows all, sitemap empty and no canonical by default. Production indexing needs approved HTTPS PUBLIC_SITE_URL plus INDEX_PUBLIC_SITE=true with VERCEL_ENV=production; temporary Vercel URLs rejected. Landing has favicon/title/description/OG/Twitter; private routes remain noindex. No tracking vendor added.
 
-Validation: 41 unit tests, existing 60 browser tests plus private-media/logout and noindex/baseline tests; lint has zero errors (five existing img warnings), staging Preview build passes. Runtime npm audit zero reported vulnerabilities. Full audit still has five high development lint-chain findings in unpatched braces; only run lint on trusted sources. Next 15.5.27/eslint-config-next same-major patch and transitive patched overrides; no React major upgrade.
+Validation: 41 unit tests and all 63 Chromium tests passed, including private-media/logout, noindex/baseline and provider-disabled Animate preparation. Animate can prepare an owned first frame while all spending gates remain blocked, including zero quotes/submissions in its regression test. Keyboard-select test explicitly waits for the portal and focused last option before acceptance, preserving the original value/type/no-submission assertions. Lint has zero errors (five existing img warnings), staging Preview build passes. Runtime npm audit zero reported vulnerabilities. Full audit still has five high development lint-chain findings in unpatched braces; only run lint on trusted sources. Next 15.5.27/eslint-config-next same-major patch and transitive patched overrides; no React major upgrade.
 
 Build first-load JS: landing 114kB, Image 165kB, Library 156kB, shared 103kB. One controlled local Chromium navigation (mocked API, loopback): landing TTFB ~74ms/DOMContentLoaded 303ms, Image ~71/157ms, Library ~53/110ms; script transfers ~169/189/195kB. These are local samples, not real-user latency/LCP or production capacity. Across the three navigations: two history reads and five private-media reads; zero submissions. Large-video Blob buffering (up to 100MiB) needs actual-tier/browser capacity validation.
 

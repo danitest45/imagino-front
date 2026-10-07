@@ -37,3 +37,22 @@ test('foreign or failed asset cannot prepare Animate or submit a video', async (
   expect(mock.downloads).toHaveLength(0);
   expect(mock.submissions).toHaveLength(0);
 });
+
+test('provider disabled allows owned Animate preparation while spending stays blocked', async ({ page, context }) => {
+  const mock = await mockStudio(context, jobs);
+  mock.models.push({ id: 'disabled-video', version: 'staging-v1', displayName: 'Disabled Video', category: 'Motion',
+    description: 'No spending authorization', mediaType: 'video', providerModel: 'controlled-fixture', availability: 'disabled', startingCredits: 54,
+    capabilities: ['imageToVideo'], rules: [], inputs: [{ role: 'firstFrame', label: 'First frame', maxCount: 1, required: true, ownedAssetOnly: true }],
+    fields: [{ key: 'duration', label: 'Duration (seconds)', type: 'integer', defaultValue: '5', options: ['5'] }] });
+  await page.goto('/library');
+  await page.getByRole('button', { name: /^Open Studio Image, Completed/ }).click();
+  await page.getByRole('dialog', { name: 'Your creation', exact: true }).getByRole('button', { name: 'Animate', exact: true }).click();
+  await expect(page.getByText('First frame prepared.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('img', { name: 'First frame 1', exact: true })).toBeVisible();
+  await page.getByRole('textbox', { name: 'Prompt', exact: true }).fill('Synthetic preparation only.');
+  await expect(page.getByRole('button', { name: 'Generate video', exact: true })).toBeDisabled();
+  expect(mock.downloads.some(value => value.id === 'owned-bottle' && value.authorization)).toBe(true);
+  expect(mock.quotes).toHaveLength(0);
+  expect(mock.submissions).toHaveLength(0);
+  expect(mock.unexpectedRequests).toEqual([]);
+});

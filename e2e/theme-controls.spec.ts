@@ -248,9 +248,13 @@ test('controlled numeric and enum selects preserve request types and never submi
   await chooseOption(page, 'Steps', '8');
   await chooseOption(page, 'Aspect ratio', '16:9');
   await expect.poll(() => mock.quotes.at(-1)?.body.settings).toEqual({ aspectRatio: '16:9', resolution: '1K', steps: 8 });
-  await page.getByRole('combobox', { name: 'Resolution', exact: true }).focus();
+  const resolution = page.getByRole('combobox', { name: 'Resolution', exact: true, includeHidden: true });
+  await resolution.focus();
   await page.keyboard.press('Enter');
+  await expect(resolution).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByRole('option', { name: '2K', exact: true })).toBeVisible();
   await page.keyboard.press('End');
+  await expect(page.getByRole('option', { name: '2K', exact: true })).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('combobox', { name: 'Resolution', exact: true })).toHaveText('2K');
   await expect.poll(() => mock.quotes.at(-1)?.body.settings.resolution).toBe('2K');
