@@ -1,0 +1,4450 @@
+{
+  "phase": "after",
+  "browser": "155.0.8059.39",
+  "scope": "Local design-review fixtures; API/external requests blocked; no generation. 200% zoom equivalent uses 384×512 CSS pixels at DPR2 for a 768×1024 physical viewport.",
+  "denied": [],
+  "errors": [],
+  "overflowFailures": [],
+  "captures": [
+    {
+      "name": "light-image-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 736,
+        "height": 175.546875,
+        "top": 270.28125,
+        "bottom": 445.828125,
+        "scrollTop": 0,
+        "scrollHeight": 176,
+        "clientHeight": 176
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1366x768-document-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 736,
+        "height": 175.546875,
+        "top": 270.28125,
+        "bottom": 445.828125,
+        "scrollTop": 0,
+        "scrollHeight": 176,
+        "clientHeight": 176
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1366x768-controls-half",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 250,
+        "scrollHeight": 812,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 736,
+        "height": 175.546875,
+        "top": 270.28125,
+        "bottom": 445.828125,
+        "scrollTop": 0,
+        "scrollHeight": 176,
+        "clientHeight": 176
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1366x768-controls-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 499,
+        "scrollHeight": 812,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 736,
+        "height": 175.546875,
+        "top": 270.28125,
+        "bottom": 445.828125,
+        "scrollTop": 0,
+        "scrollHeight": 176,
+        "clientHeight": 176
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1080,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1366x768-document-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1080,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1366x768-controls-half",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 384,
+        "scrollHeight": 1080,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1366x768-controls-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 767,
+        "scrollHeight": 1080,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 810,
+        "height": 307.546875,
+        "top": 270.28125,
+        "bottom": 577.828125,
+        "scrollTop": 0,
+        "scrollHeight": 308,
+        "clientHeight": 308
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1440x900-document-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 810,
+        "height": 307.546875,
+        "top": 270.28125,
+        "bottom": 577.828125,
+        "scrollTop": 0,
+        "scrollHeight": 308,
+        "clientHeight": 308
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1440x900-controls-half",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 212,
+        "scrollHeight": 868,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 810,
+        "height": 307.546875,
+        "top": 270.28125,
+        "bottom": 577.828125,
+        "scrollTop": 0,
+        "scrollHeight": 308,
+        "clientHeight": 308
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1440x900-controls-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 423,
+        "scrollHeight": 868,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 810,
+        "height": 307.546875,
+        "top": 270.28125,
+        "bottom": 577.828125,
+        "scrollTop": 0,
+        "scrollHeight": 308,
+        "clientHeight": 308
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1440x900-document-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1440x900-controls-half",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 346,
+        "scrollHeight": 1136,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1440x900-controls-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 691,
+        "scrollHeight": 1136,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 1290,
+        "height": 487.546875,
+        "top": 270.28125,
+        "bottom": 757.828125,
+        "scrollTop": 0,
+        "scrollHeight": 488,
+        "clientHeight": 488
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1920x1080-document-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 1290,
+        "height": 487.546875,
+        "top": 270.28125,
+        "bottom": 757.828125,
+        "scrollTop": 0,
+        "scrollHeight": 488,
+        "clientHeight": 488
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1920x1080-controls-half",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 122,
+        "scrollHeight": 868,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 1290,
+        "height": 487.546875,
+        "top": 270.28125,
+        "bottom": 757.828125,
+        "scrollTop": 0,
+        "scrollHeight": 488,
+        "clientHeight": 488
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-1920x1080-controls-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 243,
+        "scrollHeight": 868,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 1290,
+        "height": 487.546875,
+        "top": 270.28125,
+        "bottom": 757.828125,
+        "scrollTop": 0,
+        "scrollHeight": 488,
+        "clientHeight": 488
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1920x1080-document-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1920x1080-controls-half",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 256,
+        "scrollHeight": 1136,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-1920x1080-controls-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 511,
+        "scrollHeight": 1136,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-768x1024-top",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2653,
+        "width": 768,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": 502.34375,
+        "width": 678,
+        "height": 842.546875,
+        "top": 502.34375,
+        "bottom": 1344.890625,
+        "scrollTop": 0,
+        "scrollHeight": 843,
+        "clientHeight": 843
+      },
+      "footer": {
+        "x": 45,
+        "y": 1364.890625,
+        "width": 678,
+        "height": 134.59375,
+        "top": 1364.890625,
+        "bottom": 1499.484375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": 1540.484375,
+        "width": 720,
+        "height": 1064.5625,
+        "top": 1540.484375,
+        "bottom": 2605.046875,
+        "scrollTop": 0,
+        "scrollHeight": 1065,
+        "clientHeight": 1065
+      },
+      "canvas": {
+        "x": 25,
+        "y": 1683.484375,
+        "width": 718,
+        "height": 499.1875,
+        "top": 1683.484375,
+        "bottom": 2182.671875,
+        "scrollTop": 0,
+        "scrollHeight": 499,
+        "clientHeight": 499
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-768x1024-document-bottom",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2653,
+        "width": 768,
+        "scrollTop": 1629
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": -1126.65625,
+        "width": 678,
+        "height": 842.546875,
+        "top": -1126.65625,
+        "bottom": -284.109375,
+        "scrollTop": 0,
+        "scrollHeight": 843,
+        "clientHeight": 843
+      },
+      "footer": {
+        "x": 45,
+        "y": -264.109375,
+        "width": 678,
+        "height": 134.59375,
+        "top": -264.109375,
+        "bottom": -129.515625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": -88.515625,
+        "width": 720,
+        "height": 1064.5625,
+        "top": -88.515625,
+        "bottom": 976.046875,
+        "scrollTop": 0,
+        "scrollHeight": 1065,
+        "clientHeight": 1065
+      },
+      "canvas": {
+        "x": 25,
+        "y": 54.484375,
+        "width": 718,
+        "height": 499.1875,
+        "top": 54.484375,
+        "bottom": 553.671875,
+        "scrollTop": 0,
+        "scrollHeight": 499,
+        "clientHeight": 499
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-768x1024-top",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2336,
+        "width": 768,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": 502.34375,
+        "width": 678,
+        "height": 988.921875,
+        "top": 502.34375,
+        "bottom": 1491.265625,
+        "scrollTop": 0,
+        "scrollHeight": 989,
+        "clientHeight": 989
+      },
+      "footer": {
+        "x": 45,
+        "y": 1511.265625,
+        "width": 678,
+        "height": 134.59375,
+        "top": 1511.265625,
+        "bottom": 1645.859375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": 1686.859375,
+        "width": 720,
+        "height": 601.1875,
+        "top": 1686.859375,
+        "bottom": 2288.046875,
+        "scrollTop": 0,
+        "scrollHeight": 601,
+        "clientHeight": 601
+      },
+      "canvas": {
+        "x": 24,
+        "y": 1740.859375,
+        "width": 720,
+        "height": 440,
+        "top": 1740.859375,
+        "bottom": 2180.859375,
+        "scrollTop": 0,
+        "scrollHeight": 438,
+        "clientHeight": 438
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-768x1024-document-bottom",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2336,
+        "width": 768,
+        "scrollTop": 1312
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": -809.65625,
+        "width": 678,
+        "height": 988.921875,
+        "top": -809.65625,
+        "bottom": 179.265625,
+        "scrollTop": 0,
+        "scrollHeight": 989,
+        "clientHeight": 989
+      },
+      "footer": {
+        "x": 45,
+        "y": 199.265625,
+        "width": 678,
+        "height": 134.59375,
+        "top": 199.265625,
+        "bottom": 333.859375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": 374.859375,
+        "width": 720,
+        "height": 601.1875,
+        "top": 374.859375,
+        "bottom": 976.046875,
+        "scrollTop": 0,
+        "scrollHeight": 601,
+        "clientHeight": 601
+      },
+      "canvas": {
+        "x": 24,
+        "y": 428.859375,
+        "width": 720,
+        "height": 440,
+        "top": 428.859375,
+        "bottom": 868.859375,
+        "scrollTop": 0,
+        "scrollHeight": 438,
+        "clientHeight": 438
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-390x844-top",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2680,
+        "width": 390,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 324,
+        "height": 860.140625,
+        "top": 621.90625,
+        "bottom": 1482.046875,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": 1502.046875,
+        "width": 324,
+        "height": 134.59375,
+        "top": 1502.046875,
+        "bottom": 1636.640625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1677.640625,
+        "width": 358,
+        "height": 962.375,
+        "top": 1677.640625,
+        "bottom": 2640.015625,
+        "scrollTop": 0,
+        "scrollHeight": 962,
+        "clientHeight": 962
+      },
+      "canvas": {
+        "x": 17,
+        "y": 1816.640625,
+        "width": 356,
+        "height": 351,
+        "top": 1816.640625,
+        "bottom": 2167.640625,
+        "scrollTop": 0,
+        "scrollHeight": 351,
+        "clientHeight": 351
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-390x844-document-bottom",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2680,
+        "width": 390,
+        "scrollTop": 1836
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": -1214.09375,
+        "width": 324,
+        "height": 860.140625,
+        "top": -1214.09375,
+        "bottom": -353.953125,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": -333.953125,
+        "width": 324,
+        "height": 134.59375,
+        "top": -333.953125,
+        "bottom": -199.359375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": -158.359375,
+        "width": 358,
+        "height": 962.375,
+        "top": -158.359375,
+        "bottom": 804.015625,
+        "scrollTop": 0,
+        "scrollHeight": 962,
+        "clientHeight": 962
+      },
+      "canvas": {
+        "x": 17,
+        "y": -19.359375,
+        "width": 356,
+        "height": 351,
+        "top": -19.359375,
+        "bottom": 331.640625,
+        "scrollTop": 0,
+        "scrollHeight": 351,
+        "clientHeight": 351
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-390x844-top",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2572,
+        "width": 390,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 324,
+        "height": 1128.484375,
+        "top": 621.90625,
+        "bottom": 1750.390625,
+        "scrollTop": 0,
+        "scrollHeight": 1128,
+        "clientHeight": 1128
+      },
+      "footer": {
+        "x": 33,
+        "y": 1770.390625,
+        "width": 324,
+        "height": 134.59375,
+        "top": 1770.390625,
+        "bottom": 1904.984375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1945.984375,
+        "width": 358,
+        "height": 586.1875,
+        "top": 1945.984375,
+        "bottom": 2532.171875,
+        "scrollTop": 0,
+        "scrollHeight": 586,
+        "clientHeight": 586
+      },
+      "canvas": {
+        "x": 16,
+        "y": 1999.984375,
+        "width": 358,
+        "height": 405.8125,
+        "top": 1999.984375,
+        "bottom": 2405.796875,
+        "scrollTop": 0,
+        "scrollHeight": 404,
+        "clientHeight": 404
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-390x844-document-bottom",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2572,
+        "width": 390,
+        "scrollTop": 1728
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": -1106.09375,
+        "width": 324,
+        "height": 1128.484375,
+        "top": -1106.09375,
+        "bottom": 22.390625,
+        "scrollTop": 0,
+        "scrollHeight": 1128,
+        "clientHeight": 1128
+      },
+      "footer": {
+        "x": 33,
+        "y": 42.390625,
+        "width": 324,
+        "height": 134.59375,
+        "top": 42.390625,
+        "bottom": 176.984375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 217.984375,
+        "width": 358,
+        "height": 586.1875,
+        "top": 217.984375,
+        "bottom": 804.171875,
+        "scrollTop": 0,
+        "scrollHeight": 586,
+        "clientHeight": 586
+      },
+      "canvas": {
+        "x": 16,
+        "y": 271.984375,
+        "width": 358,
+        "height": 405.8125,
+        "top": 271.984375,
+        "bottom": 677.796875,
+        "scrollTop": 0,
+        "scrollHeight": 404,
+        "clientHeight": 404
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-320x900-top",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2681,
+        "width": 320,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 254,
+        "height": 860.140625,
+        "top": 621.90625,
+        "bottom": 1482.046875,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": 1502.046875,
+        "width": 254,
+        "height": 134.59375,
+        "top": 1502.046875,
+        "bottom": 1636.640625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1677.640625,
+        "width": 288,
+        "height": 963.375,
+        "top": 1677.640625,
+        "bottom": 2641.015625,
+        "scrollTop": 0,
+        "scrollHeight": 963,
+        "clientHeight": 963
+      },
+      "canvas": {
+        "x": 17,
+        "y": 1816.640625,
+        "width": 286,
+        "height": 300,
+        "top": 1816.640625,
+        "bottom": 2116.640625,
+        "scrollTop": 0,
+        "scrollHeight": 300,
+        "clientHeight": 300
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-image-320x900-document-bottom",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2681,
+        "width": 320,
+        "scrollTop": 1781
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": -1159.09375,
+        "width": 254,
+        "height": 860.140625,
+        "top": -1159.09375,
+        "bottom": -298.953125,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": -278.953125,
+        "width": 254,
+        "height": 134.59375,
+        "top": -278.953125,
+        "bottom": -144.359375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": -103.359375,
+        "width": 288,
+        "height": 963.375,
+        "top": -103.359375,
+        "bottom": 860.015625,
+        "scrollTop": 0,
+        "scrollHeight": 963,
+        "clientHeight": 963
+      },
+      "canvas": {
+        "x": 17,
+        "y": 35.640625,
+        "width": 286,
+        "height": 300,
+        "top": 35.640625,
+        "bottom": 335.640625,
+        "scrollTop": 0,
+        "scrollHeight": 300,
+        "clientHeight": 300
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-320x900-top",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2640,
+        "width": 320,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 254,
+        "height": 1165.265625,
+        "top": 621.90625,
+        "bottom": 1787.171875,
+        "scrollTop": 0,
+        "scrollHeight": 1165,
+        "clientHeight": 1165
+      },
+      "footer": {
+        "x": 33,
+        "y": 1807.171875,
+        "width": 254,
+        "height": 134.59375,
+        "top": 1807.171875,
+        "bottom": 1941.765625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1982.765625,
+        "width": 288,
+        "height": 617.4375,
+        "top": 1982.765625,
+        "bottom": 2600.203125,
+        "scrollTop": 0,
+        "scrollHeight": 617,
+        "clientHeight": 617
+      },
+      "canvas": {
+        "x": 16,
+        "y": 2036.765625,
+        "width": 288,
+        "height": 437.0625,
+        "top": 2036.765625,
+        "bottom": 2473.828125,
+        "scrollTop": 0,
+        "scrollHeight": 435,
+        "clientHeight": 435
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-320x900-document-bottom",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2640,
+        "width": 320,
+        "scrollTop": 1740
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": -1118.09375,
+        "width": 254,
+        "height": 1165.265625,
+        "top": -1118.09375,
+        "bottom": 47.171875,
+        "scrollTop": 0,
+        "scrollHeight": 1165,
+        "clientHeight": 1165
+      },
+      "footer": {
+        "x": 33,
+        "y": 67.171875,
+        "width": 254,
+        "height": 134.59375,
+        "top": 67.171875,
+        "bottom": 201.765625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 242.765625,
+        "width": 288,
+        "height": 617.4375,
+        "top": 242.765625,
+        "bottom": 860.203125,
+        "scrollTop": 0,
+        "scrollHeight": 617,
+        "clientHeight": 617
+      },
+      "canvas": {
+        "x": 16,
+        "y": 296.765625,
+        "width": 288,
+        "height": 437.0625,
+        "top": 296.765625,
+        "bottom": 733.828125,
+        "scrollTop": 0,
+        "scrollHeight": 435,
+        "clientHeight": 435
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 736,
+        "height": 175.546875,
+        "top": 270.28125,
+        "bottom": 445.828125,
+        "scrollTop": 0,
+        "scrollHeight": 176,
+        "clientHeight": 176
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1080,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 810,
+        "height": 307.546875,
+        "top": 270.28125,
+        "bottom": 577.828125,
+        "scrollTop": 0,
+        "scrollHeight": 308,
+        "clientHeight": 308
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 868,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 609,
+        "y": 270.28125,
+        "width": 1290,
+        "height": 487.546875,
+        "top": 270.28125,
+        "bottom": 757.828125,
+        "scrollTop": 0,
+        "scrollHeight": 488,
+        "clientHeight": 488
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1136,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-768x1024-top",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2653,
+        "width": 768,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": 502.34375,
+        "width": 678,
+        "height": 842.546875,
+        "top": 502.34375,
+        "bottom": 1344.890625,
+        "scrollTop": 0,
+        "scrollHeight": 843,
+        "clientHeight": 843
+      },
+      "footer": {
+        "x": 45,
+        "y": 1364.890625,
+        "width": 678,
+        "height": 134.59375,
+        "top": 1364.890625,
+        "bottom": 1499.484375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": 1540.484375,
+        "width": 720,
+        "height": 1064.5625,
+        "top": 1540.484375,
+        "bottom": 2605.046875,
+        "scrollTop": 0,
+        "scrollHeight": 1065,
+        "clientHeight": 1065
+      },
+      "canvas": {
+        "x": 25,
+        "y": 1683.484375,
+        "width": 718,
+        "height": 499.1875,
+        "top": 1683.484375,
+        "bottom": 2182.671875,
+        "scrollTop": 0,
+        "scrollHeight": 499,
+        "clientHeight": 499
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-768x1024-top",
+      "viewport": {
+        "width": 768,
+        "height": 1024,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2336,
+        "width": 768,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 45,
+        "y": 502.34375,
+        "width": 678,
+        "height": 988.921875,
+        "top": 502.34375,
+        "bottom": 1491.265625,
+        "scrollTop": 0,
+        "scrollHeight": 989,
+        "clientHeight": 989
+      },
+      "footer": {
+        "x": 45,
+        "y": 1511.265625,
+        "width": 678,
+        "height": 134.59375,
+        "top": 1511.265625,
+        "bottom": 1645.859375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 24,
+        "y": 1686.859375,
+        "width": 720,
+        "height": 601.1875,
+        "top": 1686.859375,
+        "bottom": 2288.046875,
+        "scrollTop": 0,
+        "scrollHeight": 601,
+        "clientHeight": 601
+      },
+      "canvas": {
+        "x": 24,
+        "y": 1740.859375,
+        "width": 720,
+        "height": 440,
+        "top": 1740.859375,
+        "bottom": 2180.859375,
+        "scrollTop": 0,
+        "scrollHeight": 438,
+        "clientHeight": 438
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-390x844-top",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2680,
+        "width": 390,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 324,
+        "height": 860.140625,
+        "top": 621.90625,
+        "bottom": 1482.046875,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": 1502.046875,
+        "width": 324,
+        "height": 134.59375,
+        "top": 1502.046875,
+        "bottom": 1636.640625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1677.640625,
+        "width": 358,
+        "height": 962.375,
+        "top": 1677.640625,
+        "bottom": 2640.015625,
+        "scrollTop": 0,
+        "scrollHeight": 962,
+        "clientHeight": 962
+      },
+      "canvas": {
+        "x": 17,
+        "y": 1816.640625,
+        "width": 356,
+        "height": 351,
+        "top": 1816.640625,
+        "bottom": 2167.640625,
+        "scrollTop": 0,
+        "scrollHeight": 351,
+        "clientHeight": 351
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-390x844-top",
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2572,
+        "width": 390,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 324,
+        "height": 1128.484375,
+        "top": 621.90625,
+        "bottom": 1750.390625,
+        "scrollTop": 0,
+        "scrollHeight": 1128,
+        "clientHeight": 1128
+      },
+      "footer": {
+        "x": 33,
+        "y": 1770.390625,
+        "width": 324,
+        "height": 134.59375,
+        "top": 1770.390625,
+        "bottom": 1904.984375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1945.984375,
+        "width": 358,
+        "height": 586.1875,
+        "top": 1945.984375,
+        "bottom": 2532.171875,
+        "scrollTop": 0,
+        "scrollHeight": 586,
+        "clientHeight": 586
+      },
+      "canvas": {
+        "x": 16,
+        "y": 1999.984375,
+        "width": 358,
+        "height": 405.8125,
+        "top": 1999.984375,
+        "bottom": 2405.796875,
+        "scrollTop": 0,
+        "scrollHeight": 404,
+        "clientHeight": 404
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-image-320x900-top",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2681,
+        "width": 320,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 254,
+        "height": 860.140625,
+        "top": 621.90625,
+        "bottom": 1482.046875,
+        "scrollTop": 0,
+        "scrollHeight": 860,
+        "clientHeight": 860
+      },
+      "footer": {
+        "x": 33,
+        "y": 1502.046875,
+        "width": 254,
+        "height": 134.59375,
+        "top": 1502.046875,
+        "bottom": 1636.640625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1677.640625,
+        "width": 288,
+        "height": 963.375,
+        "top": 1677.640625,
+        "bottom": 2641.015625,
+        "scrollTop": 0,
+        "scrollHeight": 963,
+        "clientHeight": 963
+      },
+      "canvas": {
+        "x": 17,
+        "y": 1816.640625,
+        "width": 286,
+        "height": 300,
+        "top": 1816.640625,
+        "bottom": 2116.640625,
+        "scrollTop": 0,
+        "scrollHeight": 300,
+        "clientHeight": 300
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "dark-video-320x900-top",
+      "viewport": {
+        "width": 320,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 2640,
+        "width": 320,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 254,
+        "height": 1165.265625,
+        "top": 621.90625,
+        "bottom": 1787.171875,
+        "scrollTop": 0,
+        "scrollHeight": 1165,
+        "clientHeight": 1165
+      },
+      "footer": {
+        "x": 33,
+        "y": 1807.171875,
+        "width": 254,
+        "height": 134.59375,
+        "top": 1807.171875,
+        "bottom": 1941.765625,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 1982.765625,
+        "width": 288,
+        "height": 617.4375,
+        "top": 1982.765625,
+        "bottom": 2600.203125,
+        "scrollTop": 0,
+        "scrollHeight": 617,
+        "clientHeight": 617
+      },
+      "canvas": {
+        "x": 16,
+        "y": 2036.765625,
+        "width": 288,
+        "height": 437.0625,
+        "top": 2036.765625,
+        "bottom": 2473.828125,
+        "scrollTop": 0,
+        "scrollHeight": 435,
+        "clientHeight": 435
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1288,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1366x768-half",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 488,
+        "scrollHeight": 1288,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1366x768-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 975,
+        "scrollHeight": 1288,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1366x768-top",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1126,
+        "height": 580.71875,
+        "top": 171.28125,
+        "bottom": 752,
+        "scrollTop": 0,
+        "scrollHeight": 4022,
+        "clientHeight": 581
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1366x768-bottom",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1126,
+        "height": 580.71875,
+        "top": 171.28125,
+        "bottom": 752,
+        "scrollTop": 3441,
+        "scrollHeight": 4022,
+        "clientHeight": 581
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1344,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1440x900-half",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 450,
+        "scrollHeight": 1344,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1440x900-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 444.9375,
+        "top": 291.46875,
+        "bottom": 736.40625,
+        "scrollTop": 899,
+        "scrollHeight": 1344,
+        "clientHeight": 445
+      },
+      "footer": {
+        "x": 249,
+        "y": 744.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 744.40625,
+        "bottom": 859,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 812,
+        "height": 708.71875,
+        "top": 171.28125,
+        "bottom": 880,
+        "scrollTop": 0,
+        "scrollHeight": 709,
+        "clientHeight": 709
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 812,
+        "height": 593.53125,
+        "top": 219.28125,
+        "bottom": 812.8125,
+        "scrollTop": 0,
+        "scrollHeight": 592,
+        "clientHeight": 592
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1440x900-top",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1200,
+        "height": 712.71875,
+        "top": 171.28125,
+        "bottom": 884,
+        "scrollTop": 0,
+        "scrollHeight": 4207,
+        "clientHeight": 713
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1440x900-bottom",
+      "viewport": {
+        "width": 1440,
+        "height": 900,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 900,
+        "width": 1440,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 811.8125,
+        "top": 88.1875,
+        "bottom": 900,
+        "scrollTop": 0,
+        "scrollHeight": 812,
+        "clientHeight": 812
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1200,
+        "height": 712.71875,
+        "top": 171.28125,
+        "bottom": 884,
+        "scrollTop": 3494,
+        "scrollHeight": 4207,
+        "clientHeight": 713
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 0,
+        "scrollHeight": 1344,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1920x1080-half",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 360,
+        "scrollHeight": 1344,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-video-1920x1080-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 624.9375,
+        "top": 291.46875,
+        "bottom": 916.40625,
+        "scrollTop": 719,
+        "scrollHeight": 1344,
+        "clientHeight": 625
+      },
+      "footer": {
+        "x": 249,
+        "y": 924.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 924.40625,
+        "bottom": 1039,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 1292,
+        "height": 888.71875,
+        "top": 171.28125,
+        "bottom": 1060,
+        "scrollTop": 0,
+        "scrollHeight": 889,
+        "clientHeight": 889
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 1292,
+        "height": 773.53125,
+        "top": 219.28125,
+        "bottom": 992.8125,
+        "scrollTop": 0,
+        "scrollHeight": 772,
+        "clientHeight": 772
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1920x1080-top",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1680,
+        "height": 892.71875,
+        "top": 171.28125,
+        "bottom": 1064,
+        "scrollTop": 0,
+        "scrollHeight": 3523,
+        "clientHeight": 893
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "light-long-assets-1920x1080-bottom",
+      "viewport": {
+        "width": 1920,
+        "height": 1080,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 1080,
+        "width": 1920,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 991.8125,
+        "top": 88.1875,
+        "bottom": 1080,
+        "scrollTop": 0,
+        "scrollHeight": 992,
+        "clientHeight": 992
+      },
+      "controls": null,
+      "footer": null,
+      "result": null,
+      "canvas": null,
+      "assets": {
+        "x": 224,
+        "y": 171.28125,
+        "width": 1680,
+        "height": 892.71875,
+        "top": 171.28125,
+        "bottom": 1064,
+        "scrollTop": 2630,
+        "scrollHeight": 3523,
+        "clientHeight": 893
+      },
+      "brokenImages": []
+    },
+    {
+      "name": "forced-colors-long-video-1366x768-footer",
+      "viewport": {
+        "width": 1366,
+        "height": 768,
+        "devicePixelRatio": 1
+      },
+      "document": {
+        "height": 768,
+        "width": 1366,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 88.1875,
+        "width": 208,
+        "height": 679.8125,
+        "top": 88.1875,
+        "bottom": 768,
+        "scrollTop": 0,
+        "scrollHeight": 680,
+        "clientHeight": 680
+      },
+      "controls": {
+        "x": 245,
+        "y": 291.46875,
+        "width": 326,
+        "height": 312.9375,
+        "top": 291.46875,
+        "bottom": 604.40625,
+        "scrollTop": 975,
+        "scrollHeight": 1288,
+        "clientHeight": 313
+      },
+      "footer": {
+        "x": 249,
+        "y": 612.40625,
+        "width": 318,
+        "height": 114.59375,
+        "top": 612.40625,
+        "bottom": 727,
+        "scrollTop": 0,
+        "scrollHeight": 114,
+        "clientHeight": 114
+      },
+      "result": {
+        "x": 608,
+        "y": 171.28125,
+        "width": 738,
+        "height": 576.71875,
+        "top": 171.28125,
+        "bottom": 748,
+        "scrollTop": 0,
+        "scrollHeight": 577,
+        "clientHeight": 577
+      },
+      "canvas": {
+        "x": 608,
+        "y": 219.28125,
+        "width": 738,
+        "height": 461.53125,
+        "top": 219.28125,
+        "bottom": 680.8125,
+        "scrollTop": 0,
+        "scrollHeight": 460,
+        "clientHeight": 460
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-200percent-browser-zoom-equivalent-768x1024-top",
+      "viewport": {
+        "width": 384,
+        "height": 512,
+        "devicePixelRatio": 2
+      },
+      "document": {
+        "height": 2780,
+        "width": 384,
+        "scrollTop": 0
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": 621.90625,
+        "width": 318,
+        "height": 1336.484375,
+        "top": 621.90625,
+        "bottom": 1958.390625,
+        "scrollTop": 0,
+        "scrollHeight": 1336,
+        "clientHeight": 1336
+      },
+      "footer": {
+        "x": 33,
+        "y": 1978.390625,
+        "width": 318,
+        "height": 134.59375,
+        "top": 1978.390625,
+        "bottom": 2112.984375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 2153.984375,
+        "width": 352,
+        "height": 586.1875,
+        "top": 2153.984375,
+        "bottom": 2740.171875,
+        "scrollTop": 0,
+        "scrollHeight": 586,
+        "clientHeight": 586
+      },
+      "canvas": {
+        "x": 16,
+        "y": 2207.984375,
+        "width": 352,
+        "height": 405.8125,
+        "top": 2207.984375,
+        "bottom": 2613.796875,
+        "scrollTop": 0,
+        "scrollHeight": 404,
+        "clientHeight": 404
+      },
+      "assets": null,
+      "brokenImages": []
+    },
+    {
+      "name": "light-video-200percent-browser-zoom-equivalent-768x1024-footer",
+      "viewport": {
+        "width": 384,
+        "height": 512,
+        "devicePixelRatio": 2
+      },
+      "document": {
+        "height": 2780,
+        "width": 384,
+        "scrollTop": 1785
+      },
+      "sidebar": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "bottom": 0,
+        "scrollTop": 0,
+        "scrollHeight": 0,
+        "clientHeight": 0
+      },
+      "controls": {
+        "x": 33,
+        "y": -1163.09375,
+        "width": 318,
+        "height": 1336.484375,
+        "top": -1163.09375,
+        "bottom": 173.390625,
+        "scrollTop": 0,
+        "scrollHeight": 1336,
+        "clientHeight": 1336
+      },
+      "footer": {
+        "x": 33,
+        "y": 193.390625,
+        "width": 318,
+        "height": 134.59375,
+        "top": 193.390625,
+        "bottom": 327.984375,
+        "scrollTop": 0,
+        "scrollHeight": 134,
+        "clientHeight": 134
+      },
+      "result": {
+        "x": 16,
+        "y": 368.984375,
+        "width": 352,
+        "height": 586.1875,
+        "top": 368.984375,
+        "bottom": 955.171875,
+        "scrollTop": 0,
+        "scrollHeight": 586,
+        "clientHeight": 586
+      },
+      "canvas": {
+        "x": 16,
+        "y": 422.984375,
+        "width": 352,
+        "height": 405.8125,
+        "top": 422.984375,
+        "bottom": 828.796875,
+        "scrollTop": 0,
+        "scrollHeight": 404,
+        "clientHeight": 404
+      },
+      "assets": null,
+      "brokenImages": []
+    }
+  ]
+}

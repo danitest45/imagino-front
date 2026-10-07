@@ -1,0 +1,19 @@
+
+> imagino-front@0.1.0 lint
+> eslint src next.config.ts playwright.config.ts e2e
+
+
+C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-creative-hub-core\src\app\images\[slug]\page.tsx
+   647:17  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  1178:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-creative-hub-core\src\components\ImageCard.tsx
+  36:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-creative-hub-core\src\components\ImageCardModal.tsx
+  121:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-creative-hub-core\src\components\profile\UserInfo.tsx
+  74:32  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+✖ 5 problems (0 errors, 5 warnings)

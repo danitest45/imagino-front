@@ -9,7 +9,7 @@ The approved Vercel Preview was verified READY: `dpl_H6v4cP2FZf1PZQnQ5NbQnbDFNV7
 ## Product changes
 
 - Shared app shell for Image, Video, Assets and Account. A labeled 208 px sidebar becomes a focus-contained drawer below 1120 px. Credits and appearance use the existing APIs and theme preference. Public landing retains Working Studio.
-- Image and Video share a 360 px desktop creation panel, schema controls, quote footer, Generate action and asset workspace. On desktop controls scroll inside the panel; on narrow screens they return to document flow.
+- Image and Video share a 360 px desktop creation panel, schema controls, quote footer, Generate action and asset workspace. Desktop uses a bounded viewport shell, fixed tool header and quote/Generate footer, with one internal controls scroller and a stationary result canvas. Assets scroll inside their workspace. On narrow screens they return to document flow.
 - Catalog-driven model picker groups by intent, exposes native/provider information, capabilities, availability and estimated starting cost; a current selected quote is shown when present. Search appears at eight models. Unavailable models have disabled Choose plus a separate View controls action; inspection cannot quote or generate. The picker loads on demand.
 - Presentation metadata accepts optional catalog fields. A central adapter maps existing catalog categories and verified exact native IDs; it never changes capabilities, availability, billing, prices or request schemas. Unknown providers remain unnamed rather than guessed.
 - Model changes preserve compatible settings and exact reference bytes. Incompatible inputs/settings are listed before confirmation; cancel preserves the setup. Quotes invalidate with request changes. Continuing with an asset in another media studio asks before replacing a draft.
@@ -36,8 +36,12 @@ New Preview origins are not added to the backend CORS allowlist in this frontend
 
 Final command results, browser engines, screenshot/accessibility counts and exact deployment are recorded in [evidence](evidence/creative-hub/README.md). Build-reported First Load JS is compared with the unchanged approved base using the same public staging settings. ModelPicker and Assets detail are conditional dynamic imports. No micro-optimization changes billing/auth semantics.
 
+The subsequent founder layout polish is documented in [fixed-workspace evidence](evidence/layout-polish/README.md), with matching before/after viewport captures, long Video/Assets fixtures, real layout assertions, doubled-text checks, fresh engine reports and a bundle comparison against the pre-polish PR #89 HEAD.
+
 ## Founder review
 
 Open `/design-review` on the Preview. Switch Surface between Image, Video and Assets; switch State to Model picker, Alternate settings, Reference, Empty, Queued, Refunded and Error. Use Appearance for System/Light/Dark, and the mobile drawer at narrow widths. All fixture credits/models/output images are explicitly sample presentation data.
+
+Use State **Long video form** and **Long asset list** to inspect the fixed desktop workspace and internal scroll behavior.
 
 Creative Hub Core UX ready for founder review.

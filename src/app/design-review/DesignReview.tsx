@@ -33,6 +33,22 @@ const models = catalog.models
 const videoModels = catalog.models
   .filter((model) => model.mediaType === "video")
   .map((model) => ({ ...model, availability: "migration_required" })) as GenerationModel[];
+// This extended form exists only to exercise layout. It is never supplied to the API.
+const longVideoModel: GenerationModel = {
+  ...videoModels[0],
+  id: "sample-long-video-form",
+  displayName: "Video layout sample",
+  description: "Layout-only sample with first and last frames and an Audio control. Generation is unavailable.",
+  fields: [
+    ...videoModels[0].fields,
+    { key: "sampleAudio", label: "Audio", type: "enum", defaultValue: "Enabled", options: ["Enabled", "Disabled"] },
+  ],
+  presentation: {
+    intent: "motion",
+    nativeDisplayName: "Sample video schema",
+    shortDescription: "Long-form layout sample. Audio choices are illustrative and do not change the provider contract.",
+  },
+};
 const prompt =
   "A blue bottle on a stone pedestal, surrounded by botanical leaves and delicate white flowers. Soft natural light, a quiet editorial composition.";
 const jobs: GenerationJob[] = [
@@ -95,6 +111,11 @@ const videoJob: GenerationJob = {
   errorCode: "provider_error",
   createdAt: "2026-10-02T12:00:00Z",
 };
+const longAssetJobs = Array.from({ length: 30 }, (_, index): GenerationJob => ({
+  ...jobs[index % jobs.length],
+  id: `sample-long-asset-${index + 1}`,
+  prompt: `${jobs[index % jobs.length].prompt} Sample asset ${index + 1} of 30.`,
+}));
 const screens = [
   "Image",
   "Video",
@@ -107,6 +128,8 @@ const states = [
   "Result",
   "Model picker",
   "Alternate settings",
+  "Long video form",
+  "Long asset list",
   "Empty",
   "Reference",
   "Queued",
@@ -141,8 +164,14 @@ export default function DesignReview() {
   const [edgeOption, setEdgeOption] = useState("option-1");
   const [sampleFilter, setSampleFilter] = useState("");
   const isVideo = screen === "Video";
-  const currentModels = isVideo ? videoModels : models;
-  const selectedModel = isVideo ? videoModels[0] : state === "Alternate settings" ? models[2] : models[1];
+  const longVideo = isVideo && state === "Long video form";
+  const currentModels = longVideo ? [longVideoModel] : isVideo ? videoModels : models;
+  const selectedModel = longVideo ? longVideoModel : isVideo ? videoModels[0] : state === "Alternate settings" ? models[2] : models[1];
+  function changeState(next: (typeof states)[number]) {
+    setState(next);
+    if (next === "Long video form") setScreen("Video");
+    if (next === "Long asset list") setScreen("Assets");
+  }
   const hasResult = ![
     "Empty",
     "Reference",
@@ -189,9 +218,12 @@ export default function DesignReview() {
     modelId: selectedModel.id,
     authenticated: state !== "Signed out",
     prompt: state === "Empty" ? "" : prompt,
-    inputs: !isVideo && ["Result", "Reference"].includes(state)
+    inputs: longVideo
+      ? [{ role: "firstFrame", data: "/brand/reference.png" }, { role: "lastFrame", data: "/brand/campaign.webp" }]
+      : !isVideo && ["Result", "Reference"].includes(state)
       ? [{ role: "reference", data: "/brand/reference.png" }]
       : [],
+    settings: longVideo ? { aspectRatio: "16:9", resolution: "720p", duration: 8, sampleAudio: "Enabled" } : undefined,
     jobs: isVideo ? [] : resultJobs,
     selectedJobId: resultJobs[0]?.id,
     modelPickerOpen: state === "Model picker",
@@ -214,19 +246,14 @@ export default function DesignReview() {
       : undefined,
   };
   return (
-    <AppShell preview={{
-      active: screen === "Video" ? "video" : screen === "Assets" ? "assets" : ["Account", "Costs"].includes(screen) ? "account" : "image",
-      credits: state === "No balance" ? 0 : 80,
-      onNavigate: (destination) => setScreen(destination === "image" ? "Image" : destination === "video" ? "Video" : destination === "assets" ? "Assets" : "Account"),
-    }}>
+    <div className="design-review">
       <section className="review-controls" aria-label="Design review controls">
         <div>
           <span className="status-badge warning">
             Design preview — sample data
           </span>
           <p>
-            Production components. Local fixtures. No generation or account
-            requests.
+            {longVideo ? "Long form · Audio is a layout-only sample. No generation or account requests." : "Production components. Local fixtures. No generation or account requests."}
           </p>
         </div>
         <div className="review-selectors">
@@ -244,12 +271,18 @@ export default function DesignReview() {
             <Select
               aria-label="State"
               value={state}
-              onValueChange={setState}
+              onValueChange={changeState}
               options={states.map(value => ({ value, label: value }))}
             />
           </label>
         </div>
       </section>
+      <div className="review-viewport">
+      <AppShell preview={{
+        active: screen === "Video" ? "video" : screen === "Assets" ? "assets" : ["Account", "Costs"].includes(screen) ? "account" : "image",
+        credits: state === "No balance" ? 0 : 80,
+        onNavigate: (destination) => setScreen(destination === "image" ? "Image" : destination === "video" ? "Video" : destination === "assets" ? "Assets" : "Account"),
+      }}>
       {(screen === "Image" || screen === "Video") && (
         <GenerationWorkspace
           key={`${screen}-${state}`}
@@ -264,6 +297,8 @@ export default function DesignReview() {
             jobs:
               state === "Empty"
                 ? []
+                : state === "Long asset list"
+                  ? longAssetJobs
                 : state === "Refunded"
                   ? [...resultJobs, videoJob]
                   : [...jobs, videoJob],
@@ -394,5 +429,7 @@ export default function DesignReview() {
         </main>
       )}
     </AppShell>
+    </div>
+    </div>
   );
 }

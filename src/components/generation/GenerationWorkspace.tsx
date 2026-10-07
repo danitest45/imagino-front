@@ -40,6 +40,7 @@ import GenerationResult from "./GenerationResult";
 import { AssetCard, AssetMediaFilter, modelAvailability } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
 import { Select } from "../ui/StudioUI";
+import { ScrollRegion } from "../ui/ScrollRegion";
 import { generationModelPresentation, isGenerationModelReady, planGenerationModelChange } from "../../lib/generation-models";
 import { assetMediaFilters, catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
 import "./studio.css";
@@ -632,7 +633,6 @@ function Workspace({
     <main className="studio-page creative-workspace">
       <header className="studio-page-heading">
         <div>
-          <p className="eyebrow">Your creative workspace</p>
           <h1>{kind === "image" ? "Image studio" : "Video studio"}</h1>
           <p className="muted">
             {kind === "image"
@@ -642,10 +642,6 @@ function Workspace({
                 : "Prepare your next scene. Video generation is currently unavailable."}
           </p>
         </div>
-        {preview ? <button type="button" className="ui-button secondary" onClick={preview.onOpenAssets} disabled={!preview.onOpenAssets}>Open Assets <ArrowRight size={16} /></button> : <Link href="/library" className="ui-button secondary">
-          Open Assets
-          <ArrowRight size={16} />
-        </Link>}
       </header>
       {preview ? (
         <p className="studio-preview-label">
@@ -659,6 +655,7 @@ function Workspace({
           className="studio-controls"
           aria-label={`Create ${kind} controls`}
         >
+          <div className="studio-controls-header">
           <nav className="creative-kind-switch" aria-label="Creation tools">
             {(["image", "video"] as const).map(value => preview ? (
               <button key={value} type="button" aria-pressed={kind === value} onClick={() => preview.onKindChange?.(value)} disabled={!preview.onKindChange && kind !== value}>
@@ -670,18 +667,13 @@ function Workspace({
               </Link>
             ))}
           </nav>
-          <div className="studio-control-scroll">
+          <div className="studio-section-heading"><h2>{kind === "image" ? "Create image" : "Create video"}</h2></div>
+          </div>
+          <ScrollRegion className="studio-control-scroll" label={`${kind === "image" ? "Image" : "Video"} inputs and settings`}>
           <fieldset
             disabled={busy || preparing}
             className="studio-control-fields"
           >
-            <div className="studio-section-heading">
-              <h2>
-                {kind === "image"
-                  ? "Create image"
-                  : "Create video"}
-              </h2>
-            </div>
             <div className="creative-input-heading"><span className="studio-step">01 / {kind === "image" ? "REFERENCE" : "INPUT"}</span><span className="studio-help">Optional</span></div>
             {model?.inputs.length ? model.inputs.map((spec) => (
                 <div key={spec.role} className="studio-reference-area">
@@ -868,7 +860,6 @@ function Workspace({
               </details>
             ) : null}
           </fieldset>
-          </div>
           {constraintError ? (
             <p role="alert" className="studio-notice">
               {constraintError}
@@ -898,6 +889,7 @@ function Workspace({
               {notice}
             </p>
           ) : null}
+          </ScrollRegion>
           <div className="studio-create-action">
             <div className="studio-cost" aria-live="polite">
               <span>{preview ? "Sample quote" : "Current cost"}</span>
@@ -967,7 +959,7 @@ function Workspace({
               canReference={catalogSupportsReference(catalogModels)}
             />
           ) : (
-            <div className="studio-empty-canvas">
+            <ScrollRegion className="studio-empty-canvas" label="Empty result workspace">
               <div className="studio-empty-top">
                 <span className="eyebrow">Room to create</span>
                 <span className="studio-step">RESULT</span>
@@ -985,7 +977,7 @@ function Workspace({
                 </span>
               </div>
               <p className="studio-empty-bottom">One idea. A new direction.</p>
-            </div>
+            </ScrollRegion>
           )}
           <div className="studio-recents-heading">
             <h2>Recent assets</h2>
@@ -995,21 +987,25 @@ function Workspace({
             </Link>}
           </div>
           {historyError ? (
+            <ScrollRegion className="studio-history-status" label="Recent assets status">
             <p role="alert" className="studio-notice error">
               History could not refresh: {historyError}
             </p>
+            </ScrollRegion>
           ) : !authenticated ? (
             <p className="studio-help">Sign in to see your recent creations.</p>
           ) : !historyLoaded ? (
+            <ScrollRegion className="studio-history-status" label="Recent assets status">
             <div className="studio-skeleton" role="status">
               Loading recent creations…
             </div>
+            </ScrollRegion>
           ) : !visibleJobs.length ? (
             <p className="studio-help">
               Your recent jobs will appear here. Select an asset to keep creating.
             </p>
           ) : (
-            <div className="studio-recents">
+            <ScrollRegion className="studio-recents" label="Recent assets">
               {visibleJobs.slice(0, 8).map((job) => (
                 <AssetCard
                   key={job.id}
@@ -1020,7 +1016,7 @@ function Workspace({
                   preview={!!preview}
                 />
               ))}
-            </div>
+            </ScrollRegion>
           )}
         </section>
       </div>

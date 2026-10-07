@@ -1,0 +1,23 @@
+
+Running 11 tests using 1 worker
+
+
+
+[1A[2K(node:33896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1A[2K(node:33896) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[1A[2K[1/11] e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1366×768
+[1A[2K[2/11] e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1366×768
+[1A[2K[3/11] e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1440×900
+[1A[2K[4/11] e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1440×900
+[1A[2K[5/11] e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1920×1080
+[1A[2K[6/11] e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1920×1080
+[1A[2K[7/11] e2e\fixed-workspace.spec.ts:114:5 › 30 Assets scroll inside the workspace while sidebar remains at viewport bottom
+[1A[2K[8/11] e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 768×1024
+[1A[2K[9/11] e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 390×844
+[1A[2K[10/11] e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 320×900
+[1A[2K[11/11] e2e\fixed-workspace.spec.ts:157:5 › 200% browser zoom layout equivalent leaves long form settings and Generate operable
+[1A[2K  11 passed (26.5s)

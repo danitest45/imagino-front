@@ -50,6 +50,10 @@ yarn-error.log*
 /evidence/creative-hub/browser-compiled.log
 /evidence/creative-hub/navigation-check.log
 /evidence/creative-hub/firefox-launch-diagnostic*.log
+/evidence/layout-polish/*-test-results/
+/evidence/layout-polish/*-results/
+/evidence/layout-polish/inspection.png
+/evidence/layout-polish/capture-*.log
 
 # typescript
 *.tsbuildinfo

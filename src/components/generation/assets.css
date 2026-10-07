@@ -20,7 +20,16 @@
   background: var(--surface);
 }
 .asset-media-filter:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
-.library-page > .asset-media-filters { margin-bottom: 18px; }
+.library-page .asset-media-filters { margin-bottom: 18px; }
+@media (min-width: 1120px) {
+  .app-shell .library-page { display: flex; flex-direction: column; width: 100%; max-width: none; height: 100%; min-height: 0; padding: 20px; overflow: hidden; }
+  .library-page > .studio-page-heading { flex: none; margin-bottom: 16px; }
+  .library-page > .studio-page-heading .eyebrow { display: none; }
+  .library-page > .studio-page-heading h1 { font-size: 23px; margin: 0 0 4px; }
+  .library-page > .studio-page-heading .muted { font-size: 13px; line-height: 1.5; }
+  .app-shell-preview .library-page > .studio-preview-label { display: none; }
+  .library-content-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px; margin: -4px; scroll-padding-block: 12px; scrollbar-width: thin; scrollbar-color: var(--control-border) transparent; }
+}
 @media (forced-colors: active) {
   .asset-media-filter[aria-pressed="true"] { border-color: Highlight; color: Highlight; }
 }

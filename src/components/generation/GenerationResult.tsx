@@ -14,6 +14,7 @@ import {
   JobStatus,
 } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
+import { ScrollRegion } from "../ui/ScrollRegion";
 
 export interface GenerationResultProps {
   job: GenerationJob;
@@ -150,7 +151,7 @@ export default function GenerationResult({
           <video src={videoUrl} controls aria-label={job.prompt} />
         ) : null}
         {!src && !videoUrl ? (
-          <div className="studio-result-state">
+          <ScrollRegion className="studio-result-state" label="Generation status">
             {videoLoading ? <LoaderCircle size={32} className="studio-spinner" aria-hidden="true" /> : <span className="studio-frame-mark" aria-hidden="true" />}
             <h3>
               {videoLoading
@@ -170,10 +171,10 @@ export default function GenerationResult({
                 ? `${job.status}. You can leave and return while this job runs.`
                 : "Your prompt and settings are available to reuse."}
             </p>
-          </div>
+          </ScrollRegion>
         ) : null}
       </div>
-      <div className="studio-result-footer">
+      <ScrollRegion className="studio-result-footer" label="Selected asset actions and details">
         <p className="studio-job-meta">
           {creditLabel(job)}
           <span>·</span>
@@ -245,7 +246,7 @@ export default function GenerationResult({
             files are not stored in job history.
           </p>
         </details>
-      </div>
+      </ScrollRegion>
       <StudioDialog
         open={zoom}
         onClose={() => setZoom(false)}

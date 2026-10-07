@@ -13,6 +13,7 @@ import type { GenerationJob, GenerationModel } from "../../types/generation";
 import { AssetCard, AssetMediaFilter } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
 import { Select } from "../ui/StudioUI";
+import { ScrollRegion } from "../ui/ScrollRegion";
 import "./studio.css";
 
 const GenerationResult = dynamic(() => import("./GenerationResult"), {
@@ -172,6 +173,7 @@ function Library({
           disabled.
         </p>
       ) : null}
+      <ScrollRegion className="library-content-scroll" label="Recent generated assets">
       {!authenticated ? (
         <div className="library-empty">
           <span className="studio-frame-mark" aria-hidden="true" />
@@ -308,6 +310,7 @@ function Library({
           )}
         </>
       )}
+      </ScrollRegion>
       <StudioDialog
         open={!!selectedJob}
         onClose={() => setSelected(null)}
