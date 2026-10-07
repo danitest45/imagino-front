@@ -3,6 +3,7 @@ import type { GenerationInput, GenerationModel, GenerationModelIntent } from '..
 /** Presentation adapter for the existing V2 catalog. Exact native IDs only: unknown
  * providers stay unnamed until the catalog supplies presentation metadata. */
 const NATIVE_MODELS: Record<string, { providerName: string; nativeDisplayName: string }> = {
+  'grok_imagine_1_5_lite': { providerName: 'Runway Dev', nativeDisplayName: 'Grok Imagine Video 1.5 Lite' },
   'flux-2-klein-4b': { providerName: 'Black Forest Labs', nativeDisplayName: 'FLUX.2 Klein' },
   'flux-2-pro': { providerName: 'Black Forest Labs', nativeDisplayName: 'FLUX.2 Pro' },
   'gemini-3.1-flash-image': { providerName: 'Google', nativeDisplayName: 'Gemini 3.1 Flash Image' },
@@ -91,7 +92,7 @@ export function planGenerationModelChange(
   const removed: GenerationInput[] = [];
   for (const input of inputs) {
     const spec = next.inputs.find(item => item.role === input.role);
-    if (spec && retained.filter(item => item.role === input.role).length < spec.maxCount) retained.push(input);
+    if (spec && (!spec.ownedAssetOnly || input.sourceAssetId) && retained.filter(item => item.role === input.role).length < spec.maxCount) retained.push(input);
     else removed.push(input);
   }
   return { settings: nextSettings, inputs: retained, removedInputs: removed, changedSettings,

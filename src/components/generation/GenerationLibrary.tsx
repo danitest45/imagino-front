@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
 import { cancelGeneration, generationCatalog, generationHistory } from "../../lib/generation-api";
 import { generationError, terminalGeneration } from "../../lib/generation";
-import { catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
+import { catalogSupportsAnimate, catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
 import type { GenerationJob, GenerationModel } from "../../types/generation";
 import { AssetCard, AssetMediaFilter } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
@@ -66,6 +66,7 @@ function Library({
   const [status, setStatus] = useState("");
   const [media, setMedia] = useState<MediaFilter>("all");
   const [canReference, setCanReference] = useState(() => catalogSupportsReference(preview?.models ?? []));
+  const [canAnimate, setCanAnimate] = useState(() => catalogSupportsAnimate(preview?.models ?? []));
   const [selected, setSelected] = useState<string | null>(null);
   const scope = useRef<AbortController | null>(null);
   const previousStates = useRef<Record<string, string>>({});
@@ -73,10 +74,13 @@ function Library({
     if (preview || !authenticated) return;
     const controller = new AbortController();
     generationCatalog(controller.signal).then((catalog) => {
-      if (!controller.signal.aborted) setCanReference(catalogSupportsReference(catalog));
+      if (!controller.signal.aborted) {
+        setCanReference(catalogSupportsReference(catalog));
+        setCanAnimate(catalogSupportsAnimate(catalog));
+      }
     }).catch(() => {
       // History and downloads remain useful when the catalog is unavailable.
-      if (!controller.signal.aborted) setCanReference(false);
+      if (!controller.signal.aborted) { setCanReference(false); setCanAnimate(false); }
     });
     return () => controller.abort();
   }, [preview, authenticated]);
@@ -131,11 +135,11 @@ function Library({
   const selectedMedia = media === "all" || jobs.some((job) => job.mediaType === media) ? media : "all";
   const filtered = filterAssets(jobs, { media: selectedMedia, model, status, query });
   const selectedJob = jobs.find((job) => job.id === selected);
-  function continueWith(job: GenerationJob, action: "reuse" | "reference") {
+  function continueWith(job: GenerationJob, action: "reuse" | "reference" | "animate") {
     if (preview || !authenticated) return;
     // IDs convey intent; the destination reloads this job from owned history.
     router.push(
-      `/create/${action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`,
+      `/create/${action === "animate" ? "video" : action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`,
     );
   }
   async function cancel(id: string) {
@@ -323,6 +327,8 @@ function Library({
             job={selectedJob}
             onReuse={(job) => continueWith(job, "reuse")}
             onReference={(job) => continueWith(job, "reference")}
+            onAnimate={(job) => continueWith(job, "animate")}
+            canAnimate={canAnimate}
             onCancel={cancel}
             preview={!!preview}
             canReference={canReference}

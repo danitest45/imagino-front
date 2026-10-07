@@ -29,7 +29,12 @@ export function catalogSupportsReference(models: GenerationModel[]): boolean {
   return models.some((model) => model.mediaType === "image" && model.inputs.some((input) => input.role === "reference" && input.maxCount > 0));
 }
 
-export type AssetActionId = "reference" | "reuse" | "download";
+export function catalogSupportsAnimate(models: GenerationModel[]): boolean {
+  return models.some(model => model.mediaType === "video" && model.availability !== "disabled" &&
+    model.capabilities.includes("imageToVideo") && model.inputs.some(input => input.role === "firstFrame" && input.maxCount > 0 && input.ownedAssetOnly));
+}
+
+export type AssetActionId = "reference" | "animate" | "reuse" | "download";
 export interface AssetAction {
   id: AssetActionId;
   label: string;
@@ -37,17 +42,19 @@ export interface AssetAction {
 }
 const assetActions: readonly AssetAction[] = [
   { id: "reference", label: "Use as reference", primary: true },
+  { id: "animate", label: "Animate" },
   { id: "reuse", label: "Reuse prompt & settings" },
   { id: "download", label: "Download" },
 ];
 
 /** UI policy only: the API still enforces ownership for each download/history request. */
-export function availableAssetActions(job: GenerationJob, context: { owned: boolean; canReference: boolean }): AssetAction[] {
+export function availableAssetActions(job: GenerationJob, context: { owned: boolean; canReference: boolean; canAnimate?: boolean }): AssetAction[] {
   if (!context.owned) return [];
   return assetActions.filter((action) => {
     if (action.id === "reuse") return true; // Failed/cancelled jobs retain useful prompts.
     if (job.status !== "Completed") return false;
     if (action.id === "reference") return job.mediaType === "image" && context.canReference;
+    if (action.id === "animate") return job.mediaType === "image" && !!context.canAnimate;
     return true;
   });
 }

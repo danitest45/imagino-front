@@ -11,6 +11,11 @@ export function defaultGenerationSettings(model: GenerationModel): Record<string
   return Object.fromEntries(model.fields.map(f => [f.key, f.type === 'integer' ? Number(f.defaultValue) : f.defaultValue]));
 }
 export function generationConstraintError(model: GenerationModel, request: GenerationRequest): string | null {
+  for (const input of model.inputs ?? []) {
+    const prepared = request.inputs.filter(value => value.role === input.role);
+    if (input.required && !prepared.length) return `Add ${input.label.toLowerCase()} from Assets before creating.`;
+    if (input.ownedAssetOnly && prepared.some(value => !value.sourceAssetId)) return `${input.label} must come from Assets.`;
+  }
   for (const rule of model.rules) {
     if (String(request.settings[rule.whenKey]) === rule.whenValue && !rule.allowedValues.includes(String(request.settings[rule.requireKey]))) {
       return `${rule.whenKey} ${rule.whenValue} requires ${rule.requireKey}: ${rule.allowedValues.join(', ')}.`;

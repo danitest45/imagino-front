@@ -53,18 +53,18 @@ test('selecting a recent asset updates the main workspace without leaving Image'
   expect(mock.unexpectedRequests).toEqual([]);
 });
 
-test('design review shows Video migration and Assets from local samples without API work', async ({ page, context }) => {
+test('design review shows approval-required Video and Assets from local samples without API work', async ({ page, context }) => {
   const mock = await mockStudio(context);
   const apiRequests: string[] = [];
   page.on('request', request => { if (new URL(request.url()).pathname.startsWith('/api/')) apiRequests.push(request.url()); });
   await page.goto('/design-review');
   await chooseOption(page, 'Surface', 'Video');
-  await expect(page.getByRole('button', { name: 'Model Fast Video', exact: true })).toContainText('Model update required');
+  await expect(page.getByRole('button', { name: 'Model Fast Video (experimental)', exact: true })).toContainText('Approval required');
   await expect(page.getByRole('button', { name: 'Generate video', exact: true })).toBeDisabled();
   await chooseOption(page, 'Surface', 'Assets');
   await expect(page.getByRole('heading', { name: 'Assets', exact: true })).toBeVisible();
   await page.getByRole('group', { name: 'Filter assets by media' }).getByRole('button', { name: 'Videos', exact: true }).click();
-  await expect(page.getByRole('button', { name: /^Open Fast Video, Failed/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Open Fast Video \(experimental\), Failed/ })).toBeVisible();
   expect(apiRequests).toEqual([]);
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);

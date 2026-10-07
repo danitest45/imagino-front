@@ -27,6 +27,18 @@ test('reference preparation follows a real image reference input schema, never a
   assert.equal(assets.catalogSupportsReference([{ mediaType: 'image', inputs: [{ role: 'reference', maxCount: 0 }] }]), false);
 });
 
+test('Animate requires an owned completed image and an owned first-frame video contract', () => {
+  const model = { mediaType: 'video', availability: 'approval_required', capabilities: ['imageToVideo'], inputs: [{ role: 'firstFrame', maxCount: 1, ownedAssetOnly: true }] };
+  assert.equal(assets.catalogSupportsAnimate([model]), true);
+  assert.equal(assets.catalogSupportsAnimate([{ ...model, inputs: [] }]), false);
+  assert.equal(assets.catalogSupportsAnimate([{ ...model, availability: 'disabled' }]), false);
+  assert.deepEqual(ids(assets.availableAssetActions(job, { owned: true, canReference: false, canAnimate: true })), ['animate', 'reuse', 'download']);
+  assert.deepEqual(ids(assets.availableAssetActions(job, { owned: false, canReference: false, canAnimate: true })), []);
+  assert.deepEqual(ids(assets.availableAssetActions({ ...job, mediaType: 'video' }, { owned: true, canReference: false, canAnimate: true })), ['reuse', 'download']);
+  for (const status of ['Queued', 'Starting', 'Processing', 'Failed', 'Cancelled'])
+    assert.deepEqual(ids(assets.availableAssetActions({ ...job, status }, { owned: true, canReference: false, canAnimate: true })), ['reuse']);
+});
+
 test('media filters are derived only from loaded assets', () => {
   assert.deepEqual(Array.from(assets.assetMediaFilters([])), ['all']);
   assert.deepEqual(Array.from(assets.assetMediaFilters([job])), ['all', 'image']);

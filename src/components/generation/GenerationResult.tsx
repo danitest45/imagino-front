@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Expand, ImagePlus, LoaderCircle, RotateCcw } from "lucide-react";
+import { Download, Expand, ImagePlus, LoaderCircle, RotateCcw, Clapperboard } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { GenerationJob } from "../../types/generation";
 import { generationDownload } from "../../lib/generation-api";
@@ -21,6 +21,8 @@ export interface GenerationResultProps {
   onReuse: (job: GenerationJob) => void;
   onCancel?: (id: string) => Promise<void>;
   onReference?: (job: GenerationJob) => void;
+  onAnimate?: (job: GenerationJob) => void;
+  canAnimate?: boolean;
   preview?: boolean;
   detail?: boolean;
   /** Only trusted, authenticated history supplies owned jobs to this component. */
@@ -33,6 +35,8 @@ export default function GenerationResult({
   onReuse,
   onCancel,
   onReference,
+  onAnimate,
+  canAnimate = false,
   preview = false,
   detail = false,
   owned,
@@ -47,7 +51,7 @@ export default function GenerationResult({
   const scope = useRef<AbortController | null>(null);
   const downloading = useRef(false);
   const src = imageUnavailable ? null : jobImageSource(job, preview);
-  const actions = availableAssetActions(job, { owned, canReference: canReference && !!onReference });
+  const actions = availableAssetActions(job, { owned, canReference: canReference && !!onReference, canAnimate: canAnimate && !!onAnimate });
   useEffect(() => {
     const controller = new AbortController();
     scope.current = controller;
@@ -182,12 +186,13 @@ export default function GenerationResult({
         </p>
         <div className="studio-result-actions">
           {actions.map((action) => {
-            const Icon = action.id === "reference" ? ImagePlus : action.id === "reuse" ? RotateCcw : Download;
+            const Icon = action.id === "animate" ? Clapperboard : action.id === "reference" ? ImagePlus : action.id === "reuse" ? RotateCcw : Download;
             return (
               <button key={action.id} type="button" className={`ui-button${action.primary ? "" : " secondary"}`} disabled={preview || (action.id === "download" && busy)} onClick={(event) => {
                 event.currentTarget.focus({ preventScroll: true });
                 if (preview || !owned) return;
                 if (action.id === "reference") onReference?.(job);
+                else if (action.id === "animate") onAnimate?.(job);
                 else if (action.id === "reuse") onReuse(job);
                 else void download();
               }}>

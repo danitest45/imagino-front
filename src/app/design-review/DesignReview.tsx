@@ -32,7 +32,7 @@ const models = catalog.models
 // Availability here is an explicit visual fixture, never the production catalog.
 const videoModels = catalog.models
   .filter((model) => model.mediaType === "video")
-  .map((model) => ({ ...model, availability: "migration_required" })) as GenerationModel[];
+  .map((model) => ({ ...model, availability: model.retirementAt ? "migration_required" : model.availability })) as GenerationModel[];
 // This extended form exists only to exercise layout. It is never supplied to the API.
 const longVideoModel: GenerationModel = {
   ...videoModels[0],

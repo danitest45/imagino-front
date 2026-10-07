@@ -1,0 +1,87 @@
+
+Running 34 tests using 1 worker
+
+(node:46840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46840) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  1 e2e\assets-core.spec.ts:5:5 › Assets exposes only loaded media and filters confirmed refunds independently from failure (1.5s)
+  ok  2 e2e\assets-core.spec.ts:30:5 › Assets keeps last-30 scope and hides absent media controls (639ms)
+  ok  3 e2e\assets-core.spec.ts:42:5 › selecting a recent asset updates the main workspace without leaving Image (716ms)
+  x   4 e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work (10.9s)
+(node:104508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:104508) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok  5 e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1366×768 (1.6s)
+  ok  6 e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1366×768 (2.0s)
+  ok  7 e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1440×900 (1.3s)
+  ok  8 e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1440×900 (1.3s)
+  ok  9 e2e\fixed-workspace.spec.ts:42:7 › Image and Video keep shell, footer and recent results within 1920×1080 (1.4s)
+  ok 10 e2e\fixed-workspace.spec.ts:69:7 › long Video scrolls its controls while sidebar, result and Generate stay fixed at 1920×1080 (1.3s)
+  ok 11 e2e\fixed-workspace.spec.ts:114:5 › 30 Assets scroll inside the workspace while sidebar remains at viewport bottom (1.5s)
+  ok 12 e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 768×1024 (887ms)
+  ok 13 e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 390×844 (891ms)
+  ok 14 e2e\fixed-workspace.spec.ts:137:7 › long Video keeps a natural document flow and reachable footer at 320×900 (780ms)
+  ok 15 e2e\fixed-workspace.spec.ts:157:5 › 200% browser zoom layout equivalent leaves long form settings and Generate operable (2.6s)
+  ok 16 e2e\model-picker-core.spec.ts:5:5 › large model catalog supports intent groups, search, keyboard choice and Escape focus return (1.2s)
+  ok 17 e2e\model-picker-core.spec.ts:38:5 › compatible model change preserves reference bytes and supported settings, and invalidates its quote (3.1s)
+  ok 18 e2e\model-picker-core.spec.ts:69:5 › unavailable models expose controls without allowing selection for spending or quotes (2.2s)
+  ok 19 e2e\model-picker-core.spec.ts:92:5 › canceling an asset-driven model change clears the pending reference and restores its actual opener (1.2s)
+  ok 20 e2e\model-picker-core.spec.ts:118:5 › cross-media reuse confirms before replacing an existing prompt and reference (983ms)
+  ok 21 e2e\studio-behavior.spec.ts:28:5 › current quote is invalidated by prompt, settings and reference changes (5.4s)
+  ok 22 e2e\studio-behavior.spec.ts:71:5 › upload rejects unsupported files and prepares a valid public local reference (1.6s)
+  ok 23 e2e\studio-behavior.spec.ts:89:5 › model change preserves references and settings until the user confirms (2.4s)
+  ok 24 e2e\studio-behavior.spec.ts:121:5 › duplicate click is blocked and ambiguous submission replays the exact body and key (1.7s)
+  ok 25 e2e\studio-behavior.spec.ts:149:5 › Library filters loaded jobs and restores keyboard focus after detail Escape (1.5s)
+  ok 26 e2e\studio-behavior.spec.ts:179:5 › Use as reference downloads the owned result and prepares a new input without generating (2.1s)
+  ok 27 e2e\studio-behavior.spec.ts:201:5 › Reuse restores prompt and supported settings but does not invent original references (2.0s)
+  ok 28 e2e\studio-behavior.spec.ts:217:5 › failed reference download preserves the current prompt and settings (907ms)
+  ok 29 e2e\studio-behavior.spec.ts:232:5 › Library shows distinct empty, unavailable and signed-out states (932ms)
+  ok 30 e2e\studio-behavior.spec.ts:247:5 › logout clears private Library immediately even when the logout request fails (949ms)
+  ok 31 e2e\studio-behavior.spec.ts:267:5 › expired quote cannot submit while its replacement is pending (2.6s)
+  ok 32 e2e\studio-behavior.spec.ts:287:5 › deployment-pending model cannot quote or submit for an authenticated account (1.5s)
+  ok 33 e2e\studio-behavior.spec.ts:303:5 › design review sends no account or generation HTTP and disables sample actions (1.8s)
+  ok 34 e2e\studio-behavior.spec.ts:337:5 › mobile navigation supports keyboard activation, Escape focus return and route change at 320 px (737ms)
+
+
+  1) e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work 
+
+    Error: [2mexpect([22m[31mlocator[39m[2m).[22mtoContainText[2m([22m[32mexpected[39m[2m)[22m failed
+
+    Locator: getByRole('button', { name: 'Model Fast Video', exact: true })
+    Expected substring: [32m"Model update required"[39m
+    Timeout: 10000ms
+    Error: element(s) not found
+
+    Call log:
+    [2m  - Expect "toContainText" with timeout 10000ms[22m
+    [2m  - waiting for getByRole('button', { name: 'Model Fast Video', exact: true })[22m
+
+
+      60 |   await page.goto('/design-review');
+      61 |   await chooseOption(page, 'Surface', 'Video');
+    > 62 |   await expect(page.getByRole('button', { name: 'Model Fast Video', exact: true })).toContainText('Model update required');
+         |                                                                                     ^
+      63 |   await expect(page.getByRole('button', { name: 'Generate video', exact: true })).toBeDisabled();
+      64 |   await chooseOption(page, 'Surface', 'Assets');
+      65 |   await expect(page.getByRole('heading', { name: 'Assets', exact: true })).toBeVisible();
+        at C:\Users\USER\Documents\ChatGPT\Imagino Revival\work\imagino-creative-hub-core\e2e\assets-core.spec.ts:62:85
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results\assets-core-design-review--d030a-al-samples-without-API-work\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results\assets-core-design-review--d030a-al-samples-without-API-work\error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\assets-core-design-review--d030a-al-samples-without-API-work\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\assets-core-design-review--d030a-al-samples-without-API-work\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    e2e\assets-core.spec.ts:56:5 › design review shows Video migration and Assets from local samples without API work 
+  33 passed (1.2m)

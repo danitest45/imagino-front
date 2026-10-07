@@ -80,7 +80,7 @@ test('incompatible model transition reports each removal while keeping compatibl
 });
 
 test('video transitions apply declared field dependencies and preserve integer request values', () => {
-  const plan = models.planGenerationModelChange(catalog[3], { resolution: '1080p', duration: 4, aspectRatio: '9:16' }, []);
+  const plan = models.planGenerationModelChange(catalog.find(model => model.id === 'veo-fast-20261002'), { resolution: '1080p', duration: 4, aspectRatio: '9:16' }, []);
   assert.equal(plan.settings.duration, 8);
   assert.equal(plan.settings.resolution, '1080p');
   assert.equal(plan.settings.aspectRatio, '9:16');

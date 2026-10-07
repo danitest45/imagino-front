@@ -31,6 +31,7 @@ export function modelAvailability(model: GenerationModel) {
         ready: "Available",
         synthetic_demo: "Synthetic staging demo",
         deployment_pending: "Generation unavailable",
+        approval_required: "Approval required",
         migration_required: "Model update required",
         retired: "Retired",
         disabled: "Unavailable",

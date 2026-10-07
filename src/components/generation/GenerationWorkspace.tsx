@@ -42,7 +42,7 @@ import StudioDialog from "./StudioDialog";
 import { Select } from "../ui/StudioUI";
 import { ScrollRegion } from "../ui/ScrollRegion";
 import { generationModelPresentation, isGenerationModelReady, planGenerationModelChange } from "../../lib/generation-models";
-import { assetMediaFilters, catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
+import { assetMediaFilters, catalogSupportsAnimate, catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
 import "./studio.css";
 import "./creative-workspace.css";
 
@@ -138,7 +138,7 @@ function Workspace({
     null,
   );
   const [pendingReuse, setPendingReuse] = useState<GenerationJob | null>(null);
-  const [pendingNavigation, setPendingNavigation] = useState<{ job: GenerationJob; action: "reuse" | "reference" } | null>(null);
+  const [pendingNavigation, setPendingNavigation] = useState<{ job: GenerationJob; action: "reuse" | "reference" | "animate" } | null>(null);
   const [pendingReference, setPendingReference] =
     useState<GenerationJob | null>(null);
   const [ambiguousSubmit, setAmbiguousSubmit] = useState(false);
@@ -341,10 +341,10 @@ function Workspace({
     setPendingModel(null);
     setPendingReference(null);
   }
-  function navigateFromAsset(job: GenerationJob, action: "reuse" | "reference") {
+  function navigateFromAsset(job: GenerationJob, action: "reuse" | "reference" | "animate") {
     const dirty = inputs.length > 0 || !!prompt.trim() || (model && JSON.stringify(settings) !== JSON.stringify(defaultGenerationSettings(model)));
     if (dirty) setPendingNavigation({ job, action });
-    else router.push(`/create/${action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`);
+    else router.push(`/create/${action === "animate" ? "video" : action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`);
   }
   async function upload(
     files: FileList | null,
@@ -445,6 +445,38 @@ function Workspace({
       if (!controller.signal.aborted) setPreparing(false);
     }
   }
+  async function animate(job: GenerationJob) {
+    if (preview || !authenticated || busy || preparingRef.current || job.status !== "Completed" || job.mediaType !== "image" ||
+        !jobs.some(value => value.id === job.id) || !catalogSupportsAnimate(catalogModels)) return;
+    if (kind !== "video") { navigateFromAsset(job, "animate"); return; }
+    const target = models.find(value => value.capabilities.includes("imageToVideo") && value.inputs.some(input => input.role === "firstFrame" && input.ownedAssetOnly));
+    const controller = scope.current;
+    if (!target || !controller || controller.signal.aborted) return;
+    preparingRef.current = true;
+    setPreparing(true);
+    setQuoted(null);
+    setError(null);
+    try {
+      const blob = await generationDownload(job.id, controller.signal);
+      if (controller.signal.aborted) return;
+      if (blob.type !== "image/png" || blob.size > 2 * 1024 * 1024) throw new Error("This first frame requires a PNG image up to 2 MB.");
+      const reader = new FileReader();
+      const data = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("First frame could not be prepared."));
+        reader.readAsDataURL(blob);
+      });
+      if (controller.signal.aborted) return;
+      selectedRef.current = target.id;
+      setSelected(target.id);
+      setSettings(defaultGenerationSettings(target));
+      setInputs([{ role: "firstFrame", data, sourceAssetId: job.id }]);
+      setReferenceSource(`${job.displayName} · selected creation`);
+      setNotice("First frame prepared. Confirm your motion prompt, model, settings and quote, then click Generate.");
+      document.getElementById("generation-prompt")?.focus();
+    } catch (e) { if (!controller.signal.aborted) setError(generationError(e)); }
+    finally { preparingRef.current = false; if (!controller.signal.aborted) setPreparing(false); }
+  }
   function reuse(job: GenerationJob) {
     if (preview || busy || preparing) return;
     if (job.mediaType !== kind) {
@@ -502,8 +534,8 @@ function Workspace({
     document.getElementById("generation-prompt")?.focus();
   }
   // Cross-route reuse carries only an opaque ID/action. Reload the owned job first.
-  const routeHandlers = useRef({ reuse, addReference });
-  routeHandlers.current = { reuse, addReference };
+  const routeHandlers = useRef({ reuse, addReference, animate });
+  routeHandlers.current = { reuse, addReference, animate };
   useEffect(() => {
     if (
       preview ||
@@ -517,7 +549,7 @@ function Workspace({
     const params = new URLSearchParams(window.location.search);
     const id = params.get("job");
     const action = params.get("action");
-    if (!id || !["reuse", "reference"].includes(action ?? "")) return;
+    if (!id || !["reuse", "reference", "animate"].includes(action ?? "")) return;
     routeActionHandled.current = true;
     const job = jobs.find((value) => value.id === id);
     if (!job)
@@ -525,6 +557,7 @@ function Workspace({
         "This creation is not available in your 30 recent jobs. Open a creation from Assets.",
       );
     else if (action === "reuse") routeHandlers.current.reuse(job);
+    else if (action === "animate") void routeHandlers.current.animate(job);
     else void routeHandlers.current.addReference(job);
     params.delete("job");
     params.delete("action");
@@ -674,7 +707,7 @@ function Workspace({
             disabled={busy || preparing}
             className="studio-control-fields"
           >
-            <div className="creative-input-heading"><span className="studio-step">01 / {kind === "image" ? "REFERENCE" : "INPUT"}</span><span className="studio-help">Optional</span></div>
+            <div className="creative-input-heading"><span className="studio-step">01 / {kind === "image" ? "REFERENCE" : "INPUT"}</span><span className="studio-help">{model?.inputs.some(input => input.required) ? "Required" : "Optional"}</span></div>
             {model?.inputs.length ? model.inputs.map((spec) => (
                 <div key={spec.role} className="studio-reference-area">
                   <div className="studio-field-label">
@@ -714,7 +747,7 @@ function Workspace({
                       )}
                     </div>
                   ) : null}
-                  <label className="studio-upload">
+                  {spec.ownedAssetOnly ? <Link href="/library" className="ui-button secondary">Choose an image from Assets</Link> : <label className="studio-upload">
                     <Upload size={19} />
                     <span>
                       Add{" "}
@@ -737,10 +770,9 @@ function Workspace({
                       }}
                     />
                     <small>PNG, JPEG or WebP · up to 10 MB</small>
-                  </label>
+                  </label>}
                   <p className="studio-help">
-                    Prepared at up to 1024 px. Reference inputs can change the
-                    cost.
+                    {spec.ownedAssetOnly ? "Choose a completed image in Assets and click Animate to prepare this first frame." : "Prepared at up to 1024 px. Reference inputs can change the cost."}
                   </p>
                 </div>
               )) : (
@@ -953,6 +985,8 @@ function Workspace({
               job={activeJob}
               onReuse={reuse}
               onReference={(job) => void addReference(job)}
+              onAnimate={(job) => void animate(job)}
+              canAnimate={catalogSupportsAnimate(catalogModels)}
               onCancel={cancel}
               preview={!!preview}
               owned={authenticated}
@@ -1061,14 +1095,14 @@ function Workspace({
         </div>
       </StudioDialog>
       <StudioDialog open={!!pendingNavigation} onClose={() => setPendingNavigation(null)} title="Continue in another studio?">
-        <p>Your current prompt, reference inputs and settings will be replaced when you continue with this asset in the {pendingNavigation?.action === "reference" ? "image" : pendingNavigation?.job.mediaType} studio.</p>
+        <p>Your current prompt, reference inputs and settings will be replaced when you continue with this asset in the {pendingNavigation?.action === "animate" ? "video" : pendingNavigation?.action === "reference" ? "image" : pendingNavigation?.job.mediaType} studio.</p>
         <div className="studio-dialog-actions">
           <button type="button" className="ui-button secondary" onClick={() => setPendingNavigation(null)}>Keep current setup</button>
           <button type="button" className="ui-button" onClick={() => {
             if (!pendingNavigation) return;
             const { job, action } = pendingNavigation;
             setPendingNavigation(null);
-            router.push(`/create/${action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`);
+            router.push(`/create/${action === "animate" ? "video" : action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`);
           }}>Continue with asset</button>
         </div>
       </StudioDialog>
