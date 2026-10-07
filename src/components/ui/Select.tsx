@@ -58,7 +58,7 @@ export function Select<Value extends string = string>({
 
   function handleOpenChange(next: boolean) {
     if (next) {
-      setContainer(trigger.current?.closest<HTMLDialogElement>("dialog[open]") ?? inheritedContainer);
+      setContainer(trigger.current?.closest<HTMLElement>("[data-imagino-dialog], dialog[open]") ?? inheritedContainer);
     }
     setOpen(next);
   }
@@ -89,7 +89,7 @@ export function Select<Value extends string = string>({
         collisionPadding={12}
         align="start"
         onEscapeKeyDown={event => {
-          // Prevent the native dialog's cancel action and header Escape handlers.
+          // Dismiss only the innermost popup; keep its containing modal open.
           event.preventDefault();
           event.stopPropagation();
           setOpen(false);

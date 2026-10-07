@@ -40,7 +40,7 @@ async function readyStudio(page: Page) {
   await page.goto('/create/image');
   // Auth initializes before the token-keyed workspace is stable for editing.
   await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Account', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
 }
 
 function collectRuntimeErrors(page: Page) {
@@ -118,7 +118,7 @@ test('preference persists through client navigation, reload, logout and same-ori
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/library');
   await appearance(page, 'dark');
-  await page.getByRole('link', { name: 'Create', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Workspace navigation', exact: true }).getByRole('link', { name: 'Image', exact: true }).click();
   await expectTheme(page, 'dark', 'dark');
   await page.reload();
   await expectTheme(page, 'dark', 'dark');
@@ -205,13 +205,12 @@ test('theme changes preserve prompt, references, quote, selected result and scro
   const mock = await mockStudio(context, jobs);
   await page.emulateMedia({ colorScheme: 'light' });
   await readyStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea', exact: true }).fill('Keep this unsent working draft');
+  await page.getByRole('textbox', { name: 'Prompt', exact: true }).fill('Keep this unsent working draft');
   await chooseOption(page, 'Aspect ratio', '16:9');
-  await page.getByRole('button', { name: 'With a reference', exact: true }).click();
   await page.getByLabel('Upload Reference image', { exact: true }).setInputFiles(referencePath);
   const reference = page.getByRole('img', { name: 'Reference image 1', exact: true });
   await expect(reference).toBeVisible();
-  const create = page.getByRole('button', { name: 'Create image · 15 credits', exact: true });
+  const create = page.getByRole('button', { name: 'Generate image · 15 credits', exact: true });
   await expect(create).toBeEnabled();
   const source = await reference.getAttribute('src');
   const quoted = mock.quotes.length;
@@ -226,7 +225,7 @@ test('theme changes preserve prompt, references, quote, selected result and scro
   expect(await page.evaluate(() => scrollY)).toBe(scroll);
   expect(await page.evaluate(() => (window as Window & { __originalPrompt?: Element | null }).__originalPrompt === document.getElementById('generation-prompt'))).toBe(true);
   await appearance(page, 'light');
-  await expect(page.getByRole('textbox', { name: 'Where do you want to take it?' })).toHaveValue('Keep this unsent working draft');
+  await expect(page.getByRole('textbox', { name: 'Prompt' })).toHaveValue('Keep this unsent working draft');
   await expect(page.getByRole('combobox', { name: 'Aspect ratio', exact: true })).toHaveText('16:9');
   await expect(reference).toHaveAttribute('src', source!);
   await expect(reference).toHaveCSS('filter', 'none');
@@ -244,8 +243,8 @@ test('controlled numeric and enum selects preserve request types and never submi
   const mock = await mockStudio(context);
   mock.models[0].fields.push({ key: 'steps', label: 'Steps', type: 'integer', defaultValue: '4', options: ['4', '8'] });
   await readyStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Check controlled schema settings');
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('Check controlled schema settings');
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
   await chooseOption(page, 'Steps', '8');
   await chooseOption(page, 'Aspect ratio', '16:9');
   await expect.poll(() => mock.quotes.at(-1)?.body.settings).toEqual({ aspectRatio: '16:9', resolution: '1K', steps: 8 });
@@ -413,13 +412,14 @@ test.describe('touch controls', () => {
     await page.goto('/design-review');
     const surface = page.getByRole('combobox', { name: 'Surface', exact: true });
     await surface.tap();
-    await page.getByRole('option', { name: 'Library', exact: true }).tap();
-    await expect(surface).toHaveText('Library');
-    await expect(page.getByRole('heading', { name: 'Library', exact: true })).toBeVisible();
+    await page.getByRole('option', { name: 'Assets', exact: true }).tap();
+    await expect(surface).toHaveText('Assets');
+    await expect(page.getByRole('heading', { name: 'Assets', exact: true })).toBeVisible();
     await surface.tap();
     await page.keyboard.press('Escape');
     await expect(surface).toBeFocused();
-    await page.getByRole('button', { name: 'Appearance', exact: true }).tap();
+    await page.getByRole('button', { name: 'Open workspace navigation', exact: true }).tap();
+    await page.getByRole('dialog', { name: 'Workspace navigation', exact: true }).getByRole('button', { name: 'Appearance', exact: true }).tap();
     await page.getByRole('menuitemradio', { name: 'Dark', exact: true }).tap();
     await expectTheme(page, 'dark', 'dark');
     expect(mock.historyRequests).toBe(0);

@@ -5,6 +5,15 @@ export interface GenerationField {
   defaultValue: string;
   options: string[];
 }
+export type GenerationModelIntent = 'recommended' | 'fast' | 'studio' | 'reference' | 'motion' | 'testing';
+/** Optional catalog presentation data. It never controls billing or capabilities. */
+export interface GenerationModelPresentation {
+  intent?: GenerationModelIntent;
+  providerName?: string;
+  nativeDisplayName?: string;
+  shortDescription?: string;
+  descriptors?: string[];
+}
 export interface GenerationModel {
   id: string;
   version: string;
@@ -15,13 +24,14 @@ export interface GenerationModel {
   providerModel: string;
   capabilities: string[];
   fields: GenerationField[];
-  inputs: { role: string; label: string; maxCount: number }[];
+  inputs: { role: string; label: string; maxCount: number; required?: boolean; ownedAssetOnly?: boolean }[];
   rules: { whenKey: string; whenValue: string; requireKey: string; allowedValues: string[] }[];
   availability: string;
   retirementAt?: string | null;
   startingCredits: number;
+  presentation?: GenerationModelPresentation;
 }
-export interface GenerationInput { role: string; data: string }
+export interface GenerationInput { role: string; data: string; sourceAssetId?: string }
 export interface GenerationRequest {
   modelId: string;
   prompt: string;

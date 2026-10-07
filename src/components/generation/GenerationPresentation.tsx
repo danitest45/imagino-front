@@ -1,9 +1,28 @@
 "use client";
 
 import Image from "next/image";
-import { ImageIcon, LoaderCircle } from "lucide-react";
+import { ImageIcon, LoaderCircle, Video } from "lucide-react";
 import type { GenerationJob, GenerationModel } from "../../types/generation";
 import { terminalGeneration } from "../../lib/generation";
+import { assetMediaFilters, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
+import "./assets.css";
+
+export function AssetMediaFilter({ jobs, value, onChange }: {
+  jobs: GenerationJob[];
+  value: MediaFilter;
+  onChange: (value: MediaFilter) => void;
+}) {
+  const filters = assetMediaFilters(jobs);
+  return (
+    <div className="asset-media-filters" role="group" aria-label="Filter assets by media">
+      {filters.map((filter) => (
+        <button key={filter} type="button" className="asset-media-filter" aria-pressed={value === filter} onClick={() => onChange(filter)}>
+          {filter === "all" ? "All" : filter === "image" ? "Images" : "Videos"}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function modelAvailability(model: GenerationModel) {
   return (
@@ -12,6 +31,7 @@ export function modelAvailability(model: GenerationModel) {
         ready: "Available",
         synthetic_demo: "Synthetic staging demo",
         deployment_pending: "Generation unavailable",
+        approval_required: "Approval required",
         migration_required: "Model update required",
         retired: "Retired",
         disabled: "Unavailable",
@@ -97,7 +117,7 @@ export function AssetCard({
             {!terminalGeneration(job.status) ? (
               <LoaderCircle className="studio-spinner" size={26} />
             ) : (
-              <ImageIcon size={28} />
+              job.mediaType === "video" ? <Video size={28} /> : <ImageIcon size={28} />
             )}
             <span>{job.status}</span>
           </span>

@@ -9,6 +9,7 @@ import { IconButton } from "./ui/StudioUI";
 import { toast } from "../lib/toast";
 import Appearance from "./Appearance";
 import BrandMark from "./BrandMark";
+import { isWorkspaceRoute } from "./shell/navigation";
 export default function Navbar() {
   const { token, isAuthenticated, logout } = useAuth();
   const pathname = usePathname();
@@ -21,6 +22,7 @@ export default function Navbar() {
   const menu = useRef<HTMLButtonElement>(null);
   const marketing = pathname === "/" || pathname === "/pricing";
   const reviewing = pathname === "/design-review";
+  const workspace = isWorkspaceRoute(pathname);
   const links = marketing
     ? [
         { href: "/#how-it-works", label: "How it works" },
@@ -32,7 +34,7 @@ export default function Navbar() {
         { href: "/library", label: "Library" },
       ];
   useEffect(() => {
-    if (!token || reviewing) return;
+    if (!token || reviewing || workspace) return;
     let current = true;
     let revision = 0;
     const refresh = () => {
@@ -53,11 +55,12 @@ export default function Navbar() {
       window.removeEventListener("imagino-credits-changed", refresh);
       window.removeEventListener("creditsUpdated", refresh);
     };
-  }, [token, reviewing]);
+  }, [token, reviewing, workspace]);
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
   const credits = token && balance?.token === token ? balance.value : null;
+  if (workspace || reviewing) return null;
   return (
     <header
       className="site-header"

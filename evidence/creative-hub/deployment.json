@@ -1,0 +1,26 @@
+{
+  "repository": "danitest45/imagino-front",
+  "pullRequest": "https://github.com/danitest45/imagino-front/pull/89",
+  "draft": true,
+  "baseBranch": "feat/imagino-working-studio",
+  "baseSha": "46c64a646dd1504369ef917c8075ea80e45b432c",
+  "branch": "feat/imagino-creative-hub-core",
+  "implementationSha": "2b954d7ed5702e66ed1ef59a9dfdef864168bb18",
+  "projectId": "prj_2Av1b3qZgj0EwyQKwQK7W7TbnIgy",
+  "deploymentId": "dpl_ZvMpzdgrkjv1dxCY2wfGeeDzjVek",
+  "state": "READY",
+  "environment": "preview",
+  "url": "https://imagino-front-e4cijk1s2-danitest45s-projects.vercel.app",
+  "stableAlias": "https://imagino-front-git-feat-imagino-crea-9cdb36-danitest45s-projects.vercel.app",
+  "configurationScope": {
+    "gitBranch": "feat/imagino-creative-hub-core",
+    "target": ["preview"],
+    "publicKeysCopiedFromApprovedWorkingStudio": ["NEXT_PUBLIC_API_URL", "MEDIA_ALLOWED_HOSTS", "NEXT_PUBLIC_GENERATION_V2_ENABLED", "ENABLE_DESIGN_REVIEW"]
+  },
+  "initialDeployment": {
+    "id": "dpl_BtLp432V9CTM54j84pTCv7Y1UTTa",
+    "state": "ERROR",
+    "context": "Git push triggered before Vercel accepted branch-scoped public Preview settings. Published replacement was created after those four settings existed."
+  },
+  "scope": "Frontend Preview only. No merge, backend, CORS, OAuth, provider, pricing, payment or production change. No paid generation."
+}

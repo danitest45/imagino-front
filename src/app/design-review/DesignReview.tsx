@@ -22,12 +22,33 @@ import type { GenerationJob, GenerationModel } from "../../types/generation";
 import catalog from "../../data/generation-catalog-preview.json";
 import { toast } from "../../lib/toast";
 import Appearance from "../../components/Appearance";
+import AppShell from "../../components/shell/AppShell";
 import "./review.css";
 
 const models = catalog.models
   .filter((m) => m.mediaType === "image")
-  .slice(0, 2)
+  .filter((m) => m.id !== "pipeline-demo-20261002")
   .map((m) => ({ ...m, availability: "ready" })) as GenerationModel[];
+// Availability here is an explicit visual fixture, never the production catalog.
+const videoModels = catalog.models
+  .filter((model) => model.mediaType === "video")
+  .map((model) => ({ ...model, availability: model.retirementAt ? "migration_required" : model.availability })) as GenerationModel[];
+// This extended form exists only to exercise layout. It is never supplied to the API.
+const longVideoModel: GenerationModel = {
+  ...videoModels[0],
+  id: "sample-long-video-form",
+  displayName: "Video layout sample",
+  description: "Layout-only sample with first and last frames and an Audio control. Generation is unavailable.",
+  fields: [
+    ...videoModels[0].fields,
+    { key: "sampleAudio", label: "Audio", type: "enum", defaultValue: "Enabled", options: ["Enabled", "Disabled"] },
+  ],
+  presentation: {
+    intent: "motion",
+    nativeDisplayName: "Sample video schema",
+    shortDescription: "Long-form layout sample. Audio choices are illustrative and do not change the provider contract.",
+  },
+};
 const prompt =
   "A blue bottle on a stone pedestal, surrounded by botanical leaves and delicate white flowers. Soft natural light, a quiet editorial composition.";
 const jobs: GenerationJob[] = [
@@ -76,15 +97,39 @@ const jobs: GenerationJob[] = [
     createdAt: "2026-10-03T12:00:00Z",
   },
 ];
+const videoJob: GenerationJob = {
+  id: "sample-video-refunded",
+  modelId: videoModels[0].id,
+  displayName: videoModels[0].displayName,
+  mediaType: "video",
+  status: "Failed",
+  creditState: "Refunded",
+  credits: 20,
+  prompt: "Sample video history: a slow move around a blue bottle in natural light.",
+  settings: { aspectRatio: "16:9", duration: "4", resolution: "720p" },
+  outputUrl: null,
+  errorCode: "provider_error",
+  createdAt: "2026-10-02T12:00:00Z",
+};
+const longAssetJobs = Array.from({ length: 30 }, (_, index): GenerationJob => ({
+  ...jobs[index % jobs.length],
+  id: `sample-long-asset-${index + 1}`,
+  prompt: `${jobs[index % jobs.length].prompt} Sample asset ${index + 1} of 30.`,
+}));
 const screens = [
-  "Create",
-  "Library",
+  "Image",
+  "Video",
+  "Assets",
   "Account",
   "Costs",
   "Components",
 ] as const;
 const states = [
   "Result",
+  "Model picker",
+  "Alternate settings",
+  "Long video form",
+  "Long asset list",
   "Empty",
   "Reference",
   "Queued",
@@ -109,7 +154,7 @@ const longOptions = [
   { value: "long-label", label: "A deliberately long option label that remains readable on a narrow screen without hiding its meaning" },
 ];
 export default function DesignReview() {
-  const [screen, setScreen] = useState<(typeof screens)[number]>("Create");
+  const [screen, setScreen] = useState<(typeof screens)[number]>("Image");
   const [state, setState] = useState<(typeof states)[number]>("Result");
   const [dialog, setDialog] = useState(false);
   const [dialogTrigger, setDialogTrigger] = useState<HTMLButtonElement | null>(null);
@@ -118,6 +163,15 @@ export default function DesignReview() {
   const [dialogOption, setDialogOption] = useState("studio");
   const [edgeOption, setEdgeOption] = useState("option-1");
   const [sampleFilter, setSampleFilter] = useState("");
+  const isVideo = screen === "Video";
+  const longVideo = isVideo && state === "Long video form";
+  const currentModels = longVideo ? [longVideoModel] : isVideo ? videoModels : models;
+  const selectedModel = longVideo ? longVideoModel : isVideo ? videoModels[0] : state === "Alternate settings" ? models[2] : models[1];
+  function changeState(next: (typeof states)[number]) {
+    setState(next);
+    if (next === "Long video form") setScreen("Video");
+    if (next === "Long asset list") setScreen("Assets");
+  }
   const hasResult = ![
     "Empty",
     "Reference",
@@ -153,20 +207,28 @@ export default function DesignReview() {
             : null,
           outputUrl: status === "Completed" ? jobs[0].outputUrl : null,
         },
+        ...jobs.slice(1),
       ]
     : [];
   const fixture: StudioPreview = {
     models:
       state === "Unavailable"
-        ? models.map((m) => ({ ...m, availability: "approval_required" }))
-        : models,
-    modelId: models[1].id,
+        ? currentModels.map((m) => ({ ...m, availability: "disabled" }))
+        : currentModels,
+    modelId: selectedModel.id,
     authenticated: state !== "Signed out",
     prompt: state === "Empty" ? "" : prompt,
-    inputs: ["Result", "Reference"].includes(state)
+    inputs: longVideo
+      ? [{ role: "firstFrame", data: "/brand/reference.png" }, { role: "lastFrame", data: "/brand/campaign.webp" }]
+      : !isVideo && ["Result", "Reference"].includes(state)
       ? [{ role: "reference", data: "/brand/reference.png" }]
       : [],
-    jobs: resultJobs,
+    settings: longVideo ? { aspectRatio: "16:9", resolution: "720p", duration: 8, sampleAudio: "Enabled" } : undefined,
+    jobs: isVideo ? [] : resultJobs,
+    selectedJobId: resultJobs[0]?.id,
+    modelPickerOpen: state === "Model picker",
+    onKindChange: (kind) => setScreen(kind === "image" ? "Image" : "Video"),
+    onOpenAssets: () => setScreen("Assets"),
     loading: state === "Loading",
     error:
       state === "No balance"
@@ -174,7 +236,7 @@ export default function DesignReview() {
         : state === "Error"
           ? "The API could not be reached. No generation was confirmed; review your history before trying again."
           : undefined,
-    quote: ["Reference", "Result"].includes(state)
+    quote: !isVideo && ["Reference", "Result"].includes(state)
       ? {
           quoteId: "sample-quote",
           credits: 15,
@@ -184,15 +246,14 @@ export default function DesignReview() {
       : undefined,
   };
   return (
-    <>
+    <div className="design-review">
       <section className="review-controls" aria-label="Design review controls">
         <div>
           <span className="status-badge warning">
             Design preview — sample data
           </span>
           <p>
-            Production components. Local fixtures. No generation or account
-            requests.
+            {longVideo ? "Long form · Audio is a layout-only sample. No generation or account requests." : "Production components. Local fixtures. No generation or account requests."}
           </p>
         </div>
         <div className="review-selectors">
@@ -210,29 +271,39 @@ export default function DesignReview() {
             <Select
               aria-label="State"
               value={state}
-              onValueChange={setState}
+              onValueChange={changeState}
               options={states.map(value => ({ value, label: value }))}
             />
           </label>
         </div>
       </section>
-      {screen === "Create" && (
+      <div className="review-viewport">
+      <AppShell preview={{
+        active: screen === "Video" ? "video" : screen === "Assets" ? "assets" : ["Account", "Costs"].includes(screen) ? "account" : "image",
+        credits: state === "No balance" ? 0 : 80,
+        onNavigate: (destination) => setScreen(destination === "image" ? "Image" : destination === "video" ? "Video" : destination === "assets" ? "Assets" : "Account"),
+      }}>
+      {(screen === "Image" || screen === "Video") && (
         <GenerationWorkspace
-          key={`create-${state}`}
-          kind="image"
+          key={`${screen}-${state}`}
+          kind={isVideo ? "video" : "image"}
           preview={fixture}
         />
       )}
-      {screen === "Library" && (
+      {screen === "Assets" && (
         <GenerationLibrary
           key={`library-${state}`}
           preview={{
             jobs:
               state === "Empty"
                 ? []
+                : state === "Long asset list"
+                  ? longAssetJobs
                 : state === "Refunded"
-                  ? [...jobs, ...resultJobs]
-                  : jobs,
+                  ? [...resultJobs, videoJob]
+                  : [...jobs, videoJob],
+            models,
+            onCreate: () => setScreen("Image"),
             authenticated: state !== "Signed out",
             loading: state === "Loading",
             error:
@@ -357,6 +428,8 @@ export default function DesignReview() {
           </Dialog>
         </main>
       )}
-    </>
+    </AppShell>
+    </div>
+    </div>
   );
 }

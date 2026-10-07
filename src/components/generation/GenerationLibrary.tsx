@@ -1,18 +1,24 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowRight, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../context/AuthContext";
-import { cancelGeneration, generationHistory } from "../../lib/generation-api";
+import { cancelGeneration, generationCatalog, generationHistory } from "../../lib/generation-api";
 import { generationError, terminalGeneration } from "../../lib/generation";
-import type { GenerationJob } from "../../types/generation";
-import { AssetCard } from "./GenerationPresentation";
-import GenerationResult from "./GenerationResult";
+import { catalogSupportsAnimate, catalogSupportsReference, filterAssets, type AssetMediaFilter as MediaFilter } from "../../lib/generation-assets";
+import type { GenerationJob, GenerationModel } from "../../types/generation";
+import { AssetCard, AssetMediaFilter } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
 import { Select } from "../ui/StudioUI";
+import { ScrollRegion } from "../ui/ScrollRegion";
 import "./studio.css";
+
+const GenerationResult = dynamic(() => import("./GenerationResult"), {
+  loading: () => <p role="status" className="studio-help">Loading asset details…</p>,
+});
 
 /** Local review data only: supplying this fixture suppresses all API requests/actions. */
 export interface LibraryPreview {
@@ -20,6 +26,8 @@ export interface LibraryPreview {
   loading?: boolean;
   error?: string;
   authenticated?: boolean;
+  models?: GenerationModel[];
+  onCreate?: () => void;
 }
 
 export default function GenerationLibrary({
@@ -56,9 +64,26 @@ function Library({
   const [query, setQuery] = useState("");
   const [model, setModel] = useState("");
   const [status, setStatus] = useState("");
+  const [media, setMedia] = useState<MediaFilter>("all");
+  const [canReference, setCanReference] = useState(() => catalogSupportsReference(preview?.models ?? []));
+  const [canAnimate, setCanAnimate] = useState(() => catalogSupportsAnimate(preview?.models ?? []));
   const [selected, setSelected] = useState<string | null>(null);
   const scope = useRef<AbortController | null>(null);
   const previousStates = useRef<Record<string, string>>({});
+  useEffect(() => {
+    if (preview || !authenticated) return;
+    const controller = new AbortController();
+    generationCatalog(controller.signal).then((catalog) => {
+      if (!controller.signal.aborted) {
+        setCanReference(catalogSupportsReference(catalog));
+        setCanAnimate(catalogSupportsAnimate(catalog));
+      }
+    }).catch(() => {
+      // History and downloads remain useful when the catalog is unavailable.
+      if (!controller.signal.aborted) { setCanReference(false); setCanAnimate(false); }
+    });
+    return () => controller.abort();
+  }, [preview, authenticated]);
   useEffect(() => {
     if (preview || !authenticated) return;
     const controller = new AbortController();
@@ -107,20 +132,14 @@ function Library({
       Array.from(new Map(jobs.map((job) => [job.modelId, job.displayName]))),
     [jobs],
   );
-  const filtered = jobs.filter(
-    (job) =>
-      (model === "" || job.modelId === model) &&
-      (status === "" || job.status === status) &&
-      `${job.prompt} ${job.displayName} ${job.status}`
-        .toLocaleLowerCase("en-US")
-        .includes(query.trim().toLocaleLowerCase("en-US")),
-  );
+  const selectedMedia = media === "all" || jobs.some((job) => job.mediaType === media) ? media : "all";
+  const filtered = filterAssets(jobs, { media: selectedMedia, model, status, query });
   const selectedJob = jobs.find((job) => job.id === selected);
-  function continueWith(job: GenerationJob, action: "reuse" | "reference") {
+  function continueWith(job: GenerationJob, action: "reuse" | "reference" | "animate") {
     if (preview || !authenticated) return;
     // IDs convey intent; the destination reloads this job from owned history.
     router.push(
-      `/create/${action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`,
+      `/create/${action === "animate" ? "video" : action === "reference" ? "image" : job.mediaType}?job=${encodeURIComponent(job.id)}&action=${action}`,
     );
   }
   async function cancel(id: string) {
@@ -137,19 +156,20 @@ function Library({
     setQuery("");
     setModel("");
     setStatus("");
+    setMedia("all");
   }
   return (
     <main className="studio-page library-page">
       <header className="studio-page-heading">
         <div>
           <p className="eyebrow">Your work, ready to continue</p>
-          <h1>Library</h1>
-          <p className="muted">Choose a creation. Find its next direction.</p>
+          <h1>Assets</h1>
+          <p className="muted">Recent generated assets. Choose a creation to continue.</p>
         </div>
-        <Link href="/create/image" className="ui-button">
+        {preview ? <button type="button" className="ui-button" disabled={!preview.onCreate} onClick={preview.onCreate}>Create an image<ArrowRight size={17} /></button> : <Link href="/create/image" className="ui-button">
           Create an image
           <ArrowRight size={17} />
-        </Link>
+        </Link>}
       </header>
       {preview ? (
         <p className="studio-preview-label">
@@ -157,20 +177,22 @@ function Library({
           disabled.
         </p>
       ) : null}
+      <ScrollRegion className="library-content-scroll" label="Recent generated assets">
       {!authenticated ? (
         <div className="library-empty">
           <span className="studio-frame-mark" aria-hidden="true" />
           <h2>Your work belongs here.</h2>
           <p>
             Sign in to see your recent creations, review settings and prepare
-            your next variation.
+            your next creation.
           </p>
-          <Link href="/login" className="ui-button">
-            Sign in to view Library
-          </Link>
+          {preview ? <button type="button" className="ui-button" disabled>Sign in to view Assets</button> : <Link href="/login" className="ui-button">
+            Sign in to view Assets
+          </Link>}
         </div>
       ) : (
         <>
+          <AssetMediaFilter jobs={jobs} value={selectedMedia} onChange={setMedia} />
           <section
             className="library-filters"
             aria-label="Filter recent creations"
@@ -210,6 +232,7 @@ function Library({
                   "Completed",
                   "Failed",
                   "Cancelled",
+                  "Refunded",
                 ].map((value) => ({ value, label: value }))]}
               />
             </label>
@@ -226,7 +249,7 @@ function Library({
           </div>
           {error ? (
             <div className="studio-notice error" role="alert">
-              <strong>Your Library could not refresh.</strong>
+              <strong>Your assets could not refresh.</strong>
               <p>{error}</p>
               {jobs.length ? (
                 <p>Previously loaded results remain below.</p>
@@ -245,7 +268,7 @@ function Library({
             </div>
           ) : null}
           {loading ? (
-            <div className="library-grid" aria-label="Loading Library">
+            <div className="library-grid" aria-label="Loading Assets">
               {Array.from({ length: 6 }, (_, index) => (
                 <div key={index} className="library-skeleton studio-skeleton" />
               ))}
@@ -258,10 +281,10 @@ function Library({
                 Your recent creations will appear here. Open the studio to begin
                 with a prompt or a reference.
               </p>
-              <Link href="/create/image" className="ui-button">
+              {preview ? <button type="button" className="ui-button" disabled={!preview.onCreate} onClick={preview.onCreate}>Explore the studio<ArrowRight size={16} /></button> : <Link href="/create/image" className="ui-button">
                 Explore the studio
                 <ArrowRight size={16} />
-              </Link>
+              </Link>}
             </div>
           ) : jobs.length > 0 && !filtered.length ? (
             <div className="library-empty">
@@ -291,6 +314,7 @@ function Library({
           )}
         </>
       )}
+      </ScrollRegion>
       <StudioDialog
         open={!!selectedJob}
         onClose={() => setSelected(null)}
@@ -303,8 +327,12 @@ function Library({
             job={selectedJob}
             onReuse={(job) => continueWith(job, "reuse")}
             onReference={(job) => continueWith(job, "reference")}
+            onAnimate={(job) => continueWith(job, "animate")}
+            canAnimate={canAnimate}
             onCancel={cancel}
             preview={!!preview}
+            canReference={canReference}
+            owned={authenticated}
             detail
           />
         ) : null}

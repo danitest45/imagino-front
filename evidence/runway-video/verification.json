@@ -1,0 +1,15 @@
+{
+  "status": "PENDING_HUMAN_GATE",
+  "date": "2026-10-07",
+  "frontendUnitTests": { "passed": 41, "failed": 0 },
+  "frontendBuild": "PASS",
+  "animateBrowserMocks": { "passed": 2, "failed": 0, "automaticSubmissions": 0 },
+  "studioAssetsPickerLayoutBrowserMocks": { "passed": 34, "failed": 0, "note": "33 regressions passed; updated approval-required design review passed on focused rerun" },
+  "capabilitiesSource": "catalog schema: imageToVideo, firstFrame, required, ownedAssetOnly",
+  "sourceTransport": "authenticated Imagino generationDownload; exact PNG data URI with sourceAssetId",
+  "settings": { "duration": 5, "resolution": "720p" },
+  "quoteCredits": 54,
+  "realProviderCreationPosts": 0,
+  "realVideoOutput": null,
+  "scope": "feat/imagino-creative-hub-core Preview; no merge or production changes"
+}

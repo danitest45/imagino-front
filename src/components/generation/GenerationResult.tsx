@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Expand, ImagePlus, RotateCcw } from "lucide-react";
+import { Download, Expand, ImagePlus, LoaderCircle, RotateCcw, Clapperboard } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import type { GenerationJob } from "../../types/generation";
 import { generationDownload } from "../../lib/generation-api";
 import { generationError, terminalGeneration } from "../../lib/generation";
+import { availableAssetActions } from "../../lib/generation-assets";
 import {
   creditLabel,
   jobDate,
@@ -13,14 +14,20 @@ import {
   JobStatus,
 } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
+import { ScrollRegion } from "../ui/ScrollRegion";
 
 export interface GenerationResultProps {
   job: GenerationJob;
   onReuse: (job: GenerationJob) => void;
   onCancel?: (id: string) => Promise<void>;
   onReference?: (job: GenerationJob) => void;
+  onAnimate?: (job: GenerationJob) => void;
+  canAnimate?: boolean;
   preview?: boolean;
   detail?: boolean;
+  /** Only trusted, authenticated history supplies owned jobs to this component. */
+  owned: boolean;
+  canReference?: boolean;
 }
 
 export default function GenerationResult({
@@ -28,23 +35,33 @@ export default function GenerationResult({
   onReuse,
   onCancel,
   onReference,
+  onAnimate,
+  canAnimate = false,
   preview = false,
   detail = false,
+  owned,
+  canReference = !!onReference,
 }: GenerationResultProps) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [imageUnavailable, setImageUnavailable] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(false);
   const scope = useRef<AbortController | null>(null);
   const downloading = useRef(false);
-  const src = jobImageSource(job, preview);
+  const src = imageUnavailable ? null : jobImageSource(job, preview);
+  const actions = availableAssetActions(job, { owned, canReference: canReference && !!onReference, canAnimate: canAnimate && !!onAnimate });
   useEffect(() => {
     const controller = new AbortController();
     scope.current = controller;
     let url: string | null = null;
     setVideoUrl(null);
+    setImageUnavailable(false);
     setError(null);
-    if (!preview && job.mediaType === "video" && job.status === "Completed") {
+    setVideoLoading(false);
+    if (!preview && owned && job.mediaType === "video" && job.status === "Completed") {
+      setVideoLoading(true);
       generationDownload(job.id, controller.signal)
         .then((blob) => {
           if (controller.signal.aborted) return;
@@ -53,15 +70,18 @@ export default function GenerationResult({
         })
         .catch((e) => {
           if (!controller.signal.aborted) setError(generationError(e));
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setVideoLoading(false);
         });
     }
     return () => {
       controller.abort();
       if (url) URL.revokeObjectURL(url);
     };
-  }, [job.id, job.mediaType, job.status, preview]);
+  }, [job.id, job.mediaType, job.status, job.outputUrl, preview, owned]);
   async function download() {
-    if (preview || downloading.current) return;
+    if (preview || !owned || job.status !== "Completed" || downloading.current) return;
     const controller = scope.current;
     if (!controller || controller.signal.aborted) return;
     downloading.current = true;
@@ -84,7 +104,7 @@ export default function GenerationResult({
     }
   }
   async function cancel() {
-    if (preview || !onCancel || busy) return;
+    if (preview || !owned || job.status !== "Queued" || !onCancel || busy) return;
     const controller = scope.current;
     setBusy(true);
     try {
@@ -102,7 +122,7 @@ export default function GenerationResult({
       <div className="studio-result-toolbar">
         <div>
           <span className="eyebrow">
-            {detail ? "Creation details" : "Selected creation"}
+            {detail ? "Asset details" : "Selected asset"}
           </span>
           <h2>{job.displayName}</h2>
         </div>
@@ -118,6 +138,7 @@ export default function GenerationResult({
               sizes="(max-width: 850px) 100vw, 70vw"
               unoptimized
               className="studio-result-image"
+              onError={() => setImageUnavailable(true)}
             />
             <button
               type="button"
@@ -134,10 +155,12 @@ export default function GenerationResult({
           <video src={videoUrl} controls aria-label={job.prompt} />
         ) : null}
         {!src && !videoUrl ? (
-          <div className="studio-result-state">
-            <span className="studio-frame-mark" aria-hidden="true" />
+          <ScrollRegion className="studio-result-state" label="Generation status">
+            {videoLoading ? <LoaderCircle size={32} className="studio-spinner" aria-hidden="true" /> : <span className="studio-frame-mark" aria-hidden="true" />}
             <h3>
-              {!terminalGeneration(job.status)
+              {videoLoading
+                ? "Loading your video."
+                : !terminalGeneration(job.status)
                 ? "Your idea is taking shape."
                 : job.status === "Failed"
                   ? "This generation could not finish."
@@ -146,54 +169,39 @@ export default function GenerationResult({
                     : "The output is unavailable."}
             </h3>
             <p>
-              {!terminalGeneration(job.status)
+              {videoLoading
+                ? "Preparing playback from your completed output."
+                : !terminalGeneration(job.status)
                 ? `${job.status}. You can leave and return while this job runs.`
                 : "Your prompt and settings are available to reuse."}
             </p>
-          </div>
+          </ScrollRegion>
         ) : null}
       </div>
-      <div className="studio-result-footer">
+      <ScrollRegion className="studio-result-footer" label="Selected asset actions and details">
         <p className="studio-job-meta">
           {creditLabel(job)}
           <span>·</span>
           <time dateTime={job.createdAt}>{jobDate(job.createdAt)}</time>
         </p>
         <div className="studio-result-actions">
-          {job.status === "Completed" &&
-          job.mediaType === "image" &&
-          onReference ? (
-            <button
-              type="button"
-              className="ui-button"
-              disabled={preview}
-              onClick={() => onReference(job)}
-            >
-              <ImagePlus size={16} />
-              Use as reference
-            </button>
-          ) : null}
-          <button
-            type="button"
-            className="ui-button secondary"
-            disabled={preview}
-            onClick={() => onReuse(job)}
-          >
-            <RotateCcw size={16} />
-            Reuse prompt & settings
-          </button>
-          {job.status === "Completed" ? (
-            <button
-              type="button"
-              className="ui-button secondary"
-              disabled={busy || preview}
-              onClick={download}
-            >
-              <Download size={16} />
-              {busy ? "Preparing…" : "Download"}
-            </button>
-          ) : null}
-          {job.status === "Queued" && onCancel ? (
+          {actions.map((action) => {
+            const Icon = action.id === "animate" ? Clapperboard : action.id === "reference" ? ImagePlus : action.id === "reuse" ? RotateCcw : Download;
+            return (
+              <button key={action.id} type="button" className={`ui-button${action.primary ? "" : " secondary"}`} disabled={preview || (action.id === "download" && busy)} onClick={(event) => {
+                event.currentTarget.focus({ preventScroll: true });
+                if (preview || !owned) return;
+                if (action.id === "reference") onReference?.(job);
+                else if (action.id === "animate") onAnimate?.(job);
+                else if (action.id === "reuse") onReuse(job);
+                else void download();
+              }}>
+                <Icon size={16} />
+                {action.id === "download" && busy ? "Preparing…" : action.label}
+              </button>
+            );
+          })}
+          {owned && job.status === "Queued" && onCancel ? (
             <button
               type="button"
               className="ui-button ghost"
@@ -243,7 +251,7 @@ export default function GenerationResult({
             files are not stored in job history.
           </p>
         </details>
-      </div>
+      </ScrollRegion>
       <StudioDialog
         open={zoom}
         onClose={() => setZoom(false)}

@@ -38,9 +38,12 @@ test('HTTP failure and network timeout expose only an explicitly unavailable pre
   for (const fetch of [async () => ({ ok: false }), async () => { throw new Error('timeout'); }]) {
     const response = await route(enabled, fetch).GET();
     assert.equal(response.body.source, 'catalog_preview');
-    assert.equal(response.body.models.length, 6);
-    assert.ok(response.body.models.every(model => model.availability === 'deployment_pending'));
+    assert.equal(response.body.models.length, snapshot.models.length);
+    assert.ok(response.body.models.every(model => ['deployment_pending', 'approval_required'].includes(model.availability)));
     assert.equal(response.options.headers['Cache-Control'], 'no-store');
-    assert.ok(response.body.models.filter(model => model.mediaType === 'video').every(model => model.lifecycle === 'COMPATIBILITY' && model.retirementAt));
+    assert.ok(response.body.models.filter(model => model.mediaType === 'video' && model.id.startsWith('veo-')).every(model => model.lifecycle === 'COMPATIBILITY' && model.retirementAt));
+    const animate = response.body.models.find(model => model.id === 'runway-fast-video-20261007');
+    assert.deepEqual(animate.capabilities, ['imageToVideo', 'firstFrame']);
+    assert.equal(animate.inputs[0].ownedAssetOnly, true);
   }
 });

@@ -22,46 +22,45 @@ async function captureMockEvidence(page: Page, name: string) {
 async function openStudio(page: Page) {
   await page.goto('/create/image');
   await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Account', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
 }
 
 test('current quote is invalidated by prompt, settings and reference changes', async ({ page, context }) => {
   const mock = await mockStudio(context);
   await openStudio(page);
-  const prompt = page.getByRole('textbox', { name: 'Describe your idea' });
+  const prompt = page.getByRole('textbox', { name: 'Prompt' });
   await prompt.fill('A bottle in soft light');
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
 
   mock.holdQuotes = true;
   mock.quoteCredits = 21;
   await prompt.fill('A bottle in warm afternoon light');
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.quotes.at(-1)?.body.prompt).toBe('A bottle in warm afternoon light');
   await mock.releaseQuotes();
-  await expect(page.getByRole('button', { name: 'Create image · 21 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 21 credits', exact: true })).toBeEnabled();
 
   mock.quoteCredits = 23;
   await chooseOption(page, 'Aspect ratio', '16:9');
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.quotes.at(-1)?.body.settings.aspectRatio).toBe('16:9');
   await mock.releaseQuotes();
-  await expect(page.getByRole('button', { name: 'Create image · 23 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 23 credits', exact: true })).toBeEnabled();
 
-  await page.getByRole('button', { name: 'With a reference', exact: true }).click();
   mock.quoteCredits = 25;
   await page.getByLabel('Upload Reference image', { exact: true }).setInputFiles(referencePath);
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.quotes.at(-1)?.body.inputs).toHaveLength(1);
   expect(mock.quotes.at(-1)?.body.inputs[0].data).toMatch(/^data:image\/png;base64,/);
   await mock.releaseQuotes();
-  await expect(page.getByRole('button', { name: 'Create image · 25 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 25 credits', exact: true })).toBeEnabled();
 
   await page.getByRole('button', { name: 'Remove Reference image 1', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.quotes.at(-1)?.body.inputs).toEqual([]);
   await mock.releaseQuotes();
@@ -72,7 +71,6 @@ test('current quote is invalidated by prompt, settings and reference changes', a
 test('upload rejects unsupported files and prepares a valid public local reference', async ({ page, context }) => {
   const mock = await mockStudio(context);
   await openStudio(page);
-  await page.getByRole('button', { name: 'With a reference', exact: true }).click();
   const upload = page.getByLabel('Upload Reference image', { exact: true });
   await upload.setInputFiles({ name: 'not-an-image.txt', mimeType: 'text/plain', buffer: Buffer.from('No image content') });
   await expect(page.getByRole('form', { name: 'Create image controls' }).getByRole('alert')).toContainText('Use a PNG, JPEG or WebP image up to 10 MB.');
@@ -81,8 +79,8 @@ test('upload rejects unsupported files and prepares a valid public local referen
   await upload.setInputFiles(referencePath);
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
   await expect(page.getByRole('form', { name: 'Create image controls' }).getByRole('alert')).toHaveCount(0);
-  await page.getByRole('textbox', { name: 'Where do you want to take it?' }).fill('Explore a calm green background');
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('Explore a calm green background');
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
   expect(mock.quotes.at(-1)?.body.inputs[0].role).toBe('reference');
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);
@@ -91,13 +89,12 @@ test('upload rejects unsupported files and prepares a valid public local referen
 test('model change preserves references and settings until the user confirms', async ({ page, context }) => {
   const mock = await mockStudio(context);
   await openStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Keep this creative direction');
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('Keep this creative direction');
   await chooseOption(page, 'Aspect ratio', '4:3');
-  await page.getByRole('button', { name: 'With a reference', exact: true }).click();
   await page.getByLabel('Upload Reference image', { exact: true }).setInputFiles(referencePath);
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Model Studio Image', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Choose your model', exact: true }).getByRole('button', { name: /^Prompt Image/ }).click();
+  await page.getByRole('dialog', { name: 'Choose your model', exact: true }).getByRole('button', { name: 'Choose Prompt Image', exact: true }).click();
   const confirmation = page.getByRole('dialog', { name: 'Change model?', exact: true });
   await expect(confirmation).toBeVisible();
   await confirmation.getByRole('button', { name: 'Keep current model', exact: true }).click();
@@ -105,16 +102,16 @@ test('model change preserves references and settings until the user confirms', a
   await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toBeVisible();
   await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('4:3');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Where do you want to take it?' })).toHaveValue('Keep this creative direction');
+  await expect(page.getByRole('textbox', { name: 'Prompt' })).toHaveValue('Keep this creative direction');
 
   await page.getByRole('button', { name: 'Model Studio Image', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Choose your model', exact: true }).getByRole('button', { name: /^Prompt Image/ }).click();
+  await page.getByRole('dialog', { name: 'Choose your model', exact: true }).getByRole('button', { name: 'Choose Prompt Image', exact: true }).click();
   await confirmation.getByRole('button', { name: 'Change model', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Model Prompt Image', exact: true })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue('Keep this creative direction');
+  await expect(page.getByRole('textbox', { name: 'Prompt' })).toHaveValue('Keep this creative direction');
   await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('1:1');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'With a reference', exact: true })).toBeDisabled();
+  await expect(page.getByLabel('Upload Reference image', { exact: true })).toHaveCount(0);
   await expect.poll(() => mock.quotes.at(-1)?.body.modelId).toBe('test-prompt');
   expect(mock.quotes.at(-1)?.body.inputs).toEqual([]);
   expect(mock.submissions).toHaveLength(0);
@@ -126,8 +123,8 @@ test('duplicate click is blocked and ambiguous submission replays the exact body
   mock.failedSubmissions = 1;
   mock.holdSubmissions = true;
   await openStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('A single deliberate creation');
-  const create = page.getByRole('button', { name: 'Create image · 15 credits', exact: true });
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('A single deliberate creation');
+  const create = page.getByRole('button', { name: 'Generate image · 15 credits', exact: true });
   await expect(create).toBeEnabled();
   await create.dblclick();
   await expect(page.getByRole('button', { name: 'Submitting…', exact: true })).toBeDisabled();
@@ -193,8 +190,8 @@ test('Use as reference downloads the owned result and prepares a new input witho
   expect(mock.downloads[0].authorization).toBe(`Bearer ${TEST_TOKEN}`);
   expect(new URL(mock.downloads[0].url).search).toBe('');
   expect(mock.submissions).toHaveLength(0);
-  await page.getByRole('textbox', { name: 'Where do you want to take it?' }).fill('Explore a warmer variation');
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('Explore a warmer variation');
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
   expect(mock.quotes.at(-1)?.body.inputs).toHaveLength(1);
   expect(mock.submissions).toHaveLength(0);
   await captureMockEvidence(page, 'http-mock-reference-prepared.png');
@@ -207,10 +204,10 @@ test('Reuse restores prompt and supported settings but does not invent original 
   await page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true }).click();
   await page.getByRole('dialog', { name: 'Your creation', exact: true }).getByRole('button', { name: 'Reuse prompt & settings', exact: true }).click();
   await expect(page).toHaveURL(/\/create\/image$/);
-  await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue(jobs[0].prompt);
+  await expect(page.getByRole('textbox', { name: 'Prompt' })).toHaveValue(jobs[0].prompt);
   await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('4:3');
   await expect(page.getByText('Prompt and supported settings restored. Original reference files are not included.', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
   expect(mock.quotes.at(-1)?.body.inputs).toEqual([]);
   expect(mock.downloads).toHaveLength(0);
   expect(mock.submissions).toHaveLength(0);
@@ -221,11 +218,11 @@ test('failed reference download preserves the current prompt and settings', asyn
   const mock = await mockStudio(context, jobs);
   mock.failDownloads = true;
   await openStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('Keep this unsent draft');
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('Keep this unsent draft');
   await chooseOption(page, 'Aspect ratio', '16:9');
   await page.getByRole('region', { name: 'Creation result' }).getByRole('button', { name: 'Use as reference', exact: true }).click();
   await expect(page.getByRole('form', { name: 'Create image controls' }).getByRole('alert')).toContainText('Reference could not be prepared.');
-  await expect(page.getByRole('textbox', { name: 'Describe your idea' })).toHaveValue('Keep this unsent draft');
+  await expect(page.getByRole('textbox', { name: 'Prompt' })).toHaveValue('Keep this unsent draft');
   await expect(page.getByRole('combobox', { name: 'Aspect ratio' })).toHaveText('16:9');
   await expect(page.getByRole('img', { name: 'Reference image 1', exact: true })).toHaveCount(0);
   expect(mock.submissions).toHaveLength(0);
@@ -238,11 +235,11 @@ test('Library shows distinct empty, unavailable and signed-out states', async ({
   await expect(page.getByRole('heading', { name: 'A place for your possibilities.' })).toBeVisible();
   mock.failHistory = true;
   await page.reload();
-  await expect(page.getByRole('alert').filter({ hasText: 'Your Library could not refresh.' })).toContainText('Your Library could not refresh.');
+  await expect(page.getByRole('alert').filter({ hasText: 'Your assets could not refresh.' })).toContainText('Your assets could not refresh.');
   await expect(page.getByRole('heading', { name: 'A place for your possibilities.' })).toHaveCount(0);
   mock.authenticated = false;
   await page.reload();
-  await expect(page.getByRole('link', { name: 'Sign in to view Library', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to view Assets', exact: true })).toBeVisible();
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);
 });
@@ -253,14 +250,14 @@ test('logout clears private Library immediately even when the logout request fai
   await page.goto('/library');
   await expect(page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
-  await expect(page.getByRole('link', { name: 'Sign in to view Library', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to view Assets', exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: /^Open .* (Completed|Failed),/ })).toHaveCount(0);
   await expect.poll(() => mock.pendingLogout.length).toBe(1);
   const historyBefore = mock.historyRequests;
   await mock.releaseLogout();
   await expect(page).toHaveURL(/\/$/);
   await page.goto('/library');
-  await expect(page.getByRole('link', { name: 'Sign in to view Library', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Sign in to view Assets', exact: true })).toBeVisible();
   expect(mock.historyRequests).toBe(historyBefore);
   expect(mock.logoutRequests).toBe(1);
   expect(mock.submissions).toHaveLength(0);
@@ -271,30 +268,30 @@ test('expired quote cannot submit while its replacement is pending', async ({ pa
   const mock = await mockStudio(context);
   mock.quoteExpiresInMs = 900;
   await openStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('A scene with a current quote');
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeEnabled();
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('A scene with a current quote');
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeEnabled();
   mock.holdQuotes = true;
   mock.quoteCredits = 18;
   await expect(page.getByText('The previous quote expired. Calculating the current cost.', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await expect.poll(() => mock.pendingQuotes.length).toBe(1);
   expect(mock.submissions).toHaveLength(0);
   expect(mock.quotes).toHaveLength(2);
   mock.quoteExpiresInMs = 60_000;
   await mock.releaseQuotes();
-  await expect(page.getByRole('button', { name: 'Create image · 18 credits', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 18 credits', exact: true })).toBeEnabled();
   expect(mock.submissions).toHaveLength(0);
   expect(mock.unexpectedRequests).toEqual([]);
 });
 
 test('deployment-pending model cannot quote or submit for an authenticated account', async ({ page, context }) => {
   const mock = await mockStudio(context);
-  mock.models[0].availability = 'deployment_pending';
+  mock.models.forEach(model => { model.availability = 'deployment_pending'; });
   await openStudio(page);
-  await page.getByRole('textbox', { name: 'Describe your idea' }).fill('This idea must remain an unsent draft');
-  await expect(page.getByText('Generation unavailable', { exact: true })).toBeVisible();
+  await page.getByRole('textbox', { name: 'Prompt' }).fill('This idea must remain an unsent draft');
+  await expect(page.getByRole('button', { name: 'Model Studio Image', exact: true })).toContainText('Generation unavailable');
   await expect(page.getByText('Creation is currently unavailable.', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create image', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image', exact: true })).toBeDisabled();
   await chooseOption(page, 'Aspect ratio', '16:9');
   // Observe beyond the 450 ms quote debounce to catch an accidentally queued request.
   await page.waitForTimeout(700);
@@ -312,7 +309,7 @@ test('design review sends no account or generation HTTP and disables sample acti
   });
   await page.goto('/design-review');
   await expect(page.getByText('Design preview — sample data', { exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Create image · 15 credits', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Generate image · 15 credits', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Reuse prompt & settings', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Download', exact: true })).toBeDisabled();
@@ -320,7 +317,7 @@ test('design review sends no account or generation HTTP and disables sample acti
   await expect(page.getByLabel('Upload Reference images', { exact: true })).toBeDisabled();
   await chooseOption(page, 'State', 'Queued');
   await expect(page.getByRole('button', { name: 'Cancel job', exact: true })).toBeDisabled();
-  await chooseOption(page, 'Surface', 'Library');
+  await chooseOption(page, 'Surface', 'Assets');
   await page.getByRole('button', { name: 'Open Studio Image, Completed, Oct 5, 2026', exact: true }).click();
   const detail = page.getByRole('dialog', { name: 'Your creation', exact: true });
   await expect(detail.getByRole('button', { name: 'Use as reference', exact: true })).toBeDisabled();

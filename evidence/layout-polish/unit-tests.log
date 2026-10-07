@@ -1,0 +1,51 @@
+
+> imagino-front@0.1.0 test
+> node --test
+
+✔ an old account response cannot refresh or retry using the new account (184.7933ms)
+✔ logout clears the memory token even if the network rejects revocation (30.0951ms)
+✔ concurrent refresh requests share one cookie rotation and keep JWT in memory (22.179ms)
+✔ logout waits for cookie rotation and revokes the rotated session (17.7795ms)
+✔ concurrent logout requests share one revocation and block new refreshes (18.4963ms)
+✔ adds numbers correctly (1.1477ms)
+✔ checkout sends only selected plan with authenticated fetch (134.1169ms)
+✔ portal posts no client economic settings (29.4793ms)
+✔ server billing state is fetched without session_id authority (15.011ms)
+✔ unsafe Checkout destination rejected: http://checkout.stripe.com/x (18.1799ms)
+✔ unsafe Checkout destination rejected: https://checkout.stripe.com.evil.test/x (18.7737ms)
+✔ unsafe Checkout destination rejected: https://evil.test/x (13.5513ms)
+✔ unsafe Checkout destination rejected: https://user@checkout.stripe.com/x (13.1897ms)
+✔ asset actions require owned history and implemented capability contracts (8.509ms)
+✔ reference preparation follows a real image reference input schema, never an edit capability label (1.4405ms)
+✔ media filters are derived only from loaded assets (0.4226ms)
+✔ asset filters combine media, model, prompt and confirmed refund state without mutating history (0.4862ms)
+✔ catalog refuses disabled or non-staging targets before contacting a backend (154.9484ms)
+✔ healthy catalog preserves live capabilities and availability without caching (21.4951ms)
+✔ HTTP failure and network timeout expose only an explicitly unavailable preview (31.378ms)
+✔ model presentation preserves native identity and uses explicit catalog categories for intent (3.0214ms)
+✔ unknown providers are not inferred and future catalog metadata overrides the legacy adapter (0.5573ms)
+✔ picker groups by intent and searches model identity and schema capabilities without enabling unavailable items (0.8852ms)
+✔ compatible model transition preserves exact reference bytes and current settings without confirmation (0.793ms)
+✔ incompatible model transition reports each removal while keeping compatible references and settings (0.4465ms)
+✔ video transitions apply declared field dependencies and preserve integer request values (0.3443ms)
+✔ catalog field types control defaults without provider-specific UI branches (1.5673ms)
+✔ video capability combinations fail before submission (0.6488ms)
+✔ only final generation states terminate processing (0.2905ms)
+✔ legacy history states normalize without modifying stored jobs (0.2636ms)
+✔ generation submission uses authenticated API and preserves caller idempotency (30.5329ms)
+✔ media proxy rejects private and arbitrary hosts before making a request (9.7426ms)
+✔ media proxy rejects private DNS answers, including IPv6 and mapped IPv4 (0.9252ms)
+✔ proxy pins the checked DNS result and refuses redirects (36.9882ms)
+✔ proxy aborts when an allowed host resolves to a private address (23.3699ms)
+✔ proxy permits only the exact configured staging host over HTTPS (0.5105ms)
+✔ proxy rejects invalid MIME, declared oversized content and streaming overflow (50.1052ms)
+✔ proxy accepts a bounded image response and preserves its MIME (18.3447ms)
+✔ all isolated branches refuse production, wrong API, wrong bucket and missing feature gate (28.4577ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1386.7236

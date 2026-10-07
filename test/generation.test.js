@@ -31,6 +31,16 @@ test('only final generation states terminate processing', () => {
   for (const state of ['Completed', 'Failed', 'Cancelled']) assert.equal(generation.terminalGeneration(state), true);
 });
 
+test('schema-required first frame blocks quote and submit until an owned asset is prepared', () => {
+  const model = { inputs: [{ role: 'firstFrame', label: 'First frame', required: true, ownedAssetOnly: true }], rules: [] };
+  const request = { settings: { duration: 5, resolution: '720p' }, inputs: [] };
+  assert.match(generation.generationConstraintError(model, request), /first frame/);
+  request.inputs = [{ role: 'firstFrame', data: 'data:image/png;base64,fixture' }];
+  assert.match(generation.generationConstraintError(model, request), /Assets/);
+  request.inputs[0].sourceAssetId = 'owned-bottle';
+  assert.equal(generation.generationConstraintError(model, request), null);
+});
+
 test('legacy history states normalize without modifying stored jobs', () => {
   assert.equal(generation.normalizeLegacyGenerationStatus('Created'), 'Queued');
   assert.equal(generation.normalizeLegacyGenerationStatus('RUNNING'), 'Processing');

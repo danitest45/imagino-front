@@ -1,0 +1,64 @@
+
+> imagino-front@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.27
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 8.3s
+   Linting and checking validity of types ...
+
+./src/app/images/[slug]/page.tsx
+647:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+1178:25  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ImageCard.tsx
+36:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/ImageCardModal.tsx
+121:15  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/profile/UserInfo.tsx
+74:32  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/20) ...
+   Generating static pages (5/20)
+   Generating static pages (10/20)
+   Generating static pages (15/20)
+ ✓ Generating static pages (20/20)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                    2.23 kB         114 kB
+├ ○ /_not-found                            999 B         104 kB
+├ ƒ /api/generation/catalog                131 B         103 kB
+├ ƒ /api/images/optimize                   131 B         103 kB
+├ ○ /checkout/cancel                       184 B         107 kB
+├ ○ /checkout/success                    3.77 kB         110 kB
+├ ○ /confirm-email                       2.24 kB         148 kB
+├ ƒ /create/[kind]                       4.29 kB         163 kB
+├ ƒ /design-review                        8.1 kB         185 kB
+├ ○ /forgot-password                     2.23 kB         148 kB
+├ ○ /google-auth                         1.73 kB         105 kB
+├ ○ /images                                870 B         108 kB
+├ ƒ /images/[slug]                       12.2 kB         158 kB
+├ ○ /library                             3.62 kB         155 kB
+├ ○ /login                               3.06 kB         149 kB
+├ ○ /pricing                              5.5 kB         145 kB
+├ ○ /profile                              6.3 kB         149 kB
+├ ○ /register                            2.25 kB         148 kB
+├ ○ /reset-password                       2.4 kB         149 kB
+├ ○ /verify                              2.55 kB         149 kB
+└ ○ /videos                              3.36 kB         111 kB
++ First Load JS shared by all             103 kB
+  ├ chunks/1255-5cd2fe06309409a0.js      46.5 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)          2.58 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand

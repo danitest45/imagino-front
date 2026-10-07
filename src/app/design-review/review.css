@@ -1,21 +1,44 @@
+.design-review, .review-viewport { min-width: 0; }
 .review-controls {
   border-bottom: 1px solid var(--border);
   background: var(--surface-tint);
-  padding: 20px max(24px, calc((100vw - 1344px) / 2));
+  padding: 10px 24px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
 }
+.review-controls > div:first-child {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1 1 280px;
+  min-width: 0;
+  gap: 8px 12px;
+}
 .review-controls p {
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--muted);
   font-size: 12px;
 }
 .review-selectors {
   display: flex;
+  flex-shrink: 0;
   gap: 12px;
+}
+@media (min-width: 1120px) {
+  .design-review {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .review-viewport {
+    min-height: 0;
+    overflow: hidden;
+  }
 }
 .review-selectors label {
   display: grid;

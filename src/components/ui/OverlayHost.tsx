@@ -2,8 +2,8 @@
 
 import { createContext, useContext, type ReactNode } from "react";
 
-// Native dialogs occupy the browser's top layer. Their popup descendants must
-// remain inside that dialog instead of being portaled behind it to document.body.
+// Keep popup descendants inside their active dialog for nested focus management,
+// stacking, and compatibility with any remaining native top-layer dialogs.
 const OverlayContainer = createContext<HTMLElement | null>(null);
 
 export function OverlayHost({ container, children }: {
@@ -25,9 +25,9 @@ const inertOwners = new WeakMap<HTMLElement, { count: number; previous: string |
 
 /** Radix Select hides other branches from assistive technology and traps focus.
  * Also make those branches genuinely unfocusable while its modal list is open.
- * Never inert an ancestor of the popup or of its native top-layer dialog. */
+ * Never inert an ancestor of the popup or its containing dialog. */
 export function inertOutsidePopup(popup: HTMLElement) {
-  const boundary = popup.closest<HTMLDialogElement>("dialog[open]") ?? popup.ownerDocument.body;
+  const boundary = popup.closest<HTMLElement>("[data-imagino-dialog], dialog[open]") ?? popup.ownerDocument.body;
   const acquired = new Set<HTMLElement>();
   let released = false;
 

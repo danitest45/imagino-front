@@ -41,6 +41,19 @@ yarn-error.log*
 /playwright-report
 /.playwright-browsers
 /evidence/theme/test-results-*/
+/evidence/creative-hub/*-test-results/
+/evidence/creative-hub/*-results/
+/evidence/creative-hub/behavior/*.png
+/evidence/creative-hub/initial.png
+/evidence/creative-hub/browser-integration.log
+/evidence/creative-hub/capture.log
+/evidence/creative-hub/browser-compiled.log
+/evidence/creative-hub/navigation-check.log
+/evidence/creative-hub/firefox-launch-diagnostic*.log
+/evidence/layout-polish/*-test-results/
+/evidence/layout-polish/*-results/
+/evidence/layout-polish/inspection.png
+/evidence/layout-polish/capture-*.log
 
 # typescript
 *.tsbuildinfo

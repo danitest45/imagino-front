@@ -1,0 +1,157 @@
+{
+  "method": "Double precomputed font sizes on all currently rendered HTML elements in the local Long video form, Failed and Queued fixtures; no CSS zoom. Newly mounted popup content retains its normal type size. Separate browser-zoom emulation checks whole-interface reflow.",
+  "elementsScaled": 194,
+  "audioValue": "Disabled",
+  "lastSettingVisible": true,
+  "generateVisible": true,
+  "blocked": [],
+  "errors": [],
+  "geometry": {
+    "width": 1366,
+    "height": 768,
+    "documentHeight": 768,
+    "documentWidth": 1366,
+    "controls": {
+      "top": 416.25,
+      "bottom": 515.234375,
+      "height": 98.984375,
+      "width": 326,
+      "scrollHeight": 2062,
+      "clientHeight": 99,
+      "fontSize": "30px"
+    },
+    "footer": {
+      "top": 523.234375,
+      "bottom": 727,
+      "height": 203.765625,
+      "width": 318,
+      "scrollHeight": 203,
+      "clientHeight": 203,
+      "fontSize": "30px"
+    },
+    "generate": {
+      "top": 666.609375,
+      "bottom": 727,
+      "height": 60.390625,
+      "width": 318,
+      "scrollHeight": 58,
+      "clientHeight": 58,
+      "fontSize": "26px"
+    },
+    "lastSetting": {
+      "top": 425.9375,
+      "bottom": 504.828125,
+      "height": 78.890625,
+      "width": 152,
+      "scrollHeight": 77,
+      "clientHeight": 77,
+      "fontSize": "26px"
+    }
+  },
+  "statusCases": [
+    {
+      "state": "Failed",
+      "elementsScaled": 197,
+      "firstHeadingReachable": true,
+      "lastParagraphReachable": true,
+      "top": {
+        "region": {
+          "top": 385.859375,
+          "bottom": 455.6875,
+          "height": 69.828125
+        },
+        "heading": {
+          "top": 417.859375,
+          "bottom": 472.453125,
+          "height": 54.59375
+        },
+        "lastParagraph": {
+          "top": 480.453125,
+          "bottom": 563.640625,
+          "height": 83.1875
+        },
+        "scrollTop": 0,
+        "scrollHeight": 194,
+        "clientHeight": 70,
+        "documentHeight": 768,
+        "documentWidth": 1366,
+        "viewportWidth": 1366
+      },
+      "bottom": {
+        "region": {
+          "top": 385.859375,
+          "bottom": 455.6875,
+          "height": 69.828125
+        },
+        "heading": {
+          "top": 293.859375,
+          "bottom": 348.453125,
+          "height": 54.59375
+        },
+        "lastParagraph": {
+          "top": 356.453125,
+          "bottom": 439.640625,
+          "height": 83.1875
+        },
+        "scrollTop": 124,
+        "scrollHeight": 194,
+        "clientHeight": 70,
+        "documentHeight": 768,
+        "documentWidth": 1366,
+        "viewportWidth": 1366
+      }
+    },
+    {
+      "state": "Queued",
+      "elementsScaled": 197,
+      "firstHeadingReachable": true,
+      "lastParagraphReachable": true,
+      "top": {
+        "region": {
+          "top": 385.859375,
+          "bottom": 455.6875,
+          "height": 69.828125
+        },
+        "heading": {
+          "top": 417.859375,
+          "bottom": 472.453125,
+          "height": 54.59375
+        },
+        "lastParagraph": {
+          "top": 480.453125,
+          "bottom": 563.640625,
+          "height": 83.1875
+        },
+        "scrollTop": 0,
+        "scrollHeight": 194,
+        "clientHeight": 70,
+        "documentHeight": 768,
+        "documentWidth": 1366,
+        "viewportWidth": 1366
+      },
+      "bottom": {
+        "region": {
+          "top": 385.859375,
+          "bottom": 455.6875,
+          "height": 69.828125
+        },
+        "heading": {
+          "top": 293.859375,
+          "bottom": 348.453125,
+          "height": 54.59375
+        },
+        "lastParagraph": {
+          "top": 356.453125,
+          "bottom": 439.640625,
+          "height": 83.1875
+        },
+        "scrollTop": 124,
+        "scrollHeight": 194,
+        "clientHeight": 70,
+        "documentHeight": 768,
+        "documentWidth": 1366,
+        "viewportWidth": 1366
+      }
+    }
+  ]
+}

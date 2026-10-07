@@ -1,15 +1,14 @@
 "use client";
 import {
-  useEffect,
   useId,
-  useState,
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
   type TextareaHTMLAttributes,
   type ReactNode,
 } from "react";
-import { Loader2, X } from "lucide-react";
-import { OverlayHost, hasOpenPopup } from "./OverlayHost";
+import { Loader2 } from "lucide-react";
+export { Dialog } from "./Dialog";
+export type { DialogProps } from "./Dialog";
 export { Select } from "./Select";
 export type { SelectProps, SelectOption } from "./Select";
 export function Button({
@@ -109,71 +108,5 @@ export function Tooltip({
         {label}
       </span>
     </span>
-  );
-}
-export function Dialog({
-  open,
-  onClose,
-  title,
-  children,
-  returnFocusTo,
-}: {
-  open: boolean;
-  onClose: () => void;
-  title: string;
-  children: ReactNode;
-  /** Explicit trigger for browsers that do not focus buttons on pointer activation. */
-  returnFocusTo?: HTMLElement | null;
-}) {
-  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
-  const titleId = useId();
-  useEffect(() => {
-    const element = dialog;
-    if (!open || !element) return;
-    const previous = returnFocusTo ?? document.activeElement as HTMLElement | null;
-    if (!element.open) element.showModal();
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      element.close();
-      document.body.style.overflow = previousOverflow;
-      if (previous?.isConnected) previous.focus({ preventScroll: true });
-    };
-  }, [open, dialog, returnFocusTo]);
-  return (
-    <dialog
-      ref={setDialog}
-      className="ui-dialog"
-      aria-labelledby={titleId}
-      onCancel={(event) => {
-        event.preventDefault();
-        if (hasOpenPopup(event.currentTarget)) return;
-        onClose();
-      }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          const r = event.currentTarget.getBoundingClientRect();
-          if (
-            event.clientX < r.left ||
-            event.clientX > r.right ||
-            event.clientY < r.top ||
-            event.clientY > r.bottom
-          )
-            onClose();
-        }
-      }}
-    >
-      {open && (
-        <OverlayHost container={dialog}>
-          <header className="ui-dialog-heading">
-            <h2 id={titleId}>{title}</h2>
-            <IconButton label="Close dialog" onClick={onClose}>
-              <X size={20} />
-            </IconButton>
-          </header>
-          {children}
-        </OverlayHost>
-      )}
-    </dialog>
   );
 }
