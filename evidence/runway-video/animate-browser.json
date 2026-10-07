@@ -75,12 +75,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 2227,
+                  "duration": 2304,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-07T15:39:44.024Z",
+                  "startTime": "2026-10-07T15:47:49.582Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -109,12 +109,12 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "passed",
-                  "duration": 636,
+                  "duration": 708,
                   "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2026-10-07T15:39:46.790Z",
+                  "startTime": "2026-10-07T15:47:52.424Z",
                   "annotations": [],
                   "attachments": []
                 }
@@ -124,7 +124,7 @@
           ],
           "id": "c96f96a571a298850529-e954af58aff1dfd50dd6",
           "file": "animate-video.spec.ts",
-          "line": 32,
+          "line": 33,
           "column": 5
         }
       ]
@@ -132,8 +132,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-10-07T15:39:42.672Z",
-    "duration": 4957.286,
+    "startTime": "2026-10-07T15:47:48.136Z",
+    "duration": 5270.2339999999995,
     "expected": 2,
     "skipped": 0,
     "unexpected": 0,

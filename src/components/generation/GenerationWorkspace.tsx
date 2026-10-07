@@ -471,6 +471,7 @@ function Workspace({
       setSelected(target.id);
       setSettings(defaultGenerationSettings(target));
       setInputs([{ role: "firstFrame", data, sourceAssetId: job.id }]);
+      setSelectedJob(job.id);
       setReferenceSource(`${job.displayName} · selected creation`);
       setNotice("First frame prepared. Confirm your motion prompt, model, settings and quote, then click Generate.");
       document.getElementById("generation-prompt")?.focus();

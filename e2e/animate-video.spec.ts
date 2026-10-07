@@ -3,7 +3,7 @@ import { jobs, mockStudio, referencePath } from './studio-mocks';
 import { readFileSync } from 'node:fs';
 
 test('Image to Animate prepares an authenticated first frame and waits for explicit Generate', async ({ page, context }) => {
-  const mock = await mockStudio(context, jobs);
+  const mock = await mockStudio(context, [jobs[1], jobs[0], jobs[2]]);
   mock.models.push({ id: 'mock-fast-video', version: 'staging-v1', displayName: 'Fast Video (experimental)', category: 'Motion',
     description: 'Controlled video fixture', mediaType: 'video', providerModel: 'grok_imagine_1_5_lite', availability: 'ready', startingCredits: 54,
     capabilities: ['imageToVideo', 'firstFrame'], rules: [], inputs: [{ role: 'firstFrame', label: 'First frame', maxCount: 1, required: true, ownedAssetOnly: true }],
@@ -15,6 +15,7 @@ test('Image to Animate prepares an authenticated first frame and waits for expli
   await page.getByRole('dialog', { name: 'Your creation', exact: true }).getByRole('button', { name: 'Animate', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Video studio', exact: true })).toBeVisible();
   await expect(page.getByText('First frame prepared.', { exact: false })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Creation result' }).getByRole('heading', { name: 'Studio Image', exact: true })).toBeVisible();
   await expect(page.getByRole('img', { name: 'First frame 1', exact: true })).toHaveAttribute('src', 'data:image/png;base64,' + readFileSync(referencePath).toString('base64'));
   expect(mock.downloads.some(value => value.id === 'owned-bottle' && value.authorization)).toBe(true);
   expect(mock.quotes).toHaveLength(0);
