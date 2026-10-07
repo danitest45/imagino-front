@@ -117,13 +117,19 @@ async function main() {
   const afterHistory = await (await context.request.get(api + '/api/generation/jobs', { headers: auth })).json();
   if (after.credits !== before.credits || afterHistory.length !== history.length || result.blockedWrites) throw new Error('Financial/write invariants failed.');
   result.checks.walletAndHistoryUnchanged = true;
+  result.checks.refreshAfterReload = httpStatuses.some(row => row.path === '/api/auth/refresh' && row.status === 200);
+  if (!result.checks.refreshAfterReload) throw new Error('Browser refresh was not proven.');
   stage = 'real-logout-and-revocation';
   await expect(page.locator('img[src^="blob:"]').first()).toBeVisible();
   await page.getByRole('button', { name: 'Sign out', exact: true }).click();
   await expect.poll(() => page.evaluate(() => {
     const a = window.__launchMediaAudit; return a.created.length > 0 && a.created.every(u => a.revoked.includes(u));
   })).toBe(true);
-  result.checks.logoutAndBlobRevocation = true; result.atUtc = new Date().toISOString();
+  result.checks.logoutAndBlobRevocation = true;
+  const revokedRefresh = await context.request.post(api + '/api/auth/refresh', { headers: { Origin: preview } });
+  result.checks.refreshAfterLogout = revokedRefresh.status();
+  if (revokedRefresh.status() !== 401) throw new Error('Logout refresh-cookie revocation failed.');
+  result.atUtc = new Date().toISOString();
   writeFileSync('launch-remote-browser-gate.json', JSON.stringify(result, null, 2));
   console.log(JSON.stringify({ status: 'PASS', ...result }));
 }

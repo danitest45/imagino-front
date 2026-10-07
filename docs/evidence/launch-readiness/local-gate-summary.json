@@ -18,7 +18,8 @@
     "newPrivateMediaLogoutTest": "PASS",
     "failed": 0,
     "externalRequests": "mocked",
-    "passed": 63,
-    "providerDisabledAnimatePreparation": "PASS"
+    "passed": 64,
+    "providerDisabledAnimatePreparation": "PASS",
+    "loginSlowHydration": "PASS"
   }
 }
