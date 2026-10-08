@@ -13,16 +13,8 @@ export interface ImageJob {
 
 export function useImageJobs() {
   const { token } = useAuth();
-  const [jobs, setJobs] = useState<ImageJob[]>(() => {
-    if (typeof window === 'undefined') return [];
-    const saved = localStorage.getItem('image-jobs');
-    return saved ? JSON.parse(saved) as ImageJob[] : [];
-  });
-
-  // Persistir no localStorage sempre que jobs mudar
-  useEffect(() => {
-    localStorage.setItem('image-jobs', JSON.stringify(jobs));
-  }, [jobs, token]);
+  const [jobs, setJobs] = useState<ImageJob[]>([]);
+  useEffect(() => { if (!token) setJobs([]); }, [token]);
 
   // Iniciar polling de jobs pendentes
   useEffect(() => {

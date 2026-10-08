@@ -31,7 +31,9 @@ test('Animate requires an owned completed image and an owned first-frame video c
   const model = { mediaType: 'video', availability: 'approval_required', capabilities: ['imageToVideo'], inputs: [{ role: 'firstFrame', maxCount: 1, ownedAssetOnly: true }] };
   assert.equal(assets.catalogSupportsAnimate([model]), true);
   assert.equal(assets.catalogSupportsAnimate([{ ...model, inputs: [] }]), false);
-  assert.equal(assets.catalogSupportsAnimate([{ ...model, availability: 'disabled' }]), false);
+  assert.equal(assets.catalogSupportsAnimate([{ ...model, availability: 'disabled' }]), true);
+  for (const availability of ['retired', 'migration_required'])
+    assert.equal(assets.catalogSupportsAnimate([{ ...model, availability }]), false);
   assert.deepEqual(ids(assets.availableAssetActions(job, { owned: true, canReference: false, canAnimate: true })), ['animate', 'reuse', 'download']);
   assert.deepEqual(ids(assets.availableAssetActions(job, { owned: false, canReference: false, canAnimate: true })), []);
   assert.deepEqual(ids(assets.availableAssetActions({ ...job, mediaType: 'video' }, { owned: true, canReference: false, canAnimate: true })), ['reuse', 'download']);

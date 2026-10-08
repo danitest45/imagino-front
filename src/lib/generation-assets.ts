@@ -30,7 +30,9 @@ export function catalogSupportsReference(models: GenerationModel[]): boolean {
 }
 
 export function catalogSupportsAnimate(models: GenerationModel[]): boolean {
-  return models.some(model => model.mediaType === "video" && model.availability !== "disabled" &&
+  // Preparing an owned first frame makes no provider call. Cost/availability
+  // guards still block quoting and submission for a disabled destination.
+  return models.some(model => model.mediaType === "video" && !["retired", "migration_required"].includes(model.availability) &&
     model.capabilities.includes("imageToVideo") && model.inputs.some(input => input.role === "firstFrame" && input.maxCount > 0 && input.ownedAssetOnly));
 }
 

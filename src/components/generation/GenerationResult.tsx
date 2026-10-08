@@ -15,6 +15,7 @@ import {
 } from "./GenerationPresentation";
 import StudioDialog from "./StudioDialog";
 import { ScrollRegion } from "../ui/ScrollRegion";
+import { usePrivateMedia } from "../../lib/use-private-media";
 
 export interface GenerationResultProps {
   job: GenerationJob;
@@ -42,42 +43,24 @@ export default function GenerationResult({
   owned,
   canReference = !!onReference,
 }: GenerationResultProps) {
-  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [imageUnavailable, setImageUnavailable] = useState(false);
-  const [videoLoading, setVideoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [zoom, setZoom] = useState(false);
   const scope = useRef<AbortController | null>(null);
   const downloading = useRef(false);
-  const src = imageUnavailable ? null : jobImageSource(job, preview);
+  const media = usePrivateMedia(job, !preview && owned);
+  const src = imageUnavailable ? null : preview ? jobImageSource(job, true) : job.mediaType === 'image' ? media.url : null;
+  const videoUrl = job.mediaType === 'video' ? media.url : null;
+  const videoLoading = media.loading;
   const actions = availableAssetActions(job, { owned, canReference: canReference && !!onReference, canAnimate: canAnimate && !!onAnimate });
   useEffect(() => {
     const controller = new AbortController();
     scope.current = controller;
-    let url: string | null = null;
-    setVideoUrl(null);
     setImageUnavailable(false);
     setError(null);
-    setVideoLoading(false);
-    if (!preview && owned && job.mediaType === "video" && job.status === "Completed") {
-      setVideoLoading(true);
-      generationDownload(job.id, controller.signal)
-        .then((blob) => {
-          if (controller.signal.aborted) return;
-          url = URL.createObjectURL(blob);
-          setVideoUrl(url);
-        })
-        .catch((e) => {
-          if (!controller.signal.aborted) setError(generationError(e));
-        })
-        .finally(() => {
-          if (!controller.signal.aborted) setVideoLoading(false);
-        });
-    }
     return () => {
       controller.abort();
-      if (url) URL.revokeObjectURL(url);
     };
   }, [job.id, job.mediaType, job.status, job.outputUrl, preview, owned]);
   async function download() {
@@ -159,7 +142,7 @@ export default function GenerationResult({
             {videoLoading ? <LoaderCircle size={32} className="studio-spinner" aria-hidden="true" /> : <span className="studio-frame-mark" aria-hidden="true" />}
             <h3>
               {videoLoading
-                ? "Loading your video."
+                ? "Loading your media."
                 : !terminalGeneration(job.status)
                 ? "Your idea is taking shape."
                 : job.status === "Failed"
@@ -222,9 +205,9 @@ export default function GenerationResult({
               : `Credit status: ${job.creditState}. A refund has not been confirmed.`}
           </p>
         ) : null}
-        {error ? (
+        {error || media.error ? (
           <p role="alert" className="studio-notice error">
-            {error}
+            {error || media.error}
           </p>
         ) : null}
         <details className="studio-metadata" open={detail || undefined}>

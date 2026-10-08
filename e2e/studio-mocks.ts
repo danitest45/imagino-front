@@ -41,6 +41,7 @@ export async function mockStudio(context: BrowserContext, initialJobs: Generatio
     quotes: [] as CapturedRequest[],
     submissions: [] as CapturedRequest[],
     downloads: [] as { id: string; authorization?: string; url: string }[],
+    mediaReads: [] as { id: string; authorization?: string; url: string }[],
     historyRequests: 0,
     logoutRequests: 0,
     unexpectedRequests: [] as string[],
@@ -104,6 +105,14 @@ export async function mockStudio(context: BrowserContext, initialJobs: Generatio
       return state.holdSubmissions ? defer(state.pendingSubmissions, respond) : respond();
     }
     const download = url.pathname.match(/^\/api\/generation\/jobs\/([^/]+)\/download$/);
+    const media = url.pathname.match(/^\/api\/generation\/jobs\/([^/]+)\/media$/);
+    if (api && media) {
+      state.mediaReads.push({ id: media[1], authorization: request.headers().authorization, url: request.url() });
+      const job = state.jobs.find(value => value.id === media[1]);
+      if (!state.authenticated || !request.headers().authorization) return json({ code: 'UNAUTHENTICATED' }, 401);
+      if (!job || job.status !== 'Completed') return json({}, 404);
+      return route.fulfill({ status: 200, headers: { ...headers, 'cache-control': 'private, no-store' }, contentType: 'image/png', body: referenceBytes });
+    }
     if (api && download) {
       state.downloads.push({ id: download[1], authorization: request.headers().authorization, url: request.url() });
       if (state.failDownloads) return json({ status: 503, title: 'Test download unavailable', detail: 'The controlled download response failed.' }, 503);

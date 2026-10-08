@@ -12,6 +12,8 @@ import {
 import StudioLink from "../components/StudioLink";
 import BrandMark from "../components/BrandMark";
 import "./landing.css";
+import { publicSite } from '../lib/public-site';
+export const metadata = { alternates: publicSite() ? { canonical: publicSite()!.href } : undefined };
 
 export default function HomePage() {
   return (
