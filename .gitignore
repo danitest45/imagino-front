@@ -62,3 +62,10 @@ next-env.d.ts
 # Launch runner output; keep concise sanitized summaries in docs.
 /launch-*.log
 /launch-*.json
+
+# Local secret material and operator-only comparison files.
+**/private/
+**/.secrets/
+*.pfx
+*.p12
+*.key
