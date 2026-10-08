@@ -45,12 +45,6 @@ const workflowSteps = [
   },
 ];
 
-const stats = [
-  { label: 'Active creators', value: '18k+' },
-  { label: 'Images generated', value: '4.2M' },
-  { label: 'Customer satisfaction', value: '4.9/5' },
-];
-
 export default function Home() {
   return (
     <main
@@ -85,17 +79,6 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid gap-6 pt-6 sm:grid-cols-3">
-            {stats.map(stat => (
-              <div
-                key={stat.label}
-                className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 shadow-inner shadow-white/5"
-              >
-                <p className="text-2xl font-semibold text-white sm:text-3xl">{stat.value}</p>
-                <p className="text-sm text-gray-400">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
 
         <div className="relative flex items-center justify-center">
